@@ -1,0 +1,27 @@
+version: 1
+formatters:
+  simple:
+    format: '%(asctime)s:[%(filename)s:%(lineno)s]:[%(levelname)s]: %(message)s'
+  with_node_id:
+    format: '[%(node_id)s]:%(asctime)s:[%(filename)s:%(lineno)s]:[%(levelname)s]: %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    stream: ext://sys.stdout
+  benchmark_log_file:
+    class: logging.FileHandler
+    filename: benchmark-logs/benchmark.log
+    formatter: with_node_id
+  basic_log_file:
+    class: logging.FileHandler
+    filename: dump.log
+    formatter: simple
+loggers:
+  benchmark_logger:
+    level: DEBUG
+    handlers: [benchmark_log_file]
+    propagate: no
+root:
+  level: INFO
+  handlers: [console, basic_log_file]

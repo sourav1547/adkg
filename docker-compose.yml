@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  honeybadgermpc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./apps:/usr/src/HoneyBadgerMPC/apps
+      - ./progs:/usr/src/HoneyBadgerMPC/progs
+      - ./benchmark:/usr/src/HoneyBadgerMPC/benchmark
+      - ./.benchmarks:/usr/src/HoneyBadgerMPC/.benchmarks
+      - ./aws:/usr/src/HoneyBadgerMPC/aws
+      - ./conf:/usr/src/HoneyBadgerMPC/conf
+      - ./docs:/usr/src/HoneyBadgerMPC/docs
+      - ./honeybadgermpc:/usr/src/HoneyBadgerMPC/honeybadgermpc
+      - ./scripts:/usr/src/HoneyBadgerMPC/scripts
+      - ./tests:/usr/src/HoneyBadgerMPC/tests
+      - ./.coveragerc:/usr/src/HoneyBadgerMPC/.coveragerc
+      - ./.flake8:/usr/src/HoneyBadgerMPC/.flake8
+      - ./Makefile:/usr/src/HoneyBadgerMPC/Makefile
+      - ./pytest.ini:/usr/src/HoneyBadgerMPC/pytest.ini
+      - ./setup.py:/usr/src/HoneyBadgerMPC/setup.py
+      - ./pairing/pypairing/__init__.py:/usr/src/HoneyBadgerMPC/pairing/pypairing/__init__.py
+      - ./pairing/src:/usr/src/HoneyBadgerMPC/pairing/src
+      - ./pairing/benches:/usr/src/HoneyBadgerMPC/pairing/benches
+      - ./pairing/Cargo.toml:/usr/src/HoneyBadgerMPC/pairing/Cargo.toml
+      - ./pairing/setup.py:/usr/src/HoneyBadgerMPC/pairing/setup.py
+      - ./:/usr/src/HoneyBadgerMPC/
+      - /usr/src/HoneyBadgerMPC/honeybadgermpc/ntl  # Directory _not_ mounted from host
+    command: pytest -v --cov=honeybadgermpc

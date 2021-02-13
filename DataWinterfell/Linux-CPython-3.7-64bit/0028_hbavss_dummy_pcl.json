@@ -1,0 +1,1402 @@
+{
+    "machine_info": {
+        "node": "9b725df03740",
+        "processor": "",
+        "machine": "x86_64",
+        "python_compiler": "GCC 6.3.0 20170516",
+        "python_implementation": "CPython",
+        "python_implementation_version": "3.7.3",
+        "python_version": "3.7.3",
+        "python_build": [
+            "default",
+            "Jun 11 2019 01:11:15"
+        ],
+        "release": "5.4.0-33-generic",
+        "system": "Linux",
+        "cpu": {
+            "vendor_id": "unknown",
+            "hardware": "unknown",
+            "brand": "unknown"
+        }
+    },
+    "commit_info": {
+        "id": "unversioned",
+        "time": null,
+        "author_time": null,
+        "dirty": false,
+        "project": "HoneyBadgerMPC",
+        "branch": "(unknown)"
+    },
+    "benchmarks": [
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_all_correct[6-1]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_all_correct[6-1]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 1
+            },
+            "param": "6-1",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.06724489200860262,
+                "max": 0.07234174385666847,
+                "mean": 0.06997645443136041,
+                "stddev": 0.001523391989086304,
+                "rounds": 11,
+                "median": 0.07049363479018211,
+                "iqr": 0.001251020235940814,
+                "q1": 0.06938759982585907,
+                "q3": 0.07063862006179988,
+                "iqr_outliers": 2,
+                "stddev_outliers": 3,
+                "outliers": "3;2",
+                "ld15iqr": 0.06905316561460495,
+                "hd15iqr": 0.07234174385666847,
+                "ops": 14.290521120656312,
+                "total": 0.7697409987449646,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_all_correct[6-2]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_all_correct[6-2]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 2
+            },
+            "param": "6-2",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.1321221785619855,
+                "max": 0.15676447935402393,
+                "mean": 0.13864410936366767,
+                "stddev": 0.007721549887591515,
+                "rounds": 8,
+                "median": 0.1375801800750196,
+                "iqr": 0.003069555852562189,
+                "q1": 0.13474168628454208,
+                "q3": 0.13781124213710427,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 0.1321221785619855,
+                "hd15iqr": 0.15676447935402393,
+                "ops": 7.212711773977861,
+                "total": 1.1091528749093413,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_all_correct[6-5]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_all_correct[6-5]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 5
+            },
+            "param": "6-5",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.4303214065730572,
+                "max": 0.46968716103583574,
+                "mean": 0.444952887793382,
+                "stddev": 0.021539857499243958,
+                "rounds": 3,
+                "median": 0.4348500957712531,
+                "iqr": 0.029524315847083926,
+                "q1": 0.43145357887260616,
+                "q3": 0.4609778947196901,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.4303214065730572,
+                "hd15iqr": 0.46968716103583574,
+                "ops": 2.247428946824499,
+                "total": 1.334858663380146,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_all_correct[6-10]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_all_correct[6-10]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 10
+            },
+            "param": "6-10",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 1.5523496698588133,
+                "max": 1.59660017862916,
+                "mean": 1.570939519442618,
+                "stddev": 0.0229570064019082,
+                "rounds": 3,
+                "median": 1.5638687098398805,
+                "iqr": 0.03318788157775998,
+                "q1": 1.55522942985408,
+                "q3": 1.58841731143184,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 1.5523496698588133,
+                "hd15iqr": 1.59660017862916,
+                "ops": 0.6365617438631935,
+                "total": 4.712818558327854,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_all_correct[6-22]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_all_correct[6-22]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 22
+            },
+            "param": "6-22",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 9.134432214312255,
+                "max": 9.222652996890247,
+                "mean": 9.17927262497445,
+                "stddev": 0.04412851010995099,
+                "rounds": 3,
+                "median": 9.180732663720846,
+                "iqr": 0.06616558693349361,
+                "q1": 9.146007326664403,
+                "q3": 9.212172913597897,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 9.134432214312255,
+                "hd15iqr": 9.222652996890247,
+                "ops": 0.10894109379421374,
+                "total": 27.53781787492335,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_all_correct[6-42]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_all_correct[6-42]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 42
+            },
+            "param": "6-42",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 51.31620397325605,
+                "max": 51.85818306170404,
+                "mean": 51.582165327233575,
+                "stddev": 0.2711294546341142,
+                "rounds": 3,
+                "median": 51.57210894674063,
+                "iqr": 0.406484316335991,
+                "q1": 51.380180216627195,
+                "q3": 51.78666453296319,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 51.31620397325605,
+                "hd15iqr": 51.85818306170404,
+                "ops": 0.019386545594898382,
+                "total": 154.74649598170072,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_max_faulty_shares[6-1]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_max_faulty_shares[6-1]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 1
+            },
+            "param": "6-1",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.09133683517575264,
+                "max": 0.1039686631411314,
+                "mean": 0.09434650144116445,
+                "stddev": 0.003544931178353057,
+                "rounds": 11,
+                "median": 0.09457276482135057,
+                "iqr": 0.00318890274502337,
+                "q1": 0.0915470072068274,
+                "q3": 0.09473590995185077,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 0.09133683517575264,
+                "hd15iqr": 0.1039686631411314,
+                "ops": 10.59922715442301,
+                "total": 1.037811515852809,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_max_faulty_shares[6-2]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_max_faulty_shares[6-2]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 2
+            },
+            "param": "6-2",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.18293415196239948,
+                "max": 0.1985342027619481,
+                "mean": 0.18866925577943525,
+                "stddev": 0.00566647794430311,
+                "rounds": 6,
+                "median": 0.18891229946166277,
+                "iqr": 0.006200049072504044,
+                "q1": 0.18326126597821712,
+                "q3": 0.18946131505072117,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 0.18293415196239948,
+                "hd15iqr": 0.1985342027619481,
+                "ops": 5.300280620012914,
+                "total": 1.1320155346766114,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_max_faulty_shares[6-5]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_max_faulty_shares[6-5]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 5
+            },
+            "param": "6-5",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.6409084051847458,
+                "max": 0.6894457675516605,
+                "mean": 0.6684641651809216,
+                "stddev": 0.024927566021321946,
+                "rounds": 3,
+                "median": 0.6750383228063583,
+                "iqr": 0.03640302177518606,
+                "q1": 0.6494408845901489,
+                "q3": 0.685843906365335,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.6409084051847458,
+                "hd15iqr": 0.6894457675516605,
+                "ops": 1.4959665036484753,
+                "total": 2.0053924955427647,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_max_faulty_shares[6-10]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_max_faulty_shares[6-10]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 10
+            },
+            "param": "6-10",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 2.505237439647317,
+                "max": 2.5353051451966166,
+                "mean": 2.5173389073461294,
+                "stddev": 0.01586862867259892,
+                "rounds": 3,
+                "median": 2.5114741371944547,
+                "iqr": 0.022550779161974788,
+                "q1": 2.5067966140341014,
+                "q3": 2.529347393196076,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 2.505237439647317,
+                "hd15iqr": 2.5353051451966166,
+                "ops": 0.3972448831112043,
+                "total": 7.552016722038388,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_max_faulty_shares[6-22]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_max_faulty_shares[6-22]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 22
+            },
+            "param": "6-22",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 15.61325228959322,
+                "max": 15.71482506673783,
+                "mean": 15.677344453521073,
+                "stddev": 0.0557708547330422,
+                "rounds": 3,
+                "median": 15.703956004232168,
+                "iqr": 0.07617958285845816,
+                "q1": 15.635928218252957,
+                "q3": 15.712107801111415,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 15.61325228959322,
+                "hd15iqr": 15.71482506673783,
+                "ops": 0.06378631297951763,
+                "total": 47.03203336056322,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss2_pcl_max_faulty_shares[6-42]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss2_pcl_max_faulty_shares[6-42]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 42
+            },
+            "param": "6-42",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 90.56864082161337,
+                "max": 90.82965470477939,
+                "mean": 90.6775712982441,
+                "stddev": 0.13575232344553617,
+                "rounds": 3,
+                "median": 90.63441836833954,
+                "iqr": 0.19576041237451136,
+                "q1": 90.58508520829491,
+                "q3": 90.78084562066942,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 90.56864082161337,
+                "hd15iqr": 90.82965470477939,
+                "ops": 0.01102808539843815,
+                "total": 272.0327138947323,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_all_correct[6-1]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_all_correct[6-1]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 1
+            },
+            "param": "6-1",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.06154764164239168,
+                "max": 0.07595863658934832,
+                "mean": 0.06483529694378376,
+                "stddev": 0.0034012965112737064,
+                "rounds": 15,
+                "median": 0.06493133213371038,
+                "iqr": 0.0023163638543337584,
+                "q1": 0.06268087099306285,
+                "q3": 0.06499723484739661,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 0.06154764164239168,
+                "hd15iqr": 0.07595863658934832,
+                "ops": 15.423697386117661,
+                "total": 0.9725294541567564,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_all_correct[6-2]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_all_correct[6-2]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 2
+            },
+            "param": "6-2",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.11350140534341335,
+                "max": 0.131880653090775,
+                "mean": 0.11976213815311591,
+                "stddev": 0.005560778653005592,
+                "rounds": 9,
+                "median": 0.11898784711956978,
+                "iqr": 0.0031747017055749893,
+                "q1": 0.11739340634085238,
+                "q3": 0.12056810804642737,
+                "iqr_outliers": 1,
+                "stddev_outliers": 3,
+                "outliers": "3;1",
+                "ld15iqr": 0.11350140534341335,
+                "hd15iqr": 0.131880653090775,
+                "ops": 8.3498843242219,
+                "total": 1.0778592433780432,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_all_correct[6-5]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_all_correct[6-5]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 5
+            },
+            "param": "6-5",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.3082142658531666,
+                "max": 0.3220222918316722,
+                "mean": 0.3179295212030411,
+                "stddev": 0.006512312711068689,
+                "rounds": 4,
+                "median": 0.32074076356366277,
+                "iqr": 0.007283173501491547,
+                "q1": 0.3142879344522953,
+                "q3": 0.32157110795378685,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.3082142658531666,
+                "hd15iqr": 0.3220222918316722,
+                "ops": 3.145351196755851,
+                "total": 1.2717180848121643,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_all_correct[6-10]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_all_correct[6-10]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 10
+            },
+            "param": "6-10",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.8647159272804856,
+                "max": 0.8913629222661257,
+                "mean": 0.8795739896595478,
+                "stddev": 0.013586031562286452,
+                "rounds": 3,
+                "median": 0.8826431194320321,
+                "iqr": 0.019985246239230037,
+                "q1": 0.8691977253183722,
+                "q3": 0.8891829715576023,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.8647159272804856,
+                "hd15iqr": 0.8913629222661257,
+                "ops": 1.136914019464201,
+                "total": 2.6387219689786434,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_all_correct[6-22]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_all_correct[6-22]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 22
+            },
+            "param": "6-22",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 3.553843672387302,
+                "max": 3.6179891377687454,
+                "mean": 3.584438648695747,
+                "stddev": 0.0321747023921989,
+                "rounds": 3,
+                "median": 3.581483135931194,
+                "iqr": 0.048109099036082625,
+                "q1": 3.560753538273275,
+                "q3": 3.6088626373093575,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 3.553843672387302,
+                "hd15iqr": 3.6179891377687454,
+                "ops": 0.2789837120978107,
+                "total": 10.753315946087241,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_all_correct[6-42]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_all_correct[6-42]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 42
+            },
+            "param": "6-42",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 16.07814582530409,
+                "max": 16.116056035272777,
+                "mean": 16.1028852260982,
+                "stddev": 0.021439921618608693,
+                "rounds": 3,
+                "median": 16.11445381771773,
+                "iqr": 0.028432657476514578,
+                "q1": 16.0872228234075,
+                "q3": 16.115655480884016,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 16.07814582530409,
+                "hd15iqr": 16.116056035272777,
+                "ops": 0.06210067239250294,
+                "total": 48.3086556782946,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_max_faulty_shares[6-1]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_max_faulty_shares[6-1]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 1
+            },
+            "param": "6-1",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.08623014390468597,
+                "max": 0.09999625477939844,
+                "mean": 0.08904962878053387,
+                "stddev": 0.0037740071621152234,
+                "rounds": 12,
+                "median": 0.08935257606208324,
+                "iqr": 0.0031166006810963154,
+                "q1": 0.08637569705024362,
+                "q3": 0.08949229773133993,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 0.08623014390468597,
+                "hd15iqr": 0.09999625477939844,
+                "ops": 11.229693078951932,
+                "total": 1.0685955453664064,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_max_faulty_shares[6-2]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_max_faulty_shares[6-2]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 2
+            },
+            "param": "6-2",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.1712695537135005,
+                "max": 0.17727151419967413,
+                "mean": 0.17249816469848156,
+                "stddev": 0.0023551579617000925,
+                "rounds": 6,
+                "median": 0.17152119893580675,
+                "iqr": 0.0006867684423923492,
+                "q1": 0.17135937698185444,
+                "q3": 0.1720461454242468,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 0.1712695537135005,
+                "hd15iqr": 0.17727151419967413,
+                "ops": 5.797163127781397,
+                "total": 1.0349889881908894,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_max_faulty_shares[6-5]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_max_faulty_shares[6-5]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 5
+            },
+            "param": "6-5",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.5303675113245845,
+                "max": 0.5594833316281438,
+                "mean": 0.543295937590301,
+                "stddev": 0.014828971683569529,
+                "rounds": 3,
+                "median": 0.5400369698181748,
+                "iqr": 0.021836865227669477,
+                "q1": 0.5327848759479821,
+                "q3": 0.5546217411756516,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.5303675113245845,
+                "hd15iqr": 0.5594833316281438,
+                "ops": 1.8406174808435602,
+                "total": 1.629887812770903,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_max_faulty_shares[6-10]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_max_faulty_shares[6-10]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 10
+            },
+            "param": "6-10",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 1.7447160594165325,
+                "max": 1.7673099469393492,
+                "mean": 1.7562883468344808,
+                "stddev": 0.011307005825416952,
+                "rounds": 3,
+                "median": 1.7568390341475606,
+                "iqr": 0.016945415642112494,
+                "q1": 1.7477468030992895,
+                "q3": 1.764692218741402,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 1.7447160594165325,
+                "hd15iqr": 1.7673099469393492,
+                "ops": 0.5693825856115208,
+                "total": 5.268865040503442,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_max_faulty_shares[6-22]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_max_faulty_shares[6-22]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 22
+            },
+            "param": "6-22",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 9.507717970758677,
+                "max": 9.633542184717953,
+                "mean": 9.572984428455433,
+                "stddev": 0.06304412824772052,
+                "rounds": 3,
+                "median": 9.577693129889667,
+                "iqr": 0.09436816046945751,
+                "q1": 9.525211760541424,
+                "q3": 9.619579921010882,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 9.507717970758677,
+                "hd15iqr": 9.633542184717953,
+                "ops": 0.1044606316320256,
+                "total": 28.718953285366297,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss1_pcl_max_faulty_shares[6-42]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss1_pcl_max_faulty_shares[6-42]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 42
+            },
+            "param": "6-42",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 50.94624022208154,
+                "max": 51.06970721669495,
+                "mean": 51.02045871565739,
+                "stddev": 0.06541139109695426,
+                "rounds": 3,
+                "median": 51.045428708195686,
+                "iqr": 0.09260024596005678,
+                "q1": 50.97103734361008,
+                "q3": 51.063637589570135,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 50.94624022208154,
+                "hd15iqr": 51.06970721669495,
+                "ops": 0.0195999805798123,
+                "total": 153.06137614697218,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_all_correct[6-1]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_all_correct[6-1]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 1
+            },
+            "param": "6-1",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.061940726824104786,
+                "max": 0.07821342442184687,
+                "mean": 0.0661243362352252,
+                "stddev": 0.0036589171990730747,
+                "rounds": 15,
+                "median": 0.06496636476367712,
+                "iqr": 0.0021164698991924524,
+                "q1": 0.06485647265799344,
+                "q3": 0.06697294255718589,
+                "iqr_outliers": 1,
+                "stddev_outliers": 2,
+                "outliers": "2;1",
+                "ld15iqr": 0.061940726824104786,
+                "hd15iqr": 0.07821342442184687,
+                "ops": 15.123025151325276,
+                "total": 0.991865043528378,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_all_correct[6-2]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_all_correct[6-2]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 2
+            },
+            "param": "6-2",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.11362909432500601,
+                "max": 0.13004663214087486,
+                "mean": 0.1191991592446963,
+                "stddev": 0.004736097384304747,
+                "rounds": 9,
+                "median": 0.11917923763394356,
+                "iqr": 0.0016185350250452757,
+                "q1": 0.11773795820772648,
+                "q3": 0.11935649323277175,
+                "iqr_outliers": 3,
+                "stddev_outliers": 3,
+                "outliers": "3;3",
+                "ld15iqr": 0.1190955126658082,
+                "hd15iqr": 0.13004663214087486,
+                "ops": 8.389320917500468,
+                "total": 1.0727924332022667,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_all_correct[6-5]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_all_correct[6-5]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 5
+            },
+            "param": "6-5",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.3197277393192053,
+                "max": 0.34353259578347206,
+                "mean": 0.32986435713246465,
+                "stddev": 0.011487658028515172,
+                "rounds": 4,
+                "median": 0.3280985467135906,
+                "iqr": 0.018976709805428982,
+                "q1": 0.32037600222975016,
+                "q3": 0.33935271203517914,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.3197277393192053,
+                "hd15iqr": 0.34353259578347206,
+                "ops": 3.03154911519715,
+                "total": 1.3194574285298586,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_all_correct[6-10]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_all_correct[6-10]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 10
+            },
+            "param": "6-10",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.8476956328377128,
+                "max": 0.8976309262216091,
+                "mean": 0.8664834334825476,
+                "stddev": 0.02716532482471023,
+                "rounds": 3,
+                "median": 0.8541237413883209,
+                "iqr": 0.03745147003792226,
+                "q1": 0.8493026599753648,
+                "q3": 0.8867541300132871,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.8476956328377128,
+                "hd15iqr": 0.8976309262216091,
+                "ops": 1.1540901549390576,
+                "total": 2.599450300447643,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_all_correct[6-22]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_all_correct[6-22]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 22
+            },
+            "param": "6-22",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 3.587991933338344,
+                "max": 3.6731541315093637,
+                "mean": 3.626332848953704,
+                "stddev": 0.04320980753152688,
+                "rounds": 3,
+                "median": 3.6178524820134044,
+                "iqr": 0.06387164862826467,
+                "q1": 3.595457070507109,
+                "q3": 3.659328719135374,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 3.587991933338344,
+                "hd15iqr": 3.6731541315093637,
+                "ops": 0.27576067659882003,
+                "total": 10.878998546861112,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_all_correct[6-42]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_all_correct[6-42]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 42
+            },
+            "param": "6-42",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 15.949323929846287,
+                "max": 16.069628057070076,
+                "mean": 15.993984531611204,
+                "stddev": 0.06586521788651822,
+                "rounds": 3,
+                "median": 15.96300160791725,
+                "iqr": 0.09022809541784227,
+                "q1": 15.952743349364027,
+                "q3": 16.04297144478187,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 15.949323929846287,
+                "hd15iqr": 16.069628057070076,
+                "ops": 0.0625235067611549,
+                "total": 47.98195359483361,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_max_faulty_shares[6-1]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_max_faulty_shares[6-1]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 1
+            },
+            "param": "6-1",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.08591308910399675,
+                "max": 0.10014920122921467,
+                "mean": 0.08981064062876006,
+                "stddev": 0.003932135204892184,
+                "rounds": 12,
+                "median": 0.08939941553398967,
+                "iqr": 0.004037049598991871,
+                "q1": 0.08667204575613141,
+                "q3": 0.09070909535512328,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 0.08591308910399675,
+                "hd15iqr": 0.10014920122921467,
+                "ops": 11.134538101488278,
+                "total": 1.0777276875451207,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_max_faulty_shares[6-2]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_max_faulty_shares[6-2]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 2
+            },
+            "param": "6-2",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.17657296638935804,
+                "max": 0.20281755924224854,
+                "mean": 0.18477293119455376,
+                "stddev": 0.010723921972776952,
+                "rounds": 6,
+                "median": 0.180452402215451,
+                "iqr": 0.015156053937971592,
+                "q1": 0.17659310158342123,
+                "q3": 0.19174915552139282,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.17657296638935804,
+                "hd15iqr": 0.20281755924224854,
+                "ops": 5.412048147610245,
+                "total": 1.1086375871673226,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_max_faulty_shares[6-5]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_max_faulty_shares[6-5]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 5
+            },
+            "param": "6-5",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.6011959901079535,
+                "max": 0.6389439916238189,
+                "mean": 0.6144099157924453,
+                "stddev": 0.02126822169626325,
+                "rounds": 3,
+                "median": 0.6030897656455636,
+                "iqr": 0.028311001136898994,
+                "q1": 0.6016694339923561,
+                "q3": 0.6299804351292551,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 0.6011959901079535,
+                "hd15iqr": 0.6389439916238189,
+                "ops": 1.6275778992112024,
+                "total": 1.843229747377336,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_max_faulty_shares[6-10]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_max_faulty_shares[6-10]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 10
+            },
+            "param": "6-10",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 2.4884427320212126,
+                "max": 2.5773207880556583,
+                "mean": 2.5344055676832795,
+                "stddev": 0.044517335728129284,
+                "rounds": 3,
+                "median": 2.5374531829729676,
+                "iqr": 0.06665854202583432,
+                "q1": 2.5006953447591513,
+                "q3": 2.5673538867849857,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 2.4884427320212126,
+                "hd15iqr": 2.5773207880556583,
+                "ops": 0.3945698402620335,
+                "total": 7.6032167030498385,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_max_faulty_shares[6-22]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_max_faulty_shares[6-22]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 22
+            },
+            "param": "6-22",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 25.432377384975553,
+                "max": 25.48666922748089,
+                "mean": 25.458656021393836,
+                "stddev": 0.02718745279734586,
+                "rounds": 3,
+                "median": 25.456921451725066,
+                "iqr": 0.040718881879001856,
+                "q1": 25.43851340166293,
+                "q3": 25.479232283541933,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 25.432377384975553,
+                "hd15iqr": 25.48666922748089,
+                "ops": 0.03927937119538689,
+                "total": 76.3759680641815,
+                "iterations": 1
+            }
+        },
+        {
+            "group": null,
+            "name": "test_hbacss0_pcl_max_faulty_shares[6-42]",
+            "fullname": "benchmark/test_benchmark_hbavss_loglin.py::test_hbacss0_pcl_max_faulty_shares[6-42]",
+            "params": {
+                "batch_multiple": 6,
+                "t": 42
+            },
+            "param": "6-42",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 3,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 263.4111733241007,
+                "max": 264.489593770355,
+                "mean": 263.93878266743076,
+                "stddev": 0.5395844752780028,
+                "rounds": 3,
+                "median": 263.91558090783656,
+                "iqr": 0.8088153346907347,
+                "q1": 263.53727522003464,
+                "q3": 264.3460905547254,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 263.4111733241007,
+                "hd15iqr": 264.489593770355,
+                "ops": 0.003788757339462402,
+                "total": 791.8163480022922,
+                "iterations": 1
+            }
+        }
+    ],
+    "datetime": "2020-09-03T06:20:09.880085",
+    "version": "3.2.3"
+}
