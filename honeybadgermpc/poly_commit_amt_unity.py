@@ -125,7 +125,22 @@ class PolyCommitAMTUnity:
             self.evaltree = gen_multipoint_eval_tree(phi, self.acctree)
         if self.comevaltree is None:
             self.comevaltree = commit_eval_tree(self.evaltree, self.g1s)
-        return get_tree_branch(self.comevaltree, bit_reverse(i, ceil(log(self.n,2))))
+        branch = get_tree_branch(self.comevaltree, bit_reverse(i, ceil(log(self.n,2))))
+        #if n is bigger than the length of the polynomial, the witness will end up having unneeded elements
+        while branch[-1] == G1.identity():
+            branch = branch[:-1]
+        return branch
+    
+    def batch_create_witness(self, phi):
+        if self.evaltree is None:
+            self.evaltree = gen_multipoint_eval_tree(phi, self.acctree)
+        if self.comevaltree is None:
+            self.comevaltree = commit_eval_tree(self.evaltree, self.g1s)
+        branches = [get_tree_branch(self.comevaltree, bit_reverse(i, ceil(log(self.n,2)))) for i in range(self.n)]
+        for i in range(len(branches)):
+            while branches[i][-1] == G1.identity():
+                branches[i] = branches[i][:-1]
+        return branches
 
     def verify_eval(self, c, i, phi_at_omega_i, witness):
         valcom = self.g1s[0]**phi_at_omega_i
@@ -133,6 +148,8 @@ class PolyCommitAMTUnity:
         lhs = pair(c*valcom, self.g2s[0])
         rhs = pair(G1.identity(), G2.identity())
         acc_branch = get_tree_branch(self.comacctree, bit_reverse(i, ceil(log(self.n,2))))
+        #if witness is shorter (due to more than degree + 1 recipients), it will only
+        #check as many entries as are in witness, which is what we want
         for items in zip(witness, acc_branch):
             rhs = rhs * pair(items[0], items[1])
         return lhs == rhs        
