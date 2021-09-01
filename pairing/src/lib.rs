@@ -1206,6 +1206,13 @@ impl PyFr {
     fn random(a: Option<Vec<u32>>) -> PyResult<PyFr> {
         Ok(PyFr::rand(a)?)
     }
+    
+    #[staticmethod]
+    fn root_of_unity() -> PyResult<PyFr> {
+        Ok(PyFr{
+            fr: Fr::root_of_unity()
+        })
+    }
 
 }
 
