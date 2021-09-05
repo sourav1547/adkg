@@ -107,10 +107,10 @@ class SimulatedAMTCom:
         self.fake_content = fake_com
     
 class PolyCommitAMTDummy:
-    def __init__(self, n, crs=None, degree_max=33):
+    def __init__(self, n, crs=None, degree_max=64):
         self.simulated_type = "AMT"
         if crs is None:
-            crs = gen_crs(degree_max=degree_max)
+            crs = gen_crs(degree_max=64)
         self.pc = PolyCommitAMTUnity(crs, n)
 
     # Takes a random length of bytes

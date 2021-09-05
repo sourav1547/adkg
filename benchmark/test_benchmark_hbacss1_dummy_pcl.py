@@ -155,7 +155,7 @@ async def hbacss1_amt_all_correct(benchmark_router, params):
     sends, recvs, _ = benchmark_router(n)
     avss_tasks = [None] * n
     dealer_id = randint(0, n - 1)
-    amt = PolyCommitAMTDummy(n, crs=crs, degree_max=t)
+    amt = PolyCommitAMTDummy(n, crs=None, degree_max=t)
 
     with ExitStack() as stack:
         hbavss_list = [None] * n
@@ -200,7 +200,7 @@ async def hbacss1_amt_max_faulty_shares(benchmark_router, params):
     sends, recvs, _ = benchmark_router(n)
     avss_tasks = [None] * n
     dealer_id = randint(0, n - 1)
-    amt = PolyCommitAMTDummy(n, crs=crs, degree_max=t)
+    amt = PolyCommitAMTDummy(n, crs=None, degree_max=t)
 
     with ExitStack() as stack:
         hbavss_list = [None] * n
