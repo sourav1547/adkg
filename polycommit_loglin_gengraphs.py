@@ -408,10 +408,10 @@ for entry in logbenchmarks:
 
 
 # Clear the data
-hbacss1_dummy_pcl_all_correct = []
-hbacss1_dummy_pcl_max_faulty_shares = []
+hbacss1_dummy_amt_all_correct = []
+hbacss1_dummy_amt_max_faulty_shares = []
 # Loading the data for hbacss1 with batch size t*(t+1)
-with open("DataWinterfell/Linux-CPython-3.7-64bit/0003_hbacss1_dummy_pcl.json", "r") as file:
+with open("DataWinterfell/Linux-CPython-3.7-64bit/0006_hbacss1_dummy_amt.json", "r") as file:
     logdata = file.read().replace("\n", "")
 logbenchmarks = json.loads(logdata)["benchmarks"]
 for entry in logbenchmarks:
@@ -422,10 +422,29 @@ for entry in logbenchmarks:
     orig_batched_stddev = entry["stats"]["stddev"]
     dict = {"t": t, "mean": mean,
             "per_party_per_proof_mean": per_party_per_proof_mean, "orig_batched_stddev": orig_batched_stddev}
-    if entry["name"].startswith("test_hbacss1_pcl_all_correct"):
-        hbacss1_dummy_pcl_all_correct.append(dict)
-    if entry["name"].startswith("test_hbacss1_pcl_max_faulty_shares"):
-        hbacss1_dummy_pcl_max_faulty_shares.append(dict)
+    if entry["name"].startswith("test_hbacss1_amt_all_correct"):
+        hbacss1_dummy_amt_all_correct.append(dict)
+    if entry["name"].startswith("test_hbacss1_amt_max_faulty_shares"):
+        hbacss1_dummy_amt_max_faulty_shares.append(dict)
+
+
+# Loading the interpolation for share recovery
+hbacss1_amt_interpolation = []
+# The time is for 2t interpolations for commits and 2t interpolation for proofs
+with open("DataWinterfell/Linux-CPython-3.7-64bit/0007_amt_interpolation.json", "r") as file:
+    logdata = file.read().replace("\n", "")
+logbenchmarks = json.loads(logdata)["benchmarks"]
+for entry in logbenchmarks:
+    t = entry["params"]["t"]
+    mean = entry["stats"]["mean"]
+    per_interpolation_mean = mean / (2*t)
+    per_interpolation_mean *= 1000.0
+    orig_batched_stddev = entry["stats"]["stddev"]
+    dict = {"t": t, "mean": mean,
+            "per_interpolation_mean":per_interpolation_mean,
+            "orig_batched_stddev": orig_batched_stddev}
+    if entry["name"].startswith("test_amt_commit_and_proof_interpolation"):
+        hbacss1_amt_interpolation.append(dict)
 
 
 td_points_c0 = []
@@ -435,7 +454,7 @@ for i in hbacss0_dummy_pcl_all_correct:
     if i['batch_multiple'] == fixed_multuple and i['t'] in t_extracted:
         td_points_c0.append(
             (i['per_party_per_proof_mean'], i['t']))
-for i in hbacss1_dummy_pcl_all_correct:
+for i in hbacss1_dummy_amt_all_correct:
     if i['t'] in t_extracted:
         td_points_c1.append(
             (i['per_party_per_proof_mean'], i['t']))
@@ -488,7 +507,7 @@ for i in hbacss0_dummy_pcl_max_faulty_shares:
     if i['batch_multiple'] == fixed_multuple and i['t'] in t_extracted:
         td_points_c0.append(
             (i['per_party_per_proof_mean'], i['t']))
-for i in hbacss1_dummy_pcl_max_faulty_shares:
+for i in hbacss1_dummy_amt_max_faulty_shares:
     if i['t'] in t_extracted:
         td_points_c1.append(
             (i['per_party_per_proof_mean'], i['t']))
@@ -496,10 +515,18 @@ for i in hbacss2_dummy_pcl_max_faulty_shares:
     if i['t'] in t_extracted:
         td_points_c2.append(
             (i['per_party_per_proof_mean'], i['t']))
+
+interpolation_overhead = []
+for i in hbacss1_amt_interpolation:
+    if i['t'] in t_extracted:
+        interpolation_overhead.append(
+            (i['per_interpolation_mean'], i['t']))
+
 # Sorting
 td_points_c0 = sorted(td_points_c0, key=lambda x: x[1])
 td_points_c1 = sorted(td_points_c1, key=lambda x: x[1])
 td_points_c2 = sorted(td_points_c2, key=lambda x: x[1])
+interpolation_overhead = sorted(interpolation_overhead, key=lambda x: x[1])
 
 td_per_party_per_proof_mean_c0 = []
 td_per_party_per_proof_mean_c1 = []
@@ -526,7 +553,7 @@ for i, elem in enumerate(td_points_c0):
     index = amt_plotting_n_arr.index(str(3 * t + 1))
     td_per_party_per_proof_mean_c2.append(
         plotting_deal_arr[index] + amt_plotting_ver_arr[index] + amt_plotting_ver_arr[index] * ((2 * t + 1) / n) + \
-            ((t + 1) / n) *amt_plotting_ver_arr[index] + td_points_c1[i][0])
+            ((t + 1) / n) *amt_plotting_ver_arr[index] + td_points_c1[i][0] + interpolation_overhead[i][0] *(2*t)/(t+1))
 
     # Calculating hbacss2 + hbPolyCommit
     index = amt_plotting_n_arr.index(str(3 * t + 1))
