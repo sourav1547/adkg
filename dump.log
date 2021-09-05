@@ -882,3 +882,8 @@ Exception:
 <Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=TypeError("__init__() missing 2 required positional arguments: 'phi' and 'pc'") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
 <class 'TypeError'> 
 __init__() missing 2 required positional arguments: 'phi' and 'pc'
+2021-09-05 05:41:10,003:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'phi' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'phi' is not defined

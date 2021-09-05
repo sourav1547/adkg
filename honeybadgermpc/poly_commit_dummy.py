@@ -99,21 +99,19 @@ class PolyCommitLoglinDummy:
         pass
 
 class SimulatedAMTProof:
-    crs = gen_crs()
-    def __init__(self, phi, j, pc):
-        fake_proof = pc.create_witness(phi, j)
+    def __init__(self, fake_proof):
         self.fake_content = fake_proof
 
 class SimulatedAMTCom:
-    crs = gen_crs()
-    def __init__(self, phi, pc):
-        fake_com = pc.commit(phi)
+    def __init__(self, fake_com):
         self.fake_content = fake_com
-
+    
 class PolyCommitAMTDummy:
-    def __init__(self, crs=None, degree_max=33):
+    def __init__(self, n, crs=None, degree_max=33):
         self.simulated_type = "AMT"
-        self.pc = PolyCommitAMTUnity(SimulatedAMTCom.crs, 16)
+        if crs is None:
+            crs = gen_crs(degree_max=degree_max)
+        self.pc = PolyCommitAMTUnity(crs, n)
 
     # Takes a random length of bytes
     def get_random_bytes(self, length):
@@ -126,7 +124,8 @@ class PolyCommitAMTDummy:
 
     def commit(self, phi, r):
         # return self.polycommit_amt_bytes_generate(phi)
-        return SimulatedAMTCom(phi, self.pc)
+        fake_com = self.pc.commit(phi)
+        return SimulatedAMTCom(fake_com)
 
     def create_witness(self, phi, r, i):
         pass
@@ -156,7 +155,7 @@ class PolyCommitAMTDummy:
         numofverifiers = n
         # random_witnesses = [SimulatedAMTProof(phis[i], self.pc) for i in range(len(phis))]
         # return [random_witnesses for _ in range(numofverifiers)]
-        return [[SimulatedAMTProof(phis[i], j, self.pc) for i in range(len(phis))] for j in range(numofverifiers)]
+        return [[SimulatedAMTProof(self.pc.create_witness(phis[i], j)) for i in range(len(phis))] for j in range(numofverifiers)]
         
     # Always eval to true
     def verify_eval(self, c, i, phi_at_i, witness):

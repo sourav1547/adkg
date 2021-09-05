@@ -137,7 +137,7 @@ def interpolate_g1_at_x(coords, x, order=-1):
         out = G1.identity()
         for i in range(order):
             out *= (sortedcoords[i][1].fake_content ** (lagrange_at_x(s, xs[i], x)))
-        return out
+        return SimulatedAMTCom(out)
     elif isinstance(coords[0][1], SimulatedAMTProof):
         if order == -1:
             order = len(coords)
@@ -155,7 +155,7 @@ def interpolate_g1_at_x(coords, x, order=-1):
             lagrange_coeff = lagrange_at_x(s, xs[i], x)
             for j in range(len(out)):
                 out[j] *= (sortedcoords[i][1].fake_content[j] ** (lagrange_coeff))
-        return out
+        return [SimulatedAMTProof(out_i) for out_i in out]
     if order == -1:
         order = len(coords)
     xs = []
