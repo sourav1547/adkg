@@ -1,58 +1,8 @@
 import random
 import math
-from pypairing import ZR, G1
-
-class PolyCommitAMTDummy:
-    def __init__(self, crs=None, degree_max=33):
-        self.simulated_type = "AMT"
-
-    # Takes a random length of bytes
-    def get_random_bytes(self, length):
-        return [random.getrandbits(8) for _ in range(length)]
-
-    # One polynomial commitment for AMT is one field element is 32 bytes
-    def polycommit_amt_bytes_generate(self, phi):
-        amt_comm_length = 32
-        return self.get_random_bytes(amt_comm_length)
-
-    def commit(self, phi, r):
-        return self.polycommit_amt_bytes_generate(phi)
-
-    def create_witness(self, phi, r, i):
-        pass
-
-    # Create witnesses for points 1 to n. n defaults to 3*degree+1 if unset.
-    def batch_create_witness(self, phi, r, n=None):
-        pass
-
-    # AMT's share is 32 bytes
-    # AMT's proof is ceil(log2(n)+1) * 32
-    # We are comparing under n = 3 * t + 1
-    # Reference: libpolycrypto/app/BandwidthCalc.cpp
-    def double_batch_create_witness_amt_bytes_generator(self, phis):
-        t = len(phis[0].coeffs) - 1
-        n = 3 * t + 1
-        numofverifiers = n
-        amt_msg_length = 32 + (math.ceil(math.log2(n)) + 1) * 32
-        random_msg = [self.get_random_bytes(amt_msg_length) * len(phis)]
-        return [random_msg for _ in range(numofverifiers)]
-
-    def double_batch_create_witness(self, phis, r, n=None):
-        return self.double_batch_create_witness_amt_bytes_generator(phis)
-
-    # Always eval to true
-    def verify_eval(self, c, i, phi_at_i, witness):
-        return True
-
-    # Always eval to true
-    def batch_verify_eval(self, cs, i, phis_at_i, witness, degree=None):
-        return True
-
-    def preprocess_prover(self, level=8):
-        pass
-
-    def preprocess_verifier(self, level=8):
-        pass
+from pypairing import ZR, G1, G2, pair
+from honeybadgermpc.polynomial import polynomials_over
+from honeybadgermpc.poly_commit_amt_unity import PolyCommitAMTUnity, get_all_roots_of_unity, 
 
 
 class SimulatedPclProof:
@@ -133,6 +83,95 @@ class PolyCommitLoglinDummy:
 
     def double_batch_create_witness(self, phis, r, n=None):
         return self.double_batch_create_witness_polycommit_loglin_bytes_generator(phis)
+
+    # Always eval to true
+    def verify_eval(self, c, i, phi_at_i, witness):
+        return True
+
+    # Always eval to true
+    def batch_verify_eval(self, cs, i, phis_at_i, witness, degree=None):
+        return True
+
+    def preprocess_prover(self, level=8):
+        pass
+
+    def preprocess_verifier(self, level=8):
+        pass
+
+class SimulatedAMTProof:
+    crs = gen_crs()
+    phi = polynomials_over(ZR).random(7)
+    pc = PolyCommitAMTUnity(crs, 16)
+    fake_proof = pc.create_witness(phi, 2)
+    def __init__(self):
+        self.fake_content = [fake_proof]
+    def __mul__(self, other):
+        # No op
+        return self
+    def __pow__(self, power, modulo=None):
+        # No op
+        return self
+    def __imul__(self, other):
+        # No op
+        return self
+
+class SimulatedAMTCom:
+    crs = gen_crs()
+    phi = polynomials_over(ZR).random(7)
+    pc = PolyCommitAMTUnity(crs, 16)
+    fake_com = pc.commit(phi)
+    def __init__(self):
+        self.fake_content = [fake_com]
+    def __mul__(self, other):
+        # No op
+        return self
+    def __pow__(self, power, modulo=None):
+        # No op
+        return self
+    def __imul__(self, other):
+        # No op
+        return self
+
+class PolyCommitAMTDummy:
+    def __init__(self, crs=None, degree_max=33):
+        self.simulated_type = "AMT"
+
+    # Takes a random length of bytes
+    def get_random_bytes(self, length):
+        return [random.getrandbits(8) for _ in range(length)]
+
+    # One polynomial commitment for AMT is one field element is 32 bytes
+    def polycommit_amt_bytes_generate(self, phi):
+        amt_comm_length = 32
+        return self.get_random_bytes(amt_comm_length)
+
+    def commit(self, phi, r):
+        # return self.polycommit_amt_bytes_generate(phi)
+        return SimulatedAMTCom()
+
+    def create_witness(self, phi, r, i):
+        pass
+
+    # Create witnesses for points 1 to n. n defaults to 3*degree+1 if unset.
+    def batch_create_witness(self, phi, r, n=None):
+        pass
+
+    # AMT's share is 32 bytes
+    # AMT's proof is ceil(log2(n)+1) * 32
+    # We are comparing under n = 3 * t + 1
+    # Reference: libpolycrypto/app/BandwidthCalc.cpp
+    def double_batch_create_witness_amt_bytes_generator(self, phis):
+        t = len(phis[0].coeffs) - 1
+        n = 3 * t + 1
+        numofverifiers = n
+        amt_msg_length = 32 + (math.ceil(math.log2(n)) + 1) * 32
+        # random_msg = [self.get_random_bytes(amt_msg_length) * len(phis)]
+        # return [random_msg for _ in range(numofverifiers)]
+        random_witnesses = [SimulatedAMTProof() for _ in range(len(phis))]
+        return [random_witnesses for _ in range(numofverifiers)]
+
+    def double_batch_create_witness(self, phis, r, n=None):
+        return self.double_batch_create_witness_amt_bytes_generator(phis)
 
     # Always eval to true
     def verify_eval(self, c, i, phi_at_i, witness):

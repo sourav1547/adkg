@@ -2,7 +2,7 @@ import logging
 from pypairing import ZR, G1
 #from honeybadgermpc.betterpairing import ZR, G1
 from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_dummy import SimulatedPclProof, SimulatedPclCom
+from honeybadgermpc.poly_commit_dummy import SimulatedPclProof, SimulatedPclCom, SimulatedAMTProof, SimulatedAMTCom
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
@@ -100,13 +100,62 @@ def lagrange_at_x(s, j, x,):
     return num / den
 
 
+# def interpolate_g1_at_x(coords, x, order=-1):
+#     if isinstance(coords[0][1], SimulatedPclProof):
+#         out = SimulatedPclProof(1)
+#         return out
+#     elif isinstance(coords[0][1], SimulatedPclCom):
+#         out = SimulatedPclCom()
+#         return out
+#     if order == -1:
+#         order = len(coords)
+#     xs = []
+#     sortedcoords = sorted(coords, key=lambda x: x[0])
+#     for coord in sortedcoords:
+#         xs.append(coord[0])
+#     s = set(xs[0:order])
+#     out = G1.identity()
+#     for i in range(order):
+#         out *= (sortedcoords[i][1] ** (lagrange_at_x(s, xs[i], x)))
+#     return out
+
 def interpolate_g1_at_x(coords, x, order=-1):
     if isinstance(coords[0][1], SimulatedPclProof):
-        out = SimulatedPclProof(1)
+        out = SimulatedPclProof(coords[0][1].fake_contents)
         return out
     elif isinstance(coords[0][1], SimulatedPclCom):
-        out = SimulatedPclCom()
+        out = SimulatedPclCom(coords[0][1].fake_contents)
         return out
+    elif isinstance(coords[0][1], SimulatedAMTCom):
+        if order == -1:
+            order = len(coords)
+        xs = []
+        sortedcoords = sorted(coords, key=lambda x: x[0])
+        for coord in sortedcoords:
+            xs.append(coord[0])
+        s = set(xs[0:order])
+        out = G1.identity()
+        for i in range(order):
+            out *= (sortedcoords[i][1].contents ** (lagrange_at_x(s, xs[i], x)))
+        return SimulatedAMTCom(out)
+    elif isinstance(coords[0][1], SimulatedAMTProof):
+        if order == -1:
+            order = len(coords)
+        xs = []
+        sortedcoords = sorted(coords, key=lambda x: x[0])
+        for coord in sortedcoords:
+            xs.append(coord[0])
+        s = set(xs[0:order])
+        out = []
+        # I'm assuming the SimulatedAMTProof class has a contents variable which
+        # gives me a list of G1s
+        for i in range(len(coords[0][1].contents)):
+            out.append(G1.identity())
+        for i in range(order):
+            lagrange_coeff = lagrange_at_x(s, xs[i], x)
+            for j in range(len(out)):
+                out[j] *= (sortedcoords[i][1].contents[j] ** (lagrange_coeff))
+        return SimulatedAMTProof(out)
     if order == -1:
         order = len(coords)
     xs = []
