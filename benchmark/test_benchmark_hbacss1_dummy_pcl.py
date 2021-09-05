@@ -16,14 +16,12 @@ import logging
 import time
 import cProfile
 
-# short_param_list_t = [1,
-#                       2,
-#                       5,
-#                       10,
-#                       22,
-#                       42]
-
-short_param_list_t = [1]
+short_param_list_t = [1,
+                      2,
+                      5,
+                      10,
+                      22,
+                      42]
 
 def get_avss_params(n, t):
     g, h = G1.rand(), G1.rand()
