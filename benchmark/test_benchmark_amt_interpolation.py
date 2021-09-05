@@ -75,6 +75,7 @@ def test_amt_commit_and_proof_interpolation(benchmark_router, benchmark, t):
     witnesses = [[pc.create_witness(phis[k], j) for i in range(len(phis))] for j in range(n)][1]
 
     params = (t, n, values, commitments, witnesses)
+    commit_and_proof_interpolation(params)
     def _prog():
         loop.run_until_complete(commit_and_proof_interpolation(params))
 

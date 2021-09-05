@@ -1,6 +1,7 @@
 import logging
 from pypairing import ZR, G1
 #from honeybadgermpc.betterpairing import ZR, G1
+from functools import lru_cache
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_dummy import SimulatedPclProof, SimulatedPclCom, SimulatedAMTProof, SimulatedAMTCom, ActualAMTCom, ActualAMTProof
 logger = logging.getLogger(__name__)
@@ -87,6 +88,7 @@ class HbACSS1Recoverer:
 
 
 # Helper Functions
+@lru_cache(maxsize=None)
 def lagrange_at_x(s, j, x,):
     s = sorted(s)
     assert j in s
@@ -167,7 +169,7 @@ def interpolate_g1_at_x(coords, x, order=-1):
         sortedcoords = sorted(coords, key=lambda x: x[0])
         for coord in sortedcoords:
             xs.append(coord[0])
-        s = set(xs[0:order])
+        s = frozenset(xs[0:order])
         out = G1.identity()
         for i in range(order):
             out *= (sortedcoords[i][1].content ** (lagrange_at_x(s, xs[i], x)))
@@ -179,7 +181,7 @@ def interpolate_g1_at_x(coords, x, order=-1):
         sortedcoords = sorted(coords, key=lambda x: x[0])
         for coord in sortedcoords:
             xs.append(coord[0])
-        s = set(xs[0:order])
+        s = frozenset(xs[0:order])
         out = []
         # I'm assuming the ActualAMTProof class has a contents variable which
         # gives me a list of G1s
@@ -196,7 +198,7 @@ def interpolate_g1_at_x(coords, x, order=-1):
     sortedcoords = sorted(coords, key=lambda x: x[0])
     for coord in sortedcoords:
         xs.append(coord[0])
-    s = set(xs[0:order])
+    s = frozenset(xs[0:order])
     out = G1.identity()
     for i in range(order):
         out *= (sortedcoords[i][1] ** (lagrange_at_x(s, xs[i], x)))

@@ -431,7 +431,7 @@ for entry in logbenchmarks:
 # Loading the interpolation for share recovery
 hbacss1_amt_interpolation = []
 # The time is for 2t interpolations for commits and 2t interpolation for proofs
-with open("DataWinterfell/Linux-CPython-3.7-64bit/0008_amt_interpolation.json", "r") as file:
+with open("DataWinterfell/Linux-CPython-3.7-64bit/0012_amt_interpolation.json", "r") as file:
     logdata = file.read().replace("\n", "")
 logbenchmarks = json.loads(logdata)["benchmarks"]
 for entry in logbenchmarks:
