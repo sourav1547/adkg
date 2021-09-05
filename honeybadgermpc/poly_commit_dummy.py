@@ -3,7 +3,24 @@ import math
 from pypairing import ZR, G1, G2, pair
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_amt_unity import PolyCommitAMTUnity, get_all_roots_of_unity, bit_reverse, gen_crs
+from math import log
 
+def log2(x, base):
+    return int(log(x) / log(base))
+ 
+ 
+# Compute power of two greater than or equal to `n`
+def findNextPowerOf2(n):
+ 
+    # decrement `n` (to handle the case when `n` itself
+    # is a power of 2)
+    n = n - 1
+ 
+    # calculate the position of the last set bit of `n`
+    lg = log2(n, 2)
+ 
+    # next power of two will have a bit set at position `lg+1`.
+    return 1 << lg + 1
 
 class SimulatedPclProof:
     def __init__(self, size):
@@ -110,8 +127,8 @@ class PolyCommitAMTDummy:
     def __init__(self, n, crs=None, degree_max=64):
         self.simulated_type = "AMT"
         if crs is None:
-            crs = gen_crs(degree_max=64)
-        self.pc = PolyCommitAMTUnity(crs, n)
+            crs = gen_crs(degree_max=128)
+        self.pc = PolyCommitAMTUnity(crs, findNextPowerOf2(n))
 
     # Takes a random length of bytes
     def get_random_bytes(self, length):
