@@ -79,7 +79,7 @@ class PolyCommitLoglinDummy:
         polycommit_loglin_msg_length = 32 + self.num_calc(n) * 32
         #random_msg = [self.get_random_bytes(polycommit_loglin_msg_length) * len(phis)]
         random_witnesses = [SimulatedPclProof(polycommit_loglin_msg_length) for _ in range(len(phis))]
-        return [random_witnesses for _ in range(numofverifiers)]
+        return [random_witnesses.copy() for _ in range(numofverifiers)]
 
     def double_batch_create_witness(self, phis, r, n=None):
         return self.double_batch_create_witness_polycommit_loglin_bytes_generator(phis)
@@ -100,8 +100,8 @@ class PolyCommitLoglinDummy:
 
 class SimulatedAMTProof:
     crs = gen_crs()
-    def __init__(self, phi, pc):
-        fake_proof = pc.create_witness(phi, 2)
+    def __init__(self, phi, j, pc):
+        fake_proof = pc.create_witness(phi, j)
         self.fake_content = fake_proof
 
 class SimulatedAMTCom:
@@ -151,11 +151,12 @@ class PolyCommitAMTDummy:
 
     def double_batch_create_witness(self, phis, r, n=None):
         # return self.double_batch_create_witness_amt_bytes_generator(phis)
-        random_witnesses = [SimulatedAMTProof(phis[i], self.pc) for i in range(len(phis))]
         t = len(phis[0].coeffs) - 1
         n = 3 * t + 1
         numofverifiers = n
-        return [random_witnesses for _ in range(numofverifiers)]
+        # random_witnesses = [SimulatedAMTProof(phis[i], self.pc) for i in range(len(phis))]
+        # return [random_witnesses for _ in range(numofverifiers)]
+        return [[SimulatedAMTProof(phis[i], j, self.pc) for i in range(len(phis))] for j in range(numofverifiers)]
         
     # Always eval to true
     def verify_eval(self, c, i, phi_at_i, witness):
