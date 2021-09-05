@@ -104,7 +104,7 @@ class SimulatedAMTProof:
     pc = PolyCommitAMTUnity(crs, 16)
     fake_proof = pc.create_witness(phi, 2)
     def __init__(self):
-        self.fake_content = [fake_proof]
+        self.fake_content = fake_proof
     def __mul__(self, other):
         # No op
         return self
@@ -121,7 +121,7 @@ class SimulatedAMTCom:
     pc = PolyCommitAMTUnity(crs, 16)
     fake_com = pc.commit(phi)
     def __init__(self):
-        self.fake_content = [fake_com]
+        self.fake_content = fake_com
     def __mul__(self, other):
         # No op
         return self
