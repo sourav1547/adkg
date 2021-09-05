@@ -553,7 +553,7 @@ for i, elem in enumerate(td_points_c0):
     index = amt_plotting_n_arr.index(str(3 * t + 1))
     td_per_party_per_proof_mean_c2.append(
         plotting_deal_arr[index] + amt_plotting_ver_arr[index] + amt_plotting_ver_arr[index] * ((2 * t + 1) / n) + \
-            ((t + 1) / n) *amt_plotting_ver_arr[index] + td_points_c1[i][0] + interpolation_overhead[i][0] *(2*t)/(t+1))
+            (t / n) *amt_plotting_ver_arr[index] + td_points_c1[i][0] + interpolation_overhead[i][0] *(2*t)/(t+1))
 
     # Calculating hbacss2 + hbPolyCommit
     index = amt_plotting_n_arr.index(str(3 * t + 1))
