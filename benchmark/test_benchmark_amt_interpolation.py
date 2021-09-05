@@ -24,15 +24,30 @@ short_param_list_t = [1,
                       22,
                       42]
 
+# async def commit_and_proof_interpolation(params):
+#     (t, n, values, commitments, witnesses) = params
+    
+#     known_commits = commitments
+#     known_commit_coords = [[i + 1, ActualAMTCom(known_commits[i])] for i in range(t + 1)]
+#     interpolated_commits = [interpolate_g1_at_x(known_commit_coords, i + 1) for i in range(t + 1, n)]
+
+#     # the proofs for the specific shares held by this node
+#     known_evalproofs = witnesses
+#     known_evalproof_coords = [[i + 1, ActualAMTProof(known_evalproofs[i])] for i in range(t + 1)]
+#     interpolated_evalproofs = [interpolate_g1_at_x(known_evalproof_coords, i + 1) for i in
+#                             range(t + 1,n)]
+
 async def commit_and_proof_interpolation(params):
     (t, n, values, commitments, witnesses) = params
     
     known_commits = commitments
+    _ = [known_commit.preprocess(4) for known_commit in known_commits]
     known_commit_coords = [[i + 1, ActualAMTCom(known_commits[i])] for i in range(t + 1)]
     interpolated_commits = [interpolate_g1_at_x(known_commit_coords, i + 1) for i in range(t + 1, n)]
 
     # the proofs for the specific shares held by this node
     known_evalproofs = witnesses
+    _ = [[g.preprocess(4) for g in known_proof] for known_proof in known_evalproofs]
     known_evalproof_coords = [[i + 1, ActualAMTProof(known_evalproofs[i])] for i in range(t + 1)]
     interpolated_evalproofs = [interpolate_g1_at_x(known_evalproof_coords, i + 1) for i in
                             range(t + 1,n)]
