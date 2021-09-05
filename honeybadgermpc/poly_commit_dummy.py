@@ -232,3 +232,13 @@ class PolyCommitAMTDummy:
 
     def preprocess_verifier(self, level=8):
         pass
+
+
+
+class ActualAMTProof:
+    def __init__(self, proof):
+        self.content = proof
+
+class ActualAMTCom:
+    def __init__(self, com):
+        self.content = com
