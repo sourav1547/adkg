@@ -1,0 +1,884 @@
+2021-09-05 04:07:55,127:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'fake_com' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'fake_com' is not defined
+2021-09-05 04:08:42,902:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:08:42,902:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:08:42,904:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:08:42,904:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:08:42,905:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:08:42,905:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:08:42,906:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:08:42,908:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'fake_com' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'fake_com' is not defined
+2021-09-05 04:09:23,922:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:09:23,922:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:09:23,924:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:09:23,924:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:09:23,925:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:09:23,926:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:09:23,927:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:09:23,928:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'fake_com' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'fake_com' is not defined
+2021-09-05 04:09:35,684:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:09:35,685:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:09:35,686:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:09:35,687:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:09:35,687:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:09:35,688:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:09:35,688:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:09:35,690:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'fake_com' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'fake_com' is not defined
+2021-09-05 04:11:28,822:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:11:28,823:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:11:28,824:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:11:28,824:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:11:28,826:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:11:28,826:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:11:28,827:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:11:28,828:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'fake_com' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'fake_com' is not defined
+2021-09-05 04:13:39,776:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:13:39,777:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:13:39,779:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:13:39,779:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:13:39,780:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:13:39,781:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:13:39,782:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:13:39,784:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'fake_com' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'fake_com' is not defined
+2021-09-05 04:14:31,199:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:31,199:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,201:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:31,201:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,203:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:31,210:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,212:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:31,212:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,223:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,224:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,225:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,226:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,259:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,259:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,259:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,260:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,260:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,260:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,261:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,261:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,272:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,276:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,277:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,278:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,279:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,279:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,281:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,281:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,288:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,289:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,290:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,291:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,324:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,324:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,325:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,325:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,325:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,326:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,326:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,326:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,337:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,341:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,343:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,343:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,344:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,345:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,346:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,346:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,354:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,355:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,356:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,357:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,390:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,390:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,390:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,391:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,391:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,391:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,392:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,392:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,403:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,403:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,404:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,405:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,406:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,406:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,407:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,411:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,422:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,423:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,424:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,425:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,458:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,458:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,458:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,459:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,459:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,459:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,460:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,460:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,471:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,471:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,472:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,473:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,474:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,474:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,475:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,479:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,490:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,491:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,492:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,493:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,526:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,526:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,527:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,527:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,527:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,528:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,528:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,528:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,539:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,539:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,541:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,544:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,546:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,546:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,548:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,548:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,558:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,559:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,560:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,561:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,594:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,594:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,595:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,595:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,595:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,596:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,596:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,596:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,607:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,611:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,613:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,613:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,614:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,615:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,616:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,617:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,624:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,625:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,626:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,627:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,659:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,660:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,660:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,660:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,661:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,661:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,662:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,662:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,673:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,673:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,674:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,674:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,676:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,676:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,677:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,681:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,692:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,693:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,694:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,695:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,727:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,728:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,728:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,728:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,729:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,729:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,730:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,730:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,741:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,741:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,742:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,746:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,748:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,748:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,750:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,750:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,761:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,762:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,763:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,764:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,796:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,796:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,797:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,797:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,798:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,798:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,798:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,799:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,809:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,810:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,811:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,815:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,817:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,817:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,818:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:31,819:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,829:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,830:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,831:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,832:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,866:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,866:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,867:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,867:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,867:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,867:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,868:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,868:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,879:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,880:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,881:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,881:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,883:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,883:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,884:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:31,888:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,899:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,900:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,901:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,902:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:31,935:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:31,936:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:31,936:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:31,936:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:31,937:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:31,937:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:31,938:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:31,938:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:31,949:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,953:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:31,954:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,955:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:31,956:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,956:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:31,958:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:31,958:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:31,966:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:31,967:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:31,968:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:31,969:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,001:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,001:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,002:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,002:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,003:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,003:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,004:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,004:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,015:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,016:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,017:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,017:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,018:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,019:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,020:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,024:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,035:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,036:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,037:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,038:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,070:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,071:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,071:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,071:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,072:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,072:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,073:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,073:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,084:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,088:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,089:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,090:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,091:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,091:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,093:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,093:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,101:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,102:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,103:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,104:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,136:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,136:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,137:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,137:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,138:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,138:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,139:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,139:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,150:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,154:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,155:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,155:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,157:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,157:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,158:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,159:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,166:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,167:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,168:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,169:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,202:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,202:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,202:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,203:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,203:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,203:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,204:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,204:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,215:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,215:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,216:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,217:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,218:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,222:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,224:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,224:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,234:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,235:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,236:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,237:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,269:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,270:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,270:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,270:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,271:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,271:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,272:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,272:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,287:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:32,287:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,289:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:32,293:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,294:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:32,294:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,296:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:32,296:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,307:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,308:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,309:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,310:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,358:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:32,386:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:32,387:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:32,387:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:32,397:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:32,424:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:32,425:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:32,425:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:32,436:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:32,463:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:32,463:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:32,464:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:32,466:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:32,466:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:32,469:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:32,469:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,479:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:32,479:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:32,481:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:32,481:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:32,482:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:32,483:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:32,484:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,484:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:32,485:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:32,486:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:32,487:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,492:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,495:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,496:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,496:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,497:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,507:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,508:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,509:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,509:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,510:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,514:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,516:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:14:32,517:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,527:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,528:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,529:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,530:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,578:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:32,605:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:32,606:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:32,607:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:32,617:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:32,645:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:32,645:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:32,645:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:32,656:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:32,683:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:32,683:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:32,684:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:32,686:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:32,687:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:32,689:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:32,689:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,699:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:32,699:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:32,701:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:32,701:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:32,702:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:32,703:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:32,704:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,704:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:32,704:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:32,706:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:32,706:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,712:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,715:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,715:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,716:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,716:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,727:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,727:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,729:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,729:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,730:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,730:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,732:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:32,736:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,747:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,748:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,749:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,750:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:32,797:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:32,825:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:32,825:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:32,826:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:32,836:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:32,863:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:32,864:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:32,864:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:32,875:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:32,902:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:32,902:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:32,902:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:32,905:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:32,905:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:32,907:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:32,908:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:32,917:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:32,918:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:32,919:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:32,920:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:32,920:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:32,922:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:32,922:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:32,923:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:32,923:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:32,925:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:32,925:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:32,931:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:32,934:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:32,934:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:32,935:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:32,935:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:32,946:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,949:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:32,951:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,951:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:32,953:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,953:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:32,955:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:14:32,955:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:32,962:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:32,963:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:32,964:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:32,965:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:33,013:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:33,040:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:33,041:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:33,041:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:33,052:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:33,079:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:33,079:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:33,079:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:33,090:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:33,117:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:33,117:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:33,117:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:33,120:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,120:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,123:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:33,123:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:33,133:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,133:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,135:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:33,135:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,136:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,137:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:33,138:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:33,138:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,139:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,140:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:33,141:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:33,146:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:33,150:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:33,150:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:33,150:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:33,151:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:33,161:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,161:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:33,163:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,167:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:33,168:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,169:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:33,170:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,170:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:33,181:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:33,182:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:33,183:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:33,184:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:33,232:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:33,259:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:33,260:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:33,260:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:33,271:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:33,298:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:33,298:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:33,298:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:33,309:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:33,336:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:33,336:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:33,337:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:33,339:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,339:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,342:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:33,342:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:33,352:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,352:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,354:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:33,355:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,355:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,356:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:33,357:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:33,358:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,358:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,360:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:33,360:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:33,366:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:33,369:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:33,369:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:33,370:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:33,370:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:33,380:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:33,381:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:33,382:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:33,382:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:33,384:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:33,384:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:33,385:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:14:33,389:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:33,401:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:33,402:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:33,403:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:33,404:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:33,451:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:33,479:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:33,479:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:33,480:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:33,490:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:33,517:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:33,517:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:33,518:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:33,528:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:33,555:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:33,556:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:33,556:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:33,558:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,559:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,561:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:33,561:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:33,571:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,571:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,573:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:33,574:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,574:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,576:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:33,576:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:33,577:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,577:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,578:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:33,579:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:33,584:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:33,587:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:33,588:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:33,588:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:33,589:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:14:33,599:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,600:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:14:33,601:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,605:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:14:33,607:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,607:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:14:33,608:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:14:33,609:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:14:33,620:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:14:33,621:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:14:33,622:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:14:33,623:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:14:33,670:[hbavss.py:417]:[DEBUG]: [0] prev sent r1
+2021-09-05 04:14:33,697:[hbavss.py:436]:[DEBUG]: [0] in between r1
+2021-09-05 04:14:33,698:[hbavss.py:440]:[DEBUG]: [0] sent r1
+2021-09-05 04:14:33,698:[hbavss.py:226]:[DEBUG]: [0] after implication
+2021-09-05 04:14:33,709:[hbavss.py:417]:[DEBUG]: [2] prev sent r1
+2021-09-05 04:14:33,736:[hbavss.py:436]:[DEBUG]: [2] in between r1
+2021-09-05 04:14:33,736:[hbavss.py:440]:[DEBUG]: [2] sent r1
+2021-09-05 04:14:33,736:[hbavss.py:226]:[DEBUG]: [2] after implication
+2021-09-05 04:14:33,747:[hbavss.py:417]:[DEBUG]: [3] prev sent r1
+2021-09-05 04:14:33,774:[hbavss.py:436]:[DEBUG]: [3] in between r1
+2021-09-05 04:14:33,775:[hbavss.py:440]:[DEBUG]: [3] sent r1
+2021-09-05 04:14:33,775:[hbavss.py:226]:[DEBUG]: [3] after implication
+2021-09-05 04:14:33,777:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,778:[hbavss.py:443]:[DEBUG]: [0] prev sent r2
+2021-09-05 04:14:33,780:[hbavss.py:462]:[DEBUG]: [0] sent r2
+2021-09-05 04:14:33,781:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:14:33,790:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,790:[hbavss.py:443]:[DEBUG]: [1] prev sent r2
+2021-09-05 04:14:33,792:[hbavss.py:462]:[DEBUG]: [1] sent r2
+2021-09-05 04:14:33,793:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,793:[hbavss.py:443]:[DEBUG]: [2] prev sent r2
+2021-09-05 04:14:33,795:[hbavss.py:462]:[DEBUG]: [2] sent r2
+2021-09-05 04:14:33,795:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:14:33,796:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,796:[hbavss.py:443]:[DEBUG]: [3] prev sent r2
+2021-09-05 04:14:33,798:[hbavss.py:462]:[DEBUG]: [3] sent r2
+2021-09-05 04:14:33,798:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:14:33,804:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:14:33,807:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:14:33,807:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:14:33,807:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:14:33,808:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:17:53,589:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=IndexError('list index out of range') created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'IndexError'> 
+list index out of range
+2021-09-05 04:18:46,506:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'crs' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'crs' is not defined
+2021-09-05 04:19:08,836:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=AttributeError("type object 'SimulatedAMTProof' has no attribute 'fake_proof'") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'AttributeError'> 
+type object 'SimulatedAMTProof' has no attribute 'fake_proof'
+2021-09-05 04:19:32,758:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=IndexError('list index out of range') created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'IndexError'> 
+list index out of range
+2021-09-05 04:22:34,243:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:22:34,244:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:22:34,246:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:22:37,407:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:22:37,407:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:22:37,408:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:22:37,409:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:22:37,411:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=IndexError('list index out of range') created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'IndexError'> 
+list index out of range
+2021-09-05 04:23:17,033:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:23:17,033:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:23:17,035:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:23:17,036:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:23:17,037:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:23:21,612:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:23:21,614:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:23:21,615:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:23:21,625:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:23:21,626:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:23:21,627:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:23:21,628:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:23:21,664:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:23:21,664:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:23:21,665:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:23:21,665:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:23:21,666:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:23:21,666:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:23:21,667:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:23:21,667:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:23:21,677:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:21,678:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:23:21,679:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:21,679:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:23:21,681:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:21,681:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:23:21,682:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:26,272:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:23:26,283:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:23:26,284:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:23:26,285:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:23:26,286:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:23:26,321:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:23:26,321:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:23:26,322:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:23:26,322:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:23:26,323:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:23:26,323:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:23:26,324:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:23:26,324:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:23:26,334:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:26,335:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:23:26,336:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:30,917:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:23:30,918:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:30,919:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:23:30,920:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:30,921:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:23:30,931:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:23:30,932:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:23:30,933:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:23:30,934:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:23:30,969:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:23:30,969:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:23:30,969:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:23:30,970:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:23:30,970:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:23:30,970:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:23:30,971:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:23:30,971:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:23:30,982:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:30,982:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:23:30,984:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:30,984:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:23:30,985:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:30,985:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:23:30,987:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 3, Client Mode: False
+2021-09-05 04:23:35,576:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:23:35,587:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:23:35,588:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:23:35,589:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:23:35,590:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:23:35,626:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:23:35,626:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:23:35,627:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:23:35,627:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:23:35,627:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:23:35,628:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:23:35,628:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:23:35,628:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:23:35,639:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:35,639:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:23:35,641:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:40,243:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:23:40,245:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:40,245:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:23:40,246:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:23:40,247:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:23:40,258:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:23:40,259:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:23:40,260:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:23:40,261:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:23:40,296:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:23:40,296:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:23:40,297:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:23:40,297:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:23:40,298:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:23:40,298:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:23:40,298:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:23:40,299:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:23:40,309:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 0, Client Mode: False
+2021-09-05 04:29:35,128:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:29:35,129:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:29:35,131:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:29:35,131:[hbavss.py:357]:[DEBUG]: [1] Starting reliable broadcast
+2021-09-05 04:29:35,132:[hbavss.py:343]:[DEBUG]: [2] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:29:39,728:[hbavss.py:357]:[DEBUG]: [2] Starting reliable broadcast
+2021-09-05 04:29:39,731:[hbavss.py:343]:[DEBUG]: [3] Starting Batch AVSS. Id: 0, Dealer Id: 2, Client Mode: False
+2021-09-05 04:29:39,731:[hbavss.py:357]:[DEBUG]: [3] Starting reliable broadcast
+2021-09-05 04:29:39,741:[hbavss.py:372]:[DEBUG]: [0] Starting AVID disperse
+2021-09-05 04:29:39,742:[hbavss.py:372]:[DEBUG]: [1] Starting AVID disperse
+2021-09-05 04:29:39,743:[hbavss.py:372]:[DEBUG]: [2] Starting AVID disperse
+2021-09-05 04:29:39,745:[hbavss.py:372]:[DEBUG]: [3] Starting AVID disperse
+2021-09-05 04:29:39,780:[hbavss.py:253]:[DEBUG]: [0] Output
+2021-09-05 04:29:39,780:[hbavss.py:257]:[DEBUG]: [0] exit
+2021-09-05 04:29:39,781:[hbavss.py:253]:[DEBUG]: [1] Output
+2021-09-05 04:29:39,781:[hbavss.py:257]:[DEBUG]: [1] exit
+2021-09-05 04:29:39,782:[hbavss.py:253]:[DEBUG]: [2] Output
+2021-09-05 04:29:39,782:[hbavss.py:257]:[DEBUG]: [2] exit
+2021-09-05 04:29:39,782:[hbavss.py:253]:[DEBUG]: [3] Output
+2021-09-05 04:29:39,782:[hbavss.py:257]:[DEBUG]: [3] exit
+2021-09-05 04:29:39,793:[hbavss.py:343]:[DEBUG]: [0] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:29:39,793:[hbavss.py:357]:[DEBUG]: [0] Starting reliable broadcast
+2021-09-05 04:29:39,795:[hbavss.py:343]:[DEBUG]: [1] Starting Batch AVSS. Id: 0, Dealer Id: 1, Client Mode: False
+2021-09-05 04:39:10,564:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=IndexError('list index out of range') created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'IndexError'> 
+list index out of range
+2021-09-05 04:39:26,555:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=TypeError("random() missing 1 required positional argument: 'degree'") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'TypeError'> 
+random() missing 1 required positional argument: 'degree'
+2021-09-05 04:40:26,503:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=IndexError('list index out of range') created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'IndexError'> 
+list index out of range
+2021-09-05 04:52:27,897:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=NameError("name 'pc' is not defined") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'NameError'> 
+name 'pc' is not defined
+2021-09-05 04:52:43,324:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=TypeError("__init__() missing 2 required positional arguments: 'phi' and 'pc'") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'TypeError'> 
+__init__() missing 2 required positional arguments: 'phi' and 'pc'
+2021-09-05 04:52:43,325:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=TypeError("__init__() missing 2 required positional arguments: 'phi' and 'pc'") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'TypeError'> 
+__init__() missing 2 required positional arguments: 'phi' and 'pc'
+2021-09-05 04:52:43,325:[misc.py:13]:[CRITICAL]: 
+Exception: 
+<Task finished coro=<Hbacss0.avss() done, defined at /usr/src/HoneyBadgerMPC/honeybadgermpc/hbavss.py:319> exception=TypeError("__init__() missing 2 required positional arguments: 'phi' and 'pc'") created at /usr/local/lib/python3.7/asyncio/tasks.py:325> 
+<class 'TypeError'> 
+__init__() missing 2 required positional arguments: 'phi' and 'pc'

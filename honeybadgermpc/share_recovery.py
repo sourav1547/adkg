@@ -121,10 +121,10 @@ def lagrange_at_x(s, j, x,):
 
 def interpolate_g1_at_x(coords, x, order=-1):
     if isinstance(coords[0][1], SimulatedPclProof):
-        out = SimulatedPclProof(coords[0][1].fake_contents)
+        out = SimulatedPclProof(len(coords[0][1].fake_content))
         return out
     elif isinstance(coords[0][1], SimulatedPclCom):
-        out = SimulatedPclCom(coords[0][1].fake_contents)
+        out = SimulatedPclCom()
         return out
     elif isinstance(coords[0][1], SimulatedAMTCom):
         if order == -1:
@@ -136,8 +136,8 @@ def interpolate_g1_at_x(coords, x, order=-1):
         s = set(xs[0:order])
         out = G1.identity()
         for i in range(order):
-            out *= (sortedcoords[i][1].fake_contents ** (lagrange_at_x(s, xs[i], x)))
-        return SimulatedAMTCom(out)
+            out *= (sortedcoords[i][1].fake_content ** (lagrange_at_x(s, xs[i], x)))
+        return out
     elif isinstance(coords[0][1], SimulatedAMTProof):
         if order == -1:
             order = len(coords)
@@ -149,13 +149,13 @@ def interpolate_g1_at_x(coords, x, order=-1):
         out = []
         # I'm assuming the SimulatedAMTProof class has a contents variable which
         # gives me a list of G1s
-        for i in range(len(coords[0][1].fake_contents)):
+        for i in range(len(coords[0][1].fake_content)):
             out.append(G1.identity())
         for i in range(order):
             lagrange_coeff = lagrange_at_x(s, xs[i], x)
             for j in range(len(out)):
-                out[j] *= (sortedcoords[i][1].fake_contents[j] ** (lagrange_coeff))
-        return SimulatedAMTProof(out)
+                out[j] *= (sortedcoords[i][1].fake_content[j] ** (lagrange_coeff))
+        return out
     if order == -1:
         order = len(coords)
     xs = []
