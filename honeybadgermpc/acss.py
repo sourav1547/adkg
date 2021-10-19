@@ -229,7 +229,8 @@ class Hbacss0SingleShare:
                 if self.tagvars[tag]['all_shares_valid'] and not output:
                     shares = self.tagvars[tag]['shares']
                     int_shares = [int(shares[i]) for i in range(len(shares))]
-                    self.output_queue.put_nowait((dealer_id, avss_id, int_shares))
+                    commitments = self.tagvars[tag]['commitments']
+                    self.output_queue.put_nowait((dealer_id, avss_id, int_shares, commitments))
                     output = True
                     logger.debug("[%d] Output", self.my_id)
 

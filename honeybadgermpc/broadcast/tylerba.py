@@ -7,6 +7,7 @@ from collections import defaultdict
 import logging
 
 from honeybadgermpc.exceptions import RedundantMessageError, AbandonedNodeError
+from honeybadgermpc.broadcast.commoncoin import shared_coin
 
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,7 @@ async def wait_for_auxset_values(
         await auxset_signal.wait()
 
 
-async def tylerba(sid, pid, n, f, coin, input_msg, decide, broadcast, receive):
+async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, receive):
     """ Implementation of Tyler20 ABA. Tyler20 has two nice properties:
         1. If all honest node input 0 to an ABA, then that ABA can terminate without a coin.
         2. An honest node can locally decide that no other honest node would require a coin.
@@ -111,6 +112,27 @@ async def tylerba(sid, pid, n, f, coin, input_msg, decide, broadcast, receive):
     aux_signal = asyncio.Event()
     auxset_signal = asyncio.Event()
 
+    pk, sk = None, None
+    coin_init = False
+
+    # TODO: We have to take in coin key inputs and create the coin instance here 
+    # instead of taking the coin instance as the input.
+
+    def coin_bcast(o):
+        broadcast(("ACS_COIN", pid, o))
+
+    coin_recvs = asyncio.Queue()
+
+    async def _coin(r, coin_init):
+        if not coin_init:
+            pk, sk = await coin_keys()
+        coin, _ = await shared_coin(
+            "COIN" + str(sid), pid, n, f, pk, sk, coin_bcast, coin_recvs.get
+        )
+        b = await coin(r)
+        return b
+
+
     async def _recv():
         while True: # not finished
             (sender, msg) = await receive()
@@ -119,6 +141,9 @@ async def tylerba(sid, pid, n, f, coin, input_msg, decide, broadcast, receive):
                 extra={"nodeid": pid, "epoch": msg[1]},
             )
             assert sender in range(n)
+
+            if msg[0] ==  "ACS_COIN":
+                coin_recvs.put_nowait((sender, msg))
 
             if msg[0] == "EST":
                 _, r, v = msg
@@ -253,10 +278,8 @@ async def tylerba(sid, pid, n, f, coin, input_msg, decide, broadcast, receive):
                 )
                 aux_signal.set()
 
-
-
-        
     _thread_recv = asyncio.create_task(_recv())
+
     try:
         # Block waiting for the input
         vi = await input_msg()
@@ -410,7 +433,8 @@ async def tylerba(sid, pid, n, f, coin, input_msg, decide, broadcast, receive):
                 if len(values2) == 1:
                     v = next(iter(values2))
                     if v == 2:
-                        est = await coin(r)
+                        est = await _coin(r, coin_init)
+                        coin_init = True
                     else:
                         if already_decided is None:
                             already_decided = v
@@ -431,7 +455,7 @@ async def tylerba(sid, pid, n, f, coin, input_msg, decide, broadcast, receive):
                         est = next(iter(values2))
                     else:
                         est = v
-                    coin(r)
+                    _coin(r)
             except AbandonedNodeError:
                 # print('[sid:%s] [pid:%d] QUITTING in round %d' % (sid,pid,r))
                 logger.debug(f"[{pid}] QUIT!", extra={"nodeid": pid, "epoch": r})

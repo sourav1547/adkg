@@ -132,8 +132,6 @@ def decode(k, n, stripes):
     return m
 
 
-
-
 def hash(x):
     assert isinstance(x, (str, bytes))
     try: 
@@ -244,7 +242,7 @@ async def qrbc(
                     m = decode(k, n, stripes[_digest])
                     # FIXME: I have to handle padding
                     if ready_digest == hash(m):
-                        self.output_queue.put_nowait(m)
+                        return m
 
                 
             

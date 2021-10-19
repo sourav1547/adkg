@@ -127,7 +127,7 @@ async def make_commonsubset(sid, pid, n, f, pk, sk, input_msg, send, recv, bcast
         rbc_input = await input_msg() if j == pid else None
 
         rbc_outputs[j] = asyncio.create_task(
-            reliablebroadcast(
+        reliablebroadcast(
                 sid + "RBC" + str(j),
                 pid,
                 n,
