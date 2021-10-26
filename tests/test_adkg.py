@@ -26,11 +26,11 @@ def get_avss_params(n, t):
 @mark.asyncio
 async def test_adkg(test_router):
     from pypairing import ZR
-    t = 21
+    t = 5
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)
-    sends, recvs, _ = test_router(n)
+    sends, recvs, _ = test_router(n, maxdelay=1)
     pc = PolyCommitFeldman(g)
 
     dkg_tasks = [None] * n # async task for adkg
@@ -59,7 +59,7 @@ async def test_adkg(test_router):
     mpk = h**msk
 
     for i in range(n):
-        assert(mpk == outputs[i][3][0])
+        assert(mpk == outputs[i][3])
 
     mks_set = outputs[0][1]
     for i in range(1, n):

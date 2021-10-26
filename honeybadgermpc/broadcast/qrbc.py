@@ -179,7 +179,7 @@ async def qrbc(
         logger.debug("[%d] Input received: %d bytes" % (pid, len(m)))
 
         for i in range(n):
-            send(i, (sid, "PROPOSE", m))
+            send(i, ("PROPOSE", m))
         
         if client_mode:
             return
@@ -190,11 +190,12 @@ async def qrbc(
     ready_senders = set()
     ready_sent = False
     from_leader = None
+    ready_digest = None
 
     while True:  # main receive loop
             sender, msg = await receive()
-            if msg[1] == "PROPOSE" and from_leader is None:
-                (_, _, m) = msg
+            if msg[0] == "PROPOSE" and from_leader is None:
+                (_, m) = msg
                 if sender != leader:
                     logger.info(f"[{pid}] PROPOSE message from other than leader: {sender}")
                     continue
@@ -205,10 +206,10 @@ async def qrbc(
                     _stripes = encode(k,n, m)
                     from_leader = _digest
                     for i in range(n):
-                        send(i, (sid, "ECHO", _digest, _stripes[i]))
+                        send(i, ("ECHO", _digest, _stripes[i]))
                     
-            if msg[1] == "ECHO":
-                (_, _,  _digest, stripe) = msg
+            if msg[0] == "ECHO":
+                (_, _digest, stripe) = msg
                 if sender in echo_senders:
                     # Received redundant ECHO message from the same sender
                     continue
@@ -222,10 +223,10 @@ async def qrbc(
                 
                 if len(echo_senders) >= echo_threshold and not ready_sent:
                     ready_sent = True
-                    broadcast((sid, "READY", ready_digest, ready_stripe))
+                    broadcast(("READY", ready_digest, ready_stripe))
             
-            elif msg[1] == "READY":
-                (_, _, _digest, stripe) = msg
+            elif msg[0] == "READY":
+                (_, _digest, stripe) = msg
                 # Validation
                 if sender in ready_senders:
                     logger.info("[{pid}] Redundant READY")

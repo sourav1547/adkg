@@ -90,14 +90,13 @@ class adkg:
                 if len(outputs) == self.n:
                     return    
 
-    async def commonsubset(self, rbc_out, acss_outputs, acss_signal, coin_keys, aba_in, aba_out):
+    async def commonsubset(self, rbc_out, acss_outputs, acss_signal, rbc_signal, rbc_values, coin_keys, aba_in, aba_out):
         assert len(rbc_out) == self.n
         assert len(aba_in) == self.n
         assert len(aba_out) == self.n
 
         aba_inputted = [False]*self.n
         aba_values = [0]*self.n
-        rbc_values = [None]*self.n
 
         async def _recv_rbc(j):
             rbc_values[j] = await rbc_out[j]
@@ -136,9 +135,6 @@ class adkg:
                 acss_signal.clear()
                 await acss_signal.wait()
 
-            
-
-        
         r_threads = [asyncio.create_task(_recv_rbc(j)) for j in range(self.n)]
 
         async def _recv_aba(j):
@@ -163,39 +159,21 @@ class adkg:
                 r_threads[j].cancel()
                 rbc_values[j] = None
 
-        return tuple(rbc_values)
+        rbc_signal.set()
+        return 
 
 
     async def agreement(self, key_proposal, acss_outputs, acss_signal):
         from honeybadgermpc.broadcast.tylerba import tylerba
         from honeybadgermpc.broadcast.qrbc import qrbc
 
-        aba_recvs = [asyncio.Queue() for _ in range(self.n)]
-        rbc_recvs = [asyncio.Queue() for _ in range(self.n)]
+        # aba_recvs = [asyncio.Queue() for _ in range(self.n)]
 
         aba_inputs = [asyncio.Queue() for _ in range(self.n)]
         aba_outputs = [asyncio.Queue() for _ in range(self.n)]
         rbc_outputs = [asyncio.Queue() for _ in range(self.n)]
         
         coin_keys = [asyncio.Queue() for _ in range(self.n)]
-
-        def bcast(o):
-            for i in range(self.n):
-                self.send(i, o)
-
-        async def _recv():
-            while True:
-                (sender, (tag, j, msg)) = await self.recv()
-                if tag == "ACS_RBC":
-                    rbc_recvs[j].put_nowait((sender, msg))
-                elif tag == "ACS_ABA":
-                    aba_recvs[j].put_nowait((sender, msg))
-                else:
-                    raise ValueError("Unknown tag: %s", tag)
-
-        recv_tasks = []
-        recv_tasks.append(asyncio.create_task(_recv()))
-
 
         async def predicate(_key_proposal):
             if len(_key_proposal) < self.n -self.t:
@@ -213,58 +191,113 @@ class adkg:
                 await acss_signal.wait()
 
         async def _setup(j):
-            def aba_bcast(o):
-                bcast(("ACS_ABA", j, o))
+            abatag = "ABA" + str(j)
+            abasend, abarecv =  self.get_send(abatag), self.subscribe_recv(abatag)
 
+            def bcast(o):
+                for i in range(self.n):
+                    abasend(i, o)
+                
             aba_task = asyncio.create_task(
                 tylerba(
-                    "ABA" + str(j),
+                    abatag,
                     self.my_id,
                     self.n,
                     self.t,
                     coin_keys[j].get,
                     aba_inputs[j].get,
                     aba_outputs[j].put_nowait,
-                    aba_bcast,
-                    aba_recvs[j].get,
+                    bcast,
+                    abarecv,
                 )
             )
-
-            def rbc_send(k, o):
-                self.send(k, ("ACS_RBC", j, o))
 
             # Only leader gets input
             rbc_input = bytes(key_proposal) if j == self.my_id else None
 
+            rbctag ="RBC" + str(j)
+            rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
+            
             rbc_outputs[j] = asyncio.create_task(
                 qrbc(
-                    "RBC" + str(j),
+                    rbctag,
                     self.my_id,
                     self.n,
                     self.t,
                     j,
                     predicate,
                     rbc_input,
-                    rbc_send,
-                    rbc_recvs[j].get,
+                    rbcsend,
+                    rbcrecv,
                 )
             )
 
             return aba_task
 
         work_tasks = await asyncio.gather(*[_setup(j) for j in range(self.n)])
+        rbc_signal = asyncio.Event()
+        rbc_values = [None for i in range(self.n)]
 
         return (
             self.commonsubset(
                 rbc_outputs,
                 acss_outputs,
                 acss_signal,
+                rbc_signal,
+                rbc_values,
                 [_.put_nowait for _ in coin_keys],
                 [_.put_nowait for _ in aba_inputs],
                 [_.get for _ in aba_outputs],
-            ), 
+            ),
+            self.derive_key(
+                acss_outputs,
+                acss_signal,
+                rbc_values,
+                rbc_signal,
+            ),
             work_tasks,
         )
+
+    async def derive_key(self, acss_outputs, acss_signal, rbc_values, rbc_signal):
+        # Waiting for the ABA to terminate
+        await rbc_signal.wait()
+        rbc_signal.clear()
+
+        mks = set() # master key set
+        for ks in  rbc_values:
+            if ks is not None:
+                mks = mks.union(set(list(ks)))
+
+        for k in mks:
+            if k not in acss_outputs:
+                await acss_signal.wait()
+                acss_signal.clear()
+        
+        secret = 0
+        for k in mks:
+            secret = secret + acss_outputs[k][0][0]
+        
+        x = self.g**secret
+        y = self.h**secret
+        cp = CP(self.g, self.h)
+        chal, res = cp.dleq_prove(secret, x, y)
+
+        key_tag = "ACS_KEY"
+        send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
+
+        for i in range(self.n):
+            send(i, (x, y, chal, res))
+
+        pk_shares = []
+        while True:
+            (sender, msg) = await recv()
+            x, y, chal, res = msg
+            if cp.dleq_verify(x, y, chal, res):
+                pk_shares.append([sender+1, y])
+            if len(pk_shares) > self.t:
+                break
+        pk =  interpolate_g1_at_x(pk_shares, 0)
+        return (mks, secret, pk)
 
     # TODO: This function given an index computes g^x
     def derive_x(self, acss_outputs, mks):
@@ -272,32 +305,11 @@ class adkg:
         for i in range(self.n):
             xi = G1.identity()
             for ii in mks:
-                # FIXME: This is not the correct implementation.
+                # TODO: This is not the correct implementation.
+                # 
                 xi = xi*acss_outputs[ii][i]
             xlist.append(xi)
         return xlist
-
-    async def derive_key(self, secret, xlist):
-        x = self.g**secret
-        y = self.h**secret
-        cp = CP(self.g, self.h)
-        chal, res = cp.dleq_prove(secret, x, y)
-
-        for i in range(self.n):
-            self.send(i, ("KEY", x, y, chal, res))
-
-        pk_shares = []
-        while True:
-            (sender, msg) = await self.recv()
-            mid, x, y, chal, res = msg
-            if mid == "KEY":
-                # FIXME: Each node should locally compute this
-                # xj = xlist[sender]
-                if cp.dleq_verify(x, y, chal, res):
-                    pk_shares.append([sender+1, y])
-                if len(pk_shares) > self.t:
-                    break
-        return interpolate_g1_at_x(pk_shares, 0)
 
     async def run_adkg(self):
         acss_outputs = {}
@@ -309,32 +321,12 @@ class adkg:
         await acss_signal.wait()
         acss_signal.clear()
 
-        key_proposal = list(acss_outputs.keys()) # @sourav: checked so far
+        key_proposal = list(acss_outputs.keys())
         
-        # FIXME: I am not entirely sure on how this works
         create_acs_task = asyncio.create_task(self.agreement(key_proposal, acss_outputs, acss_signal))
-        acs, work_tasks = await create_acs_task
-        acs_output = await acs
+        acs, key_task, work_tasks = await create_acs_task
+        await asyncio.gather(acs)
+        output = await key_task
         await asyncio.gather(*work_tasks)
-
-        mks = set() # master key set
-        for ks in  acs_output:
-            if ks is not None:
-                mks = mks.union(set(list(ks)))
-
-        rem_acss = defaultdict()
-        for k in mks:
-            if k not in acss_outputs:
-                await acss_signal.wait()
-                acss_signal.clear()
-        
-        sk_share = 0
-        for k in mks:
-            sk_share = sk_share + acss_outputs[k][0][0]
-        
-        # xlist = self.derive_x(acss_outputs, mks)
-        xlist = None
-
-        pk_task = asyncio.create_task(self.derive_key(sk_share, xlist))
-        pk = await asyncio.gather(pk_task)
-        self.output_queue.put_nowait((value[0], mks, sk_share, pk))
+        mks, sk, pk = output
+        self.output_queue.put_nowait((value[0], mks, sk, pk))
