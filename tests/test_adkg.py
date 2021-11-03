@@ -1,14 +1,7 @@
 from pytest import mark
-from random import randint
-from contextlib import ExitStack
-from pickle import dumps
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
-from honeybadgermpc.acss import Hbacss0SingleShare
-from honeybadgermpc.adkg import adkg
-#from adkg.mpc import TaskProgramRunner
-from honeybadgermpc.symmetric_crypto import SymmetricCrypto
-from honeybadgermpc.utils.misc import print_exception_callback
+from honeybadgermpc.adkg import ADKG
 import asyncio
 
 
@@ -26,27 +19,34 @@ def get_avss_params(n, t):
 @mark.asyncio
 async def test_adkg(test_router):
     from pypairing import ZR
-    t = 5
+    t = 1
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)
-    sends, recvs, _ = test_router(n, maxdelay=1)
+    sends, recvs, _ = test_router(n, maxdelay=10)
     pc = PolyCommitFeldman(g)
 
     dkg_tasks = [None] * n # async task for adkg
     dkg_list = [None] * n #
 
     for i in range(n):
-        dkg = adkg(pks, sks[i], g, h, n, t, i, sends[i], recvs[i], pc)
+        dkg = ADKG(pks, sks[i], g, h, n, t, i, sends[i], recvs[i], pc)
         dkg_list[i] = dkg
         dkg_tasks[i] = asyncio.create_task(dkg.run_adkg())
+    
+    await dkg_list[0].output_queue.get()
+    dkg_tasks[0].cancel()
+    dkg_list[0].kill()
+    
     outputs = await asyncio.gather(
-        *[dkg_list[i].output_queue.get() for i in range(n)]
+        *[dkg_list[i].output_queue.get() for i in range(1,n)]
     )
-    for task in dkg_tasks:
+    for task in dkg_tasks[1:n]:
         task.cancel()
-    for dkg in dkg_list:
+    for dkg in dkg_list[1:n]:
         dkg.kill()
+
+    return
     
     shares = []
     i = 1

@@ -60,7 +60,6 @@ class Hbacss0SingleShare:
             )
 
     def __enter__(self):
-        self.avid_recv_task = asyncio.create_task(self._recv_loop(self.avid_msg_queue))
         return self
 
     #def __exit__(self, typ, value, traceback):
@@ -71,9 +70,8 @@ class Hbacss0SingleShare:
         for key in self.tagvars:
             for task in self.tagvars[key]['tasks']:
                 task.cancel()
-        #self.avid_recv_task.cancel()
-        #for task in self.tasks:
-        #    task.cancel()
+
+    
     #@profile
     async def _handle_implication(self, tag, j, j_sk):
         """

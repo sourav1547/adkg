@@ -1,4 +1,3 @@
-from collections import defaultdict
 from inspect import CO_NESTED
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.acss import Hbacss0SingleShare
@@ -10,7 +9,6 @@ import asyncio
 import hashlib
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey  # noqa:F401
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPrivateKey  # noqa:F401
-
 
 class CP:
     def __init__(self, g, h, field=ZR):
@@ -42,7 +40,7 @@ class CP:
         e = self.dleq_derive_chal(x, a1, y, a2)
         return  e, w - e*alpha # return (challenge, response)
 
-class adkg:
+class ADKG:
     def __init__(self, public_keys, private_key, g, h, n, t, my_id, send, recv, pc, field=ZR):
         self.public_keys, self.private_key, self.g, self.h = (public_keys, private_key, g, h)
         self.n, self.t, self.my_id = (n, t, my_id)
@@ -59,10 +57,18 @@ class adkg:
         self.output_queue = asyncio.Queue()
     
     def kill(self):
+        self.subscribe_recv_task.cancel()
         for task in self.acss_tasks:
             task.cancel()
         self.acss.kill()
-        self.subscribe_recv_task.cancel()
+        self.acss_task.cancel()
+        
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        return self
 
     async def acss_step(self, outputs, value, acss_signal):
         #todo, need to modify send and recv
@@ -81,8 +87,6 @@ class adkg:
         while True:
                 (dealer, _, share, commitments) = await self.acss.output_queue.get()
                 outputs[dealer] = [share, commitments]
-                print("appended")
-                
                 if len(outputs) >= self.n - self.t:
                     print("Player " + str(self.my_id) + " Got shares from: " + str([output for output in outputs]))
                     acss_signal.set()
@@ -162,12 +166,9 @@ class adkg:
         rbc_signal.set()
         return 
 
-
     async def agreement(self, key_proposal, acss_outputs, acss_signal):
         from honeybadgermpc.broadcast.tylerba import tylerba
         from honeybadgermpc.broadcast.qrbc import qrbc
-
-        # aba_recvs = [asyncio.Queue() for _ in range(self.n)]
 
         aba_inputs = [asyncio.Queue() for _ in range(self.n)]
         aba_outputs = [asyncio.Queue() for _ in range(self.n)]
@@ -285,6 +286,7 @@ class adkg:
         key_tag = "ACS_KEY"
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
+        print("Node " + str(self.my_id) + " starting key-derivation")
         for i in range(self.n):
             send(i, (x, y, chal, res))
 
@@ -294,6 +296,7 @@ class adkg:
             x, y, chal, res = msg
             if cp.dleq_verify(x, y, chal, res):
                 pk_shares.append([sender+1, y])
+                print("Node " + str(self.my_id) + "Received key shares from "+ str(sender))
             if len(pk_shares) > self.t:
                 break
         pk =  interpolate_g1_at_x(pk_shares, 0)
@@ -306,7 +309,6 @@ class adkg:
             xi = G1.identity()
             for ii in mks:
                 # TODO: This is not the correct implementation.
-                # 
                 xi = xi*acss_outputs[ii][i]
             xlist.append(xi)
         return xlist
@@ -316,17 +318,14 @@ class adkg:
         acss_signal = asyncio.Event()
 
         value =[ZR.rand()]
-
-        asyncio.create_task(self.acss_step(acss_outputs, value, acss_signal))
+        self.acss_task = asyncio.create_task(self.acss_step(acss_outputs, value, acss_signal))
         await acss_signal.wait()
         acss_signal.clear()
-
         key_proposal = list(acss_outputs.keys())
-        
         create_acs_task = asyncio.create_task(self.agreement(key_proposal, acss_outputs, acss_signal))
         acs, key_task, work_tasks = await create_acs_task
         await asyncio.gather(acs)
-        output = await key_task
         await asyncio.gather(*work_tasks)
+        output = await key_task
         mks, sk, pk = output
         self.output_queue.put_nowait((value[0], mks, sk, pk))

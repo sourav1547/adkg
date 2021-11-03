@@ -28,12 +28,12 @@ MODULE_PATH=${DOT_SEPARATED_PATH::-3}
 
 CONFIG_PATH=$2
 
-CMD="python -m ${MODULE_PATH}"
+CMD="python3 -m ${MODULE_PATH}"
 echo ">>> Command to be executed: '${CMD}'"
 
 # Create simulated latency using tc
-scripts/latency-control.sh stop
-scripts/latency-control.sh start 20ms 5ms
+# sudo sh scripts/latency-control.sh stop
+# sudo sh scripts/latency-control.sh start 20ms 5ms
 
 ## TODO: the following was used for launching a larger number
 ## of processes locally, with only a portion of them shown in tmux

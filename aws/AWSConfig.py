@@ -13,12 +13,11 @@ class RegionConfig(object):
 
 
 class MPCConfig(object):
-    def __init__(self, command, t, k, port, num_triples, n, num_faulty_nodes):
+    def __init__(self, command, t, k, port, n, num_faulty_nodes):
         self.COMMAND = command
         self.T = t
-        self.PORT = port
-        self.NUM_TRIPLES = num_triples
         self.K = k
+        self.PORT = port
         self.N = n
         self.NUM_FAULTY_NODES = num_faulty_nodes
 
@@ -47,7 +46,6 @@ class AwsConfig:
         mpc_config["t"],
         mpc_config["k"],
         mpc_config["port"],
-        mpc_config["num_triples"],
         mpc_config["n"],
         mpc_config["num_faulty_nodes"],
     )

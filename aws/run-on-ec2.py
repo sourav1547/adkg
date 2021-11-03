@@ -4,8 +4,7 @@ import os
 import argparse
 import json
 import logging
-from time import time
-from math import log
+import time
 
 from aws.ec2Manager import EC2Manager
 from aws.AWSConfig import AwsConfig
@@ -60,33 +59,11 @@ def get_ipc_setup_commands(s3manager, instance_ids):
 
     n, t = AwsConfig.TOTAL_VM_COUNT, AwsConfig.MPC_CONFIG.T
 
-    num_triples = AwsConfig.MPC_CONFIG.NUM_TRIPLES
-    pp_elements = PreProcessedElements()
-
-    pp_elements.generate_zeros(num_triples, n, t)
-    pp_elements.generate_triples(num_triples, n, t)
-
-    triple_urls = s3manager.upload_files(
-        [
-            pp_elements.mixins[Constants.TRIPLES]._build_file_name(n, t, i)
-            for i in range(n)
-        ]
-    )
-    zero_urls = s3manager.upload_files(
-        [
-            pp_elements.mixins[Constants.ZEROS]._build_file_name(n, t, i)
-            for i in range(n)
-        ]
-    )
-
     setup_commands = [
         [
             instance_id,
             [
                 "sudo docker pull %s" % (AwsConfig.DOCKER_IMAGE_PATH),
-                "mkdir -p sharedata",
-                "cd sharedata; curl -sSO %s" % (triple_urls[i]),
-                "cd sharedata; curl -sSO %s" % (zero_urls[i]),
                 "mkdir -p benchmark-logs",
             ],
         ]
@@ -110,124 +87,7 @@ def get_hbavss_setup_commands(s3manager, instance_ids):
 
     return setup_commands
 
-
-def get_butterfly_network_setup_commands(max_k, s3manager, instance_ids):
-    from honeybadgermpc.preprocessing import PreProcessedElements
-    from honeybadgermpc.preprocessing import PreProcessingConstants as Constants
-
-    n, t = AwsConfig.TOTAL_VM_COUNT, AwsConfig.MPC_CONFIG.T
-    k = max_k if max_k else AwsConfig.MPC_CONFIG.K
-
-    logging.info("Starting to create preprocessing files.")
-    stime = time()
-    num_switches = k * int(log(k, 2)) ** 2
-    pp_elements = PreProcessedElements()
-    pp_elements.generate_triples(2 * num_switches, n, t)
-    pp_elements.generate_one_minus_ones(num_switches, n, t)
-    pp_elements.generate_rands(k, n, t)
-    logging.info(f"Preprocessing files created in {time()-stime}")
-
-    logging.info("Uploading inputs to AWS S3.")
-    stime = time()
-    triple_urls = s3manager.upload_files(
-        [
-            pp_elements.mixins[Constants.TRIPLES]._build_file_name(n, t, i)
-            for i in range(n)
-        ]
-    )
-    input_urls = s3manager.upload_files(
-        [
-            pp_elements.mixins[Constants.RANDS]._build_file_name(n, t, i)
-            for i in range(n)
-        ]
-    )
-    rand_share_urls = s3manager.upload_files(
-        [
-            pp_elements.mixins[Constants.ONE_MINUS_ONE]._build_file_name(n, t, i)
-            for i in range(n)
-        ]
-    )
-    logging.info(f"Inputs successfully uploaded in {time()-stime} seconds.")
-
-    setup_commands = [
-        [
-            instance_id,
-            [
-                "sudo docker pull %s" % (AwsConfig.DOCKER_IMAGE_PATH),
-                "mkdir -p sharedata",
-                "cd sharedata; curl -sSO %s" % (triple_urls[i]),
-                "cd sharedata; curl -sSO %s" % (rand_share_urls[i]),
-                "cd sharedata; curl -sSO %s" % (input_urls[i]),
-                "mkdir -p benchmark-logs",
-            ],
-        ]
-        for i, instance_id in enumerate(instance_ids)
-    ]
-
-    return setup_commands
-
-
-def get_powermixing_setup_commands(max_k, runid, s3manager, instance_ids):
-    from honeybadgermpc.preprocessing import PreProcessedElements
-    from honeybadgermpc.preprocessing import PreProcessingConstants as Constants
-
-    n, t = AwsConfig.TOTAL_VM_COUNT, AwsConfig.MPC_CONFIG.T
-    k = max_k if max_k else AwsConfig.MPC_CONFIG.K
-
-    logging.info("Starting to create preprocessing files.")
-    stime = time()
-    pp_elements = PreProcessedElements()
-    pp_elements.generate_powers(k, n, t, k)
-    pp_elements.generate_rands(k, n, t)
-    logging.info(f"Preprocessing files created in {time()-stime}")
-
-    setup_commands = []
-    total_time = 0
-    logging.info(f"Uploading input files to AWS S3.")
-
-    for i, instance_id in enumerate(instance_ids):
-        url = s3manager.upload_file(f"aws/download_input.sh")
-        commands = [
-            "sudo docker pull %s" % (AwsConfig.DOCKER_IMAGE_PATH),
-            f"curl -sSO {url}",
-            "mkdir -p sharedata",
-            "cp download_input.sh sharedata/download_input.sh ",
-            "mkdir -p benchmark-logs",
-            "ulimit -n 10000",
-        ]
-        file_names = []
-        for j in range(k):
-            prefix1 = f"{pp_elements.mixins[Constants.POWERS].file_prefix}_{j}"
-            file_names.append(
-                pp_elements.mixins[Constants.POWERS].build_filename(
-                    n, t, i, prefix=prefix1
-                )
-            )
-
-            file_names.append(
-                pp_elements.mixins[Constants.RANDS].build_filename(n, t, i)
-            )
-
-        stime = time()
-        urls = s3manager.upload_files(file_names)
-        total_time += time() - stime
-        with open("%s-%d-links" % (runid, i), "w") as f:
-            for url in urls:
-                print(url, file=f)
-        fname = f"{runid}-{i}-links"
-        url = s3manager.upload_file(fname)
-        commands.append(
-            f"cd sharedata; curl -sSO {url}; bash download_input.sh {fname}"
-        )
-        setup_commands.append([instance_id, commands])
-
-    logging.info(f"Upload completed in {total_time} seconds.")
-
-    return setup_commands
-
-
 def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
-    os.makedirs("sharedata/", exist_ok=True)
     logging.info(f"Run Id: {run_id}")
     ec2manager, s3manager = EC2Manager(), S3Manager(run_id)
     instance_ids, instance_ips = ec2manager.create_instances()
@@ -244,19 +104,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
 
     if AwsConfig.MPC_CONFIG.COMMAND.endswith("ipc"):
         instance_configs = get_instance_configs(instance_ips)
-    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("powermixing"):
-        instance_configs = get_instance_configs(
-            instance_ips, {"k": AwsConfig.MPC_CONFIG.K, "run_id": run_id}
-        )
-    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("butterfly_network"):
-        instance_configs = get_instance_configs(
-            instance_ips, {"k": AwsConfig.MPC_CONFIG.K, "run_id": run_id}
-        )
-    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("hbavss_batch"):
-        instance_configs = get_instance_configs(
-            instance_ips, {"k": AwsConfig.MPC_CONFIG.K, "run_id": run_id}
-        )
-    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("hbavss_light"):
+    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("adkg_run"):
         instance_configs = get_instance_configs(
             instance_ips, {"k": AwsConfig.MPC_CONFIG.K, "run_id": run_id}
         )
@@ -280,17 +128,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
     if not skip_setup:
         if AwsConfig.MPC_CONFIG.COMMAND.endswith("ipc"):
             setup_commands = get_ipc_setup_commands(s3manager, instance_ids)
-        elif AwsConfig.MPC_CONFIG.COMMAND.endswith("powermixing"):
-            setup_commands = get_powermixing_setup_commands(
-                max_k, run_id, s3manager, instance_ids
-            )
-        elif AwsConfig.MPC_CONFIG.COMMAND.endswith("butterfly_network"):
-            setup_commands = get_butterfly_network_setup_commands(
-                max_k, s3manager, instance_ids
-            )
-        elif AwsConfig.MPC_CONFIG.COMMAND.endswith("hbavss_batch"):
-            setup_commands = get_hbavss_setup_commands(s3manager, instance_ids)
-        elif AwsConfig.MPC_CONFIG.COMMAND.endswith("hbavss_light"):
+        elif AwsConfig.MPC_CONFIG.COMMAND.endswith("adkg_run"):
             setup_commands = get_hbavss_setup_commands(s3manager, instance_ids)
         logging.info("Triggering setup commands.")
         run_commands_on_instances(ec2manager, setup_commands, False)
@@ -304,7 +142,6 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
                     f"sudo docker run\
                 -p {port}:{port} \
                 -v /home/ubuntu/config:/usr/src/HoneyBadgerMPC/config/ \
-                -v /home/ubuntu/sharedata:/usr/src/HoneyBadgerMPC/sharedata/ \
                 -v /home/ubuntu/benchmark-logs:/usr/src/HoneyBadgerMPC/benchmark-logs/ \
                 {AwsConfig.DOCKER_IMAGE_PATH} \
                 {AwsConfig.MPC_CONFIG.COMMAND} -d -f config/config-{i}.json"
@@ -327,7 +164,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Runs HBMPC code on AWS.")
+    parser = argparse.ArgumentParser(description="Runs ADKG code on AWS.")
     parser.add_argument(
         "-s",
         "--skip-setup",

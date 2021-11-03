@@ -98,6 +98,12 @@ class EC2Manager:
             ec2_resource.Instance(id=instance_id).terminate()
         if os.path.isfile(EC2Manager.current_vms_file_name):
             os.remove(EC2Manager.current_vms_file_name)
+    
+    def stop_instance_by_id(self):
+        instance_ids = self.get_current_vm_instance_ids()
+        for instance_id in instance_ids:
+            ec2_resource = self.ec2Resources[self.instanceIdRegion[instance_id]]
+            ec2_resource.Instance(id=instance_id).stop()
 
     def get_instance_public_ip(self, instance_id):
         ec2_resource = self.ec2Resources[self.instanceIdRegion[instance_id]]
