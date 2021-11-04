@@ -58,7 +58,7 @@ class NodeCommunicator(object):
         logging.debug("Dealer tasks finished.")
         self._router_task.cancel()
         logging.debug("Router task cancelled.")
-        self.zmq_context.destroy(linger=self.linger_timeout * 1000)
+        # self.zmq_context.destroy(linger=self.linger_timeout) # wait here
         self.benchmark_logger.info("Total bytes sent out: %d", self.bytes_sent)
 
     async def _setup(self):
@@ -158,12 +158,13 @@ class ProcessProgramRunner(object):
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
+        logging.info("Waiting for programms to finish.")
         await asyncio.gather(*self.progs)
-        logging.debug("All programs finished.")
+        logging.info("All programs finished.")
         await self.node_communicator.__aexit__(exc_type, exc, tb)
-        logging.debug("NodeCommunicator closed.")
+        logging.info("NodeCommunicator closed.")
         self.subscribe_task.cancel()
-        logging.debug("Subscribe task cancelled.")
+        logging.info("Subscribe task cancelled.")
 
 
 async def verify_all_connections(peers, n, my_id):

@@ -1,3 +1,5 @@
 honeybadgermpc/__pycache__/*.pyc
 honeybadgermpc/ntl/__pycache__/
 scripts/__pycache__/
+logs/
+apps/tutorial/__pycache__/

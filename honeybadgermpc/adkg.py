@@ -296,7 +296,7 @@ class ADKG:
             x, y, chal, res = msg
             if cp.dleq_verify(x, y, chal, res):
                 pk_shares.append([sender+1, y])
-                print("Node " + str(self.my_id) + "Received key shares from "+ str(sender))
+                print("Node " + str(self.my_id) + " received key shares from "+ str(sender))
             if len(pk_shares) > self.t:
                 break
         pk =  interpolate_g1_at_x(pk_shares, 0)
@@ -324,7 +324,7 @@ class ADKG:
         key_proposal = list(acss_outputs.keys())
         create_acs_task = asyncio.create_task(self.agreement(key_proposal, acss_outputs, acss_signal))
         acs, key_task, work_tasks = await create_acs_task
-        await asyncio.gather(acs)
+        await acs
         await asyncio.gather(*work_tasks)
         output = await key_task
         mks, sk, pk = output
