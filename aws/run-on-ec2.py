@@ -131,7 +131,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
         log_collection_cmds = [
             [id, ["cat benchmark-logs/*.log"]] for id in instance_ids
         ]
-        os.makedirs(run_id, exist_ok=True)
+        os.makedirs(f"data/{run_id}", exist_ok=True)
         run_commands_on_instances(
             ec2manager, log_collection_cmds, True, f"data/{run_id}/benchmark-logs"
         )

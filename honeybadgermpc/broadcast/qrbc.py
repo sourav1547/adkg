@@ -240,10 +240,13 @@ async def qrbc(
                         broadcast((sid, "READY", ready_digest, ready_stripe))
                 
                 if len(ready_senders) >= output_threshold:
-                    m = decode(k, n, stripes[_digest])
-                    # FIXME: I have to handle padding
-                    if ready_digest == hash(m):
+                    if from_leader and ready_digest == hash(m):
                         return m
+                    else:
+                        mp = decode(k, n, stripes[_digest])
+                        # FIXME: I have to handle padding
+                        if ready_digest == hash(mp):
+                            return m
 
                 
             
