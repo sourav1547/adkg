@@ -130,6 +130,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
             "COIN" + str(sid), pid, n, f, pk, sk, coin_bcast, coin_recvs.get
         )
         b = await coin(r)
+        print("Coin requested!!")
         return b
 
 

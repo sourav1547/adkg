@@ -59,6 +59,7 @@ class HbmpcConfig(object):
     skip_preprocessing = False
     extras = None
     reconstruction = None
+    time = None
 
     @staticmethod
     def load_config():
@@ -81,6 +82,13 @@ class HbmpcConfig(object):
             help="Path from where to load the HBMPC config file.",
         )
 
+        parser.add_argument(
+            "-time",
+            type=int,
+            dest="time",
+            help="Stores the start time of the experiment.",
+        )
+
         args = parser.parse_args()
 
         if args.is_dist:
@@ -93,6 +101,7 @@ class HbmpcConfig(object):
                 peerid: NodeDetails(addrinfo.split(":")[0], int(addrinfo.split(":")[1]))
                 for peerid, addrinfo in enumerate(config["peers"])
             }
+            HbmpcConfig.time = args.time
 
             if "skip_preprocessing" in config:
                 HbmpcConfig.skip_preprocessing = config["skip_preprocessing"]
@@ -112,3 +121,4 @@ class HbmpcConfig(object):
             assert HbmpcConfig.N is not None, "N: missing"
             assert HbmpcConfig.t is not None, "t: missing"
             assert HbmpcConfig.peers is not None, "peers: missing"
+            assert HbmpcConfig.time is not None, "time: missing"

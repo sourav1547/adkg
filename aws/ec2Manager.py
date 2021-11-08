@@ -1,4 +1,4 @@
-import boto3
+import boto3, botocore
 import paramiko
 import os.path
 import logging
@@ -10,12 +10,16 @@ class EC2Manager:
     current_vms_file_name = "current.vms"
 
     def __init__(self):
+        client_config = botocore.config.Config(
+            max_pool_connections=256
+        )
         self.ec2Resources = {
             region: boto3.resource(
                 "ec2",
                 aws_access_key_id=AwsConfig.ACCESS_KEY_ID,
                 aws_secret_access_key=AwsConfig.SECRET_ACCESS_KEY,
                 region_name=region,
+                config=client_config,
             )
             for region in AwsConfig.REGION.keys()
         }
@@ -76,11 +80,15 @@ class EC2Manager:
                 for instance_id in ids:
                     ec2_resource.Instance(id=instance_id).wait_until_running()
 
+                client_config = botocore.config.Config(
+                    max_pool_connections=256
+                )
                 ec2_client = boto3.client(
                     "ec2",
                     aws_access_key_id=AwsConfig.ACCESS_KEY_ID,
                     aws_secret_access_key=AwsConfig.SECRET_ACCESS_KEY,
                     region_name=region,
+                    config=client_config,
                 )
                 ec2_client.get_waiter("instance_status_ok").wait(InstanceIds=ids)
 

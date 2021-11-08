@@ -3,7 +3,7 @@
     "mpc" : {
         "command": "python3 -m scripts.adkg_run",
         "t": 2, 
-        "n": 7,
+        "n": 8,
         "k": 2,
         "num_faulty_nodes": 0,
         "port": 7001
@@ -14,16 +14,65 @@
 
         "region":{
             "us-east-2": {
-                "vm_count": 7,
+                "vm_count": 1,
                 "security_group_ids": ["sg-0a15458b66176b13b"], 
-                "image_id": "ami-0feb7c90cb466efb5",
+                "image_id": "ami-0556469b1e9127857",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            },
+            "us-east-1": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-0989fe0a3bf9f3f30"], 
+                "image_id": "ami-02bbd23f7aa200dac",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            },
+            "us-west-1": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-0b03d0d5c436df304"], 
+                "image_id": "ami-09347f9fbd1452140",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            }, 
+            "ca-central-1": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-03be11c47546b2195"], 
+                "image_id": "ami-025de56e059040247",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            },
+            "eu-west-1": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-0bf8c68ef0f229387"], 
+                "image_id": "ami-0cde2d49a17cd8b76",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            },
+            "us-west-2": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-05c941cf79c01d9cf"], 
+                "image_id": "ami-07f0dbd34bad9a35d",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            },
+            "ap-northeast-1": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-0f208f45f0922247d"], 
+                "image_id": "ami-0c24b772a1162d344",
+                "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
+                "key_name": "node"
+            },
+            "ap-southeast-1": {
+                "vm_count": 1,
+                "security_group_ids": ["sg-0c8eaef8b13f643be"], 
+                "image_id": "ami-0188f94a048b5b3a4",
                 "key_file_path": "/Users/sourav/drb-expt/remote/node.pem",
                 "key_name": "node"
             }
         },
 
         "vm_name": "adkg-vms",
-        "instance_type": "t2.micro",
+        "instance_type": "t3a.medium",
         "instance_user_name": "ubuntu",
         "bucket_name": "adkg"
     },

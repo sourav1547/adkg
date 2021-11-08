@@ -96,7 +96,8 @@ RUN apt-get install -y --no-install-recommends \
     bison \
     cmake \
     flex \
-    wget
+    wget \
+    psmisc
 
 # Downloads rust and sets it up
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
@@ -151,8 +152,8 @@ COPY --from=build ${PYTHON_LIBRARY_PATH} ${PYTHON_LIBRARY_PATH}
 COPY --from=build /usr/local/include/ /usr/local/include/
 COPY --from=build ${LIBRARY_PATH} ${LIBRARY_PATH}
 
-COPY apps/asynchromix/cpp/ apps/asynchromix/cpp/
-RUN make -C apps/asynchromix/cpp
+# COPY apps/asynchromix/cpp/ apps/asynchromix/cpp/
+# RUN make -C apps/asynchromix/cpp
 
 COPY setup.py .
 COPY README.md .
@@ -176,31 +177,31 @@ FROM pre-prod AS pre-dev
 WORKDIR /
 
 # Install solidity
-RUN git clone --recursive https://github.com/ethereum/solidity.git
-WORKDIR /solidity/
-RUN git checkout v0.4.24 # Old version necessary to work???
-RUN git submodule update --init --recursive
-RUN ./scripts/install_deps.sh
-RUN mkdir build/
-WORKDIR /solidity/build/
-RUN cmake ..
-RUN make install
-WORKDIR /
+# RUN git clone --recursive https://github.com/ethereum/solidity.git
+# WORKDIR /solidity/
+# RUN git checkout v0.4.24 # Old version necessary to work???
+# RUN git submodule update --init --recursive
+# RUN ./scripts/install_deps.sh
+# RUN mkdir build/
+# WORKDIR /solidity/build/
+# RUN cmake ..
+# RUN make install
+# WORKDIR /
 
 # Bash commands
 RUN echo "alias cls=\"clear && printf '\e[3J'\"" >> ~/.bashrc
 
 # Install Nodejs
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
+# RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
 
 # If you're testing out apt dependencies, put them here
 RUN apt-get install -y --no-install-recommends \
-    nodejs \
-    npm \
+    # nodejs \
+    # npm \
     tmux \
     vim
 
-RUN npm install -g ganache-cli
+# RUN npm install -g ganache-cli
 
 # Install remaining pip dependencies here
 WORKDIR /usr/src/HoneyBadgerMPC/

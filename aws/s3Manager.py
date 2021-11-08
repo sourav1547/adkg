@@ -1,16 +1,20 @@
-import boto3
+import boto3, botocore
 from concurrent.futures import ThreadPoolExecutor
 from aws.AWSConfig import AwsConfig
 
 
 class S3Manager(object):
     def __init__(self, run_id):
+        client_config = botocore.config.Config(
+           max_pool_connections=256
+        )
         # Always create bucket in 'us-east-1'
         self.s3Client = boto3.client(
             "s3",
             aws_access_key_id=AwsConfig.ACCESS_KEY_ID,
             aws_secret_access_key=AwsConfig.SECRET_ACCESS_KEY,
             region_name="us-east-1",
+            config=client_config,
         )
         self.bucket = AwsConfig.BUCKET_NAME
         self.prefix = run_id

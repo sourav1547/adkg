@@ -87,8 +87,9 @@ class ADKG:
         while True:
                 (dealer, _, share, commitments) = await self.acss.output_queue.get()
                 outputs[dealer] = [share, commitments]
-                if len(outputs) >= self.n - self.t:
-                    print("Player " + str(self.my_id) + " Got shares from: " + str([output for output in outputs]))
+                # if len(outputs) >= self.n - self.t:
+                if len(outputs) > self.t:
+                    # print("Player " + str(self.my_id) + " Got shares from: " + str([output for output in outputs]))
                     acss_signal.set()
 
                 if len(outputs) == self.n:
@@ -144,7 +145,8 @@ class ADKG:
         async def _recv_aba(j):
             aba_values[j] = await aba_out[j]()  # May block
             # print pid, j, 'ENTERING CRITICAL'
-            if sum(aba_values) >= self.n - self.t:
+            # if sum(aba_values) >= self.n - self.t:
+            if sum(aba_values) >= 1:
                 # Provide 0 to all other aba
                 for k in range(self.n):
                     if not aba_inputted[k]:
@@ -152,7 +154,8 @@ class ADKG:
                         aba_in[k](0)
         
         await asyncio.gather(*[asyncio.create_task(_recv_aba(j)) for j in range(self.n)])
-        assert sum(aba_values) >= self.n - self.t  # Must have at least N-f committed
+        # assert sum(aba_values) >= self.n - self.t  # Must have at least N-f committed
+        assert sum(aba_values) >= 1  # Must have at least N-f committed
 
         # Wait for the corresponding broadcasts
         for j in range(self.n):
@@ -177,7 +180,8 @@ class ADKG:
         coin_keys = [asyncio.Queue() for _ in range(self.n)]
 
         async def predicate(_key_proposal):
-            if len(_key_proposal) < self.n -self.t:
+            # if len(_key_proposal) < self.n -self.t:
+            if len(_key_proposal) <= self.t:
                 return False
         
             while True:
@@ -286,7 +290,7 @@ class ADKG:
         key_tag = "ACS_KEY"
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
-        print("Node " + str(self.my_id) + " starting key-derivation")
+        # print("Node " + str(self.my_id) + " starting key-derivation")
         for i in range(self.n):
             send(i, (x, y, chal, res))
 
@@ -296,7 +300,7 @@ class ADKG:
             x, y, chal, res = msg
             if cp.dleq_verify(x, y, chal, res):
                 pk_shares.append([sender+1, y])
-                print("Node " + str(self.my_id) + " received key shares from "+ str(sender))
+                # print("Node " + str(self.my_id) + " received key shares from "+ str(sender))
             if len(pk_shares) > self.t:
                 break
         pk =  interpolate_g1_at_x(pk_shares, 0)

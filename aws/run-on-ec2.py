@@ -52,28 +52,7 @@ def run_commands_on_instances(
     for thread in node_threads:
         thread.join()
 
-
-def get_ipc_setup_commands(s3manager, instance_ids):
-    from honeybadgermpc.preprocessing import PreProcessedElements
-    from honeybadgermpc.preprocessing import PreProcessingConstants as Constants
-
-    n, t = AwsConfig.TOTAL_VM_COUNT, AwsConfig.MPC_CONFIG.T
-
-    setup_commands = [
-        [
-            instance_id,
-            [
-                "sudo docker pull %s" % (AwsConfig.DOCKER_IMAGE_PATH),
-                "mkdir -p benchmark-logs",
-            ],
-        ]
-        for i, instance_id in enumerate(instance_ids)
-    ]
-
-    return setup_commands
-
-
-def get_hbavss_setup_commands(s3manager, instance_ids):
+def get_adkg_setup_commands(s3manager, instance_ids):
     setup_commands = [
         [
             instance_id,
@@ -102,9 +81,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
 
     port = AwsConfig.MPC_CONFIG.PORT
 
-    if AwsConfig.MPC_CONFIG.COMMAND.endswith("ipc"):
-        instance_configs = get_instance_configs(instance_ips)
-    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("adkg_run"):
+    if AwsConfig.MPC_CONFIG.COMMAND.endswith("adkg_run"):
         instance_configs = get_instance_configs(
             instance_ips, {"k": AwsConfig.MPC_CONFIG.K, "run_id": run_id}
         )
@@ -126,14 +103,13 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
     logging.info("Config update completed successfully.")
 
     if not skip_setup:
-        if AwsConfig.MPC_CONFIG.COMMAND.endswith("ipc"):
-            setup_commands = get_ipc_setup_commands(s3manager, instance_ids)
-        elif AwsConfig.MPC_CONFIG.COMMAND.endswith("adkg_run"):
-            setup_commands = get_hbavss_setup_commands(s3manager, instance_ids)
+        if AwsConfig.MPC_CONFIG.COMMAND.endswith("adkg_run"):
+            setup_commands = get_adkg_setup_commands(s3manager, instance_ids)
         logging.info("Triggering setup commands.")
         run_commands_on_instances(ec2manager, setup_commands, False)
 
     if not only_setup:
+        start_time = int(time.time()) + 60 # starting 1 minute in future
         logging.info("Setup commands executed successfully.")
         instance_commands = [
             [
@@ -144,7 +120,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
                 -v /home/ubuntu/config:/usr/src/HoneyBadgerMPC/config/ \
                 -v /home/ubuntu/benchmark-logs:/usr/src/HoneyBadgerMPC/benchmark-logs/ \
                 {AwsConfig.DOCKER_IMAGE_PATH} \
-                {AwsConfig.MPC_CONFIG.COMMAND} -d -f config/config-{i}.json"
+                {AwsConfig.MPC_CONFIG.COMMAND} -d -f config/config-{i}.json -time {start_time}"
                 ],
             ]
             for i, instance_id in enumerate(instance_ids)
@@ -157,7 +133,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
         ]
         os.makedirs(run_id, exist_ok=True)
         run_commands_on_instances(
-            ec2manager, log_collection_cmds, True, f"{run_id}/benchmark-logs"
+            ec2manager, log_collection_cmds, True, f"data/{run_id}/benchmark-logs"
         )
 
     s3manager.cleanup()

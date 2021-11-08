@@ -30,7 +30,7 @@ def get_avss_params(n, t):
     return g, h, public_keys, private_keys
 
 
-async def _run(peers, n, t, my_id):
+async def _run(peers, n, t, my_id, start_time):
     g, h, pks, sks = get_avss_params(n + 1, t)
     pc = PolyCommitFeldman(g)
 
@@ -38,8 +38,18 @@ async def _run(peers, n, t, my_id):
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("ADKG")
         logging.info(f"Starting ADKG: {(my_id)}")
+        logging.info(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
+
+        benchmark_logger = logging.LoggerAdapter(
+           logging.getLogger("benchmark_logger"), {"node_id": my_id}
+        )
 
         with ADKG(pks, sks[my_id], g, h, n, t, my_id, send, recv, pc) as adkg:
+            while True:
+                if time.time() > start_time:
+                    break
+                time.sleep(0.1)
+            
             begin_time = time.time()
             logging.info(f"ADKG start time: {(begin_time)}")
             adkg_task = asyncio.create_task(adkg.run_adkg())
@@ -47,8 +57,9 @@ async def _run(peers, n, t, my_id):
             logging.info(f"Created ADKG task, now waiting...")
             await adkg_task
             end_time = time.time()
-            logging.info(f"ADKG time: {(end_time - begin_time)}")
-            print("ADKG time:", str(end_time - begin_time))
+            adkg_time = end_time-begin_time
+            logging.info(f"ADKG time: {(adkg_time)}")
+            benchmark_logger.info("ADKG time: %f", adkg_time)
             adkg.kill()
             adkg_task.cancel()
         bytes_sent = runner.node_communicator.bytes_sent
@@ -66,7 +77,13 @@ if __name__ == "__main__":
     loop.set_debug(True)
     try:
         loop.run_until_complete(
-            _run(HbmpcConfig.peers, HbmpcConfig.N, HbmpcConfig.t, HbmpcConfig.my_id)
+            _run(
+                HbmpcConfig.peers,
+                HbmpcConfig.N,
+                HbmpcConfig.t,
+                HbmpcConfig.my_id,
+                HbmpcConfig.time,
+            )
         )
     finally:
         loop.close()
