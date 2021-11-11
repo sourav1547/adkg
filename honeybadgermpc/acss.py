@@ -6,6 +6,7 @@ from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.broadcast.avid import AVID
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
+from honeybadgermpc.broadcast.qrbc import qrbc
 
 import logging
 logger = logging.getLogger(__name__)
@@ -33,6 +34,10 @@ class Hbacss0SingleShare:
         self.n, self.t, self.my_id = n, t, my_id
         self.g = g
         self.poly_commit = pc
+
+        self.benchmark_logger = logging.LoggerAdapter(
+            logging.getLogger("benchmark_logger"), {"node_id": self.my_id}
+        )
 
         # Create a mechanism to split the `recv` channels based on `tag`
         self.subscribe_recv_task, self.subscribe_recv = subscribe_recv(recv)
@@ -64,12 +69,16 @@ class Hbacss0SingleShare:
 
     #def __exit__(self, typ, value, traceback):
     def kill(self):
+        # self.benchmark_logger.info("ACSS kill called")
         self.subscribe_recv_task.cancel()
+        # self.benchmark_logger.info("ACSS recv task cancelled")
         for task in self.tasks:
             task.cancel()
+        # self.benchmark_logger.info("ACSS self.tasks cancelled")
         for key in self.tagvars:
             for task in self.tagvars[key]['tasks']:
                 task.cancel()
+        # self.benchmark_logger.info("ACSS self tagvars canceled")
 
     
     #@profile
@@ -339,16 +348,30 @@ class Hbacss0SingleShare:
 
         send, recv = self.get_send(rbctag), self.subscribe_recv(rbctag)
         logger.debug("[%d] Starting reliable broadcast", self.my_id)
-        rbc_msg = await reliablebroadcast(
+
+        async def predicate(_m):
+            return True
+        rbc_msg = await qrbc(
             rbctag,
             self.my_id,
-            n,
+            self.n,
             self.t,
             dealer_id,
+            predicate,
             broadcast_msg,
-            recv,
             send,
-        )  # (# noqa: E501)
+            recv,
+        )
+        # rbc_msg = await reliablebroadcast(
+        #     rbctag,
+        #     self.my_id,
+        #     n,
+        #     self.t,
+        #     dealer_id,
+        #     broadcast_msg,
+        #     recv,
+        #     send,
+        # )  # (# noqa: E501)
         
         
 

@@ -9,6 +9,9 @@ import asyncio
 import hashlib
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey  # noqa:F401
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPrivateKey  # noqa:F401
+import time
+import logging
+
 
 class CP:
     def __init__(self, g, h, field=ZR):
@@ -55,13 +58,25 @@ class ADKG:
             return wrap_send(tag, send)
         self.get_send = _send
         self.output_queue = asyncio.Queue()
-    
+
+
+        self.benchmark_logger = logging.LoggerAdapter(
+            logging.getLogger("benchmark_logger"), {"node_id": self.my_id}
+        )
+            
     def kill(self):
+        self.benchmark_logger.info("ADKG kill called")
         self.subscribe_recv_task.cancel()
+        self.benchmark_logger.info("ADKG Recv task canceled called")
         for task in self.acss_tasks:
             task.cancel()
+        self.benchmark_logger.info("ADKG ACSS tasks canceled")
+        # TODO: To determine the order of kills, I think that might giving that error.
+        # 1. 
         self.acss.kill()
+        self.benchmark_logger.info("ADKG ACSS killed")
         self.acss_task.cancel()
+        self.benchmark_logger.info("ADKG ACSS task killed")
         
 
     def __enter__(self):
@@ -112,32 +127,13 @@ class ADKG:
             
             subset = True
             while True:
+                acss_signal.clear()
                 for k in rbc_values[j]:
                     if k not in acss_outputs.keys():
                         subset = False
                 if subset:
-                    skj = 0
-                    coeffs = [G1.identity() for _ in range(self.t+1)]
-                    for kk in rbc_values[j]:
-                        skj = skj + acss_outputs[kk][0][0]
-                        commitments = acss_outputs[kk][1]
-                        for i in range(len(coeffs)):
-                            coeffs[i] = coeffs[i]*commitments[0][i] #TODO: Optimize this
-                    
-                    pkj = [G1.identity() for _ in range(self.n)] #TODO: Optimize this
-                    for i in range(self.n):
-                        exp = ZR(1)
-                        pkji = G1.identity()
-                        for j in range(len(coeffs)):
-                            pkji*=coeffs[j]**exp
-                            exp *= (i+1)
-                        pkj[i] = pkji
-                    bpk = TBLSPublicKey(self.n, self.t, pkj[j], pkj)
-                    bsk = TBLSPrivateKey(self.n, self.t, pkj[j], pkj, skj, j)
-                    coin_keys[j]((bpk, bsk))
-                    acss_signal.clear()
-                    return 
-                acss_signal.clear()
+                    coin_keys[j]((acss_outputs, rbc_values[j]))
+                    return
                 await acss_signal.wait()
 
         r_threads = [asyncio.create_task(_recv_rbc(j)) for j in range(self.n)]

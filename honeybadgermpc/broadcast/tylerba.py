@@ -124,10 +124,31 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
     coin_recvs = asyncio.Queue()
 
     async def _coin(r, coin_init):
+        from pypairing import G1, ZR
         if not coin_init:
-            pk, sk = await coin_keys()
+            acss_outputs, rbc_values = await coin_keys()
+        
+        skj = 0
+        coeffs = [G1.identity() for _ in range(f+1)]
+        for kk in rbc_values:
+            skj = skj + acss_outputs[kk][0][0]
+            commitments = acss_outputs[kk][1]
+            for i in range(len(coeffs)):
+                coeffs[i] = coeffs[i]*commitments[0][i] #TODO: Optimize this
+        
+        pkj = [G1.identity() for _ in range(n)] #TODO: Optimize this
+        for i in range(n):
+            exp = ZR(1)
+            pkji = G1.identity()
+            for j in range(len(coeffs)):
+                pkji*=coeffs[j]**exp
+                exp *= (i+1)
+            pkj[i] = pkji
+        bpk = TBLSPublicKey(n, f, pkj[j], pkj)
+        bsk = TBLSPrivateKey(n, f, pkj[j], pkj, skj, j)
+
         coin, _ = await shared_coin(
-            "COIN" + str(sid), pid, n, f, pk, sk, coin_bcast, coin_recvs.get
+            "COIN" + str(sid), pid, n, f, bpk, bsk, coin_bcast, coin_recvs.get
         )
         b = await coin(r)
         print("Coin requested!!")
@@ -434,6 +455,8 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 if len(values2) == 1:
                     v = next(iter(values2))
                     if v == 2:
+                        # print("Coin!!")
+                        # decide(0)
                         est = await _coin(r, coin_init)
                         coin_init = True
                     else:
@@ -457,6 +480,9 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                     else:
                         est = v
                     _coin(r)
+                    # decide(0)
+                    # print("Coin invoked!!")
+                    # return
             except AbandonedNodeError:
                 # print('[sid:%s] [pid:%d] QUITTING in round %d' % (sid,pid,r))
                 logger.debug(f"[{pid}] QUIT!", extra={"nodeid": pid, "epoch": r})

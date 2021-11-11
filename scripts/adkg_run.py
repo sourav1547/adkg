@@ -50,6 +50,7 @@ async def _run(peers, n, t, my_id, start_time):
             benchmark_logger.info("ADKG time: %f", adkg_time)
             adkg.kill()
             adkg_task.cancel()
+            benchmark_logger.info("ADKG ACSS cancelled!")
         bytes_sent = runner.node_communicator.bytes_sent
         logging.info(f"[{my_id}] Total bytes sent out aa: {bytes_sent}")
 
