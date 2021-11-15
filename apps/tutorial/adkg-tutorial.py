@@ -20,18 +20,17 @@ logger.setLevel(logging.ERROR)
 # Uncomment this when you want logs from this file.
 logger.setLevel(logging.NOTSET)
 
-def get_avss_params(n, t):
+def get_avss_params(n):
     g, h = G1.hash(b'g'), G1.rand(b'h')   
     public_keys, private_keys = [None] * n, [None] * n
     for i in range(n):
-        private_keys[i] = ZR.random([0, 0, 0, i])
-        # private_keys[i] = ZR.hash(i) # TODO: Convert i to byte string
+        private_keys[i] = ZR.hash(bytes(i))
         public_keys[i] = pow(g, private_keys[i])
     return g, h, public_keys, private_keys
 
 
 async def _run(peers, n, t, my_id, start_time):
-    g, h, pks, sks = get_avss_params(n + 1, t)
+    g, h, pks, sks = get_avss_params(n)
     pc = PolyCommitFeldman(g)
 
     from honeybadgermpc.ipc import ProcessProgramRunner
