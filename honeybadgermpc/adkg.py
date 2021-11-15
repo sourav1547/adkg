@@ -3,7 +3,8 @@ from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.acss import Hbacss0SingleShare
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.share_recovery import interpolate_g1_at_x
-from pypairing import G1, ZR
+# from pypairing import G1, ZR
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 import asyncio
 import hashlib

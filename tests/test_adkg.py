@@ -6,7 +6,8 @@ import asyncio
 
 
 def get_avss_params(n, t):
-    from pypairing import G1, ZR
+    # from pypairing import G1, ZR
+    from pypairing import Curve25519ZR as ZR, Curve25519G as G1
     g = G1.rand()
     h = G1.rand()
     public_keys, private_keys = [None] * n, [None] * n
@@ -18,12 +19,13 @@ def get_avss_params(n, t):
 
 @mark.asyncio
 async def test_adkg(test_router):
-    from pypairing import ZR
+    # from pypairing import ZR
+    from pypairing import Curve25519ZR as ZR
     t = 1
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)
-    sends, recvs, _ = test_router(n, maxdelay=10)
+    sends, recvs, _ = test_router(n, maxdelay=0.001)
     pc = PolyCommitFeldman(g)
 
     dkg_tasks = [None] * n # async task for adkg

@@ -1,6 +1,8 @@
 import asyncio
 from pickle import dumps, loads
-from pypairing import ZR, G1
+from honeybadgermpc.broadcast.crypto.boldyreva import dealer
+# from pypairing import ZR, G1
+from pypairing import Curve25519ZR as ZR
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
@@ -189,6 +191,7 @@ class Hbacss0SingleShare:
         else:
             multicast((HbAVSSMessageType.IMPLICATE, self.private_key))
             implicate_sent = True
+            logger.debug("Implicate Sent [%d]", dealer_id)
             self.tagvars[tag]['in_share_recovery'] = True
 
         ok_set = set()
@@ -205,10 +208,12 @@ class Hbacss0SingleShare:
             if avss_msg[0] == HbAVSSMessageType.IMPLICATE and not self.tagvars[tag]['in_share_recovery']:
                 if sender not in implicate_set:
                     implicate_set.add(sender)
+                    logger.debug("Handling Implicate Message [%d]", dealer_id)
                     # validate the implicate
                     #todo: implicate should be forwarded to others if we haven't sent one
                     if await self._handle_implication(tag, sender, avss_msg[1]):
                         # proceed to share recovery
+                        logger.debug("Handle implication called [%d]", dealer_id)
                         self.tagvars[tag]['in_share_recovery'] = True
                         await self._handle_share_recovery(tag)
                         logger.debug("[%d] after implication", self.my_id)
@@ -320,12 +325,12 @@ class Hbacss0SingleShare:
             assert dealer_id != self.my_id
         assert type(avss_id) is int
 
-        logger.debug(
-            "[%d] Starting Batch AVSS. Id: %s, Dealer Id: %d",
-            self.my_id,
-            avss_id,
-            dealer_id,
-        )
+        # logger.debug(
+        #     "[%d] Starting Batch AVSS. Id: %s, Dealer Id: %d",
+        #     self.my_id,
+        #     avss_id,
+        #     dealer_id,
+        # )
 
         n = self.n
         rbctag = f"{dealer_id}-{avss_id}-B-RBC"
@@ -376,7 +381,7 @@ class Hbacss0SingleShare:
         
 
 
-        logger.debug("[%d] Starting AVID disperse", self.my_id)
+        # logger.debug("[%d] Starting AVID disperse", self.my_id)
         avidsend, avidrecv = self.get_send(avidtag), self.subscribe_recv(avidtag)
         avid = AVID(n, self.t, dealer_id, avidrecv, avidsend, n)
 
@@ -384,7 +389,7 @@ class Hbacss0SingleShare:
         self.tagvars[acsstag]['avid_msg_queue'].put_nowait((avid, avidtag, dispersal_msg_list))
 
         # avss processing
-        logger.debug("starting acss")
+        # logger.debug("starting acss")
         await self._process_avss_msg(avss_id, dealer_id, rbc_msg, avid)
         
         #acss is done, cancel ongoing tasks

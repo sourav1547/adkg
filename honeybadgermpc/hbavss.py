@@ -3,7 +3,8 @@ import asyncio
 import pypairing
 from pickle import dumps, loads
 #from honeybadgermpc.betterpairing import ZR, G1
-from pypairing import ZR, G1
+# from pypairing import ZR, G1
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_log import PolyCommitLog
 from honeybadgermpc.symmetric_crypto import SymmetricCrypto

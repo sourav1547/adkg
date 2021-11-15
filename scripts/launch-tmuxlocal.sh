@@ -41,7 +41,7 @@ start_time=$((start_time+10))
 
 ## TODO: the following was used for launching a larger number
 ## of processes locally, with only a portion of them shown in tmux
-for ID in $(seq 6 13)
+for ID in $(seq 4 13)
 do
    echo
    ${CMD} -d -f ${CONFIG_PATH}.${ID}.json -time $start_time > logs/logs-${ID}.log 2>&1 &
@@ -65,7 +65,7 @@ elif [ "$3" == "dealer" ]
   then
     set -x
     rm -rf sharedata/
-    tmux new-session     "${CMD} -d -f ${CONFIG_PATH}.0.json; sh" \; \
+    tmux new-session     "${CMD} -d -f ${CONFIG_PATH}.0.json > xxxxxxxx.out; sh" \; \
         splitw -h -p 50 "${CMD} -d -f ${CONFIG_PATH}.1.json; sh" \; \
         splitw -v -p 50 "sleep 2; ${CMD} -d -f ${CONFIG_PATH}.2.json; sh" \; \
         selectp -t 0 \; \

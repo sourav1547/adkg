@@ -12,7 +12,8 @@ import asyncio
 
 
 def get_avss_params(n, t):
-    from pypairing import G1, ZR
+    # from pypairing import G1, ZR
+    from pypairing import Curve25519ZR as ZR, Curve25519G as G1
     g = G1.rand()
     public_keys, private_keys = [None] * n, [None] * n
     for i in range(n):
@@ -23,7 +24,8 @@ def get_avss_params(n, t):
 
 @mark.asyncio
 async def test_hbacss0(test_router):
-    from pypairing import G1, ZR
+    # from pypairing import G1, ZR
+    from pypairing import Curve25519ZR as ZR, Curve25519G as G1
     t = 2
     n = 3 * t + 1
 

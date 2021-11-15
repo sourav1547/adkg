@@ -1,5 +1,6 @@
 #from honeybadgermpc.betterpairing import ZR, G1
-from pypairing import ZR, G1
+# from pypairing import ZR, G1
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.proofs import MerkleTree
 import pickle
 import math

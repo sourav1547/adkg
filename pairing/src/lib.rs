@@ -22,6 +22,8 @@ use pyo3::types::PyBytes;
 use pyo3::types::PyLong;
 use pyo3::PyNumberProtocol;
 use pyo3::basic::CompareOp;
+use pyo3::PyErr;
+use pyo3::exceptions;
 //mod number;
 //use self::number::PyNumberProtocol;
 use pyo3::PyObjectProtocol;
@@ -61,6 +63,17 @@ use std::io::{self, Write};
 use rand_chacha::ChaCha20Rng;
 use rand_core::SeedableRng;
 use sha2::{Sha256, Sha512, Digest};
+extern crate curve25519_dalek;
+use curve25519_dalek::scalar::Scalar;
+use curve25519_dalek::ristretto::RistrettoPoint;
+use curve25519_dalek::ristretto::CompressedRistretto;
+use curve25519_dalek::traits::Identity;
+use std::ops::MulAssign;
+use std::ops::AddAssign;
+use std::ops::SubAssign;
+use std::ops::Neg;
+extern crate num_integer;
+use num_integer::Integer;
 
 
 fn hex_to_bin (hexstr: &String) -> String
@@ -68,7 +81,14 @@ fn hex_to_bin (hexstr: &String) -> String
     let mut out = String::from("");
     let mut bin = "";
     //Ignore the 0x at the beginning
-    for c in hexstr[2..].chars()
+    let mut searchstr = "";
+    if hexstr.as_bytes()[1] as char == 'x'{
+        searchstr = &hexstr[2..];
+    }
+    else{
+        searchstr = hexstr;
+    }
+    for c in searchstr.chars()
     {
         match c
         {
@@ -1756,6 +1776,611 @@ impl PyObjectProtocol for PyFq12 {
 }
 
 
+#[pyclass(module = "pypairing", name = Curve25519G)]
+#[derive(Clone)]
+struct PyRistG {
+   g : RistrettoPoint,
+   pp : Vec<RistrettoPoint>,
+   pplevel : usize
+}
+
+#[pymethods]
+impl PyRistG {
+
+    #[new]
+    fn new() -> Self {
+        let g =  RistrettoPoint::identity();
+        PyRistG{
+            g: g,
+            pp: Vec::new(),
+            pplevel : 0
+        }
+    }
+
+    fn one(&mut self) -> PyResult<()> {
+        self.g = RistrettoPoint::identity();
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+    }
+
+    fn negate(&mut self) -> PyResult<()> {
+        self.g = self.g.neg();
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+    }
+
+    fn add_assign(&mut self, other: &PyRistG) -> PyResult<()> {
+        self.g.add_assign(&other.g);
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+    }
+    
+
+    fn sub_assign(&mut self, other: &PyRistG) -> PyResult<()> {
+        self.g.sub_assign(&other.g);
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+    }
+
+    //Keeping previous code for multithreading in case it comes in handy
+    //fn mul_assign(&mut self, py: Python, other:&PyFr) -> PyResult<()> {
+    fn mul_assign(&mut self, other:&PyRistScalar) -> PyResult<()>{
+        //py.allow_threads(move || self.g1.mul_assign(other.fr));
+        self.g.mul_assign(other.scalar);
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+    }
+
+    /// a.equals(b)
+    fn equals(&self, other: &PyRistG) -> bool {
+        self.g == other.g
+    }
+
+    /// Copy other into self
+    fn copy(&mut self, other: &PyRistG) -> PyResult<()> {
+        self.g = other.g;
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+    }
+    
+    //Serialize into affine coordinates so that equal points serialize the same
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+        let compressed = self.g.compress();
+        Ok(PyList::new(py, compressed.to_bytes()))
+        /*let aff = self.g1.into_affine();
+        let fqx = FqRepr::from(aff.x);
+        let fqy = FqRepr::from(aff.y);
+        let arr1: &[u64] = fqx.as_ref();
+        let arr2: &[u64] = fqy.as_ref();
+        let mut end: [u64;1] = [0;1];
+        if aff.infinity {
+            end[0] = 1;
+        }
+        let arr = [arr1, arr2, &end].concat();
+        Ok(PyList::new(py, arr))*/
+    }
+    
+    pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
+    {
+        let arr: [u8; 32] = list.extract()?;
+        let compressed = CompressedRistretto::from_slice(&arr);
+        let decompressed = compressed.decompress().ok_or_else(|| PyErr::new::<exceptions::TypeError, _>("Invalid deserialization for Ristretto Point (expected [u8;32])"))?;
+        self.g = decompressed;
+        Ok(())
+    }
+    
+    //Creates preprocessing elements to allow fast scalar multiplication.
+    //Level determines extent of precomputation
+    fn preprocess(&mut self, level: usize) -> PyResult<()> {
+        self.pplevel = level;
+        //Everything requires a different kind of int (and only works with that kind)
+        let mut base: u64 = 2;
+        //calling pow on a u64 only accepts a u32 parameter for reasons undocumented
+        base = base.pow(level as u32);
+        let ppsize = (base - 1) * ((252 + level as u64 - 1)/(level as u64));
+        self.pp = Vec::with_capacity(ppsize as usize);
+        let factor = Scalar::from(base);
+        self.pp.push(self.g.clone());
+        for i in 1..base-1
+        {
+            //Yes, I really need to expicitly cast the indexing variable...
+            let mut next = self.pp[i as usize -1].clone();
+            next.add_assign(&self.g);
+            self.pp.push(next);
+        }
+        //(x + y - 1) / y is a way to round up the integer division x/y
+        for i in base-1..(base - 1) * ((252 + level as u64 - 1)/(level as u64)) {
+            let mut next = self.pp[i as usize - (base-1) as usize].clone();
+            //Wait, so add_assign takes a borrowed object but mul_assign doesn't?!?!?!?
+            next.mul_assign(factor);
+            self.pp.push(next);
+        }
+        //It's not really Ok. This is terrible.
+        Ok(())
+    }
+ 
+    fn ppmul(&self, prodend: &PyRistScalar, out: &mut PyRistG) -> PyResult<()>
+    {
+        if self.pp.len() == 0
+        {
+            out.g = self.g.clone();
+            out.g.mul_assign(prodend.scalar);
+        }
+        else
+        {
+            let zero = Scalar::zero();
+            out.g.mul_assign(zero);
+            let mut scalarbytes = prodend.scalar.to_bytes();
+            scalarbytes.reverse();
+            let hexstr = hex::encode(scalarbytes);
+            let binstr = hex_to_bin(&hexstr);
+            let mut buffer = 0usize;
+            for (i, c) in binstr.chars().rev().enumerate()
+            {
+                if i%self.pplevel == 0 && buffer != 0
+                {
+                    //(2**level - 1)*(i/level - 1) + (buffer - 1)
+                    out.g.add_assign(&self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)]);
+                    buffer = 0;
+                }
+                if c == '1'
+                {
+                    buffer = buffer + 2usize.pow((i%self.pplevel) as u32);
+                }
+                if i == 255 && buffer != 0{
+                    out.g.add_assign(&self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel) + (buffer-1)]);
+                    buffer = 0;
+                }
+            }
+            if buffer != 0{
+                 panic!("I KNEW IT");
+            }
+        }
+        Ok(())
+    }
+    
+    fn get_pplevel(&self) -> PyResult<usize> {
+        Ok(self.pplevel)
+    }
+
+    fn pow(&self, rhs: PyRistScalar)  -> PyResult<PyRistG> {
+        let mut out = PyRistG{
+            g: RistrettoPoint::identity(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        self.ppmul(&rhs, &mut out).unwrap();
+        Ok(out)
+    }
+    //todo: they have their own from hash function
+    #[staticmethod]
+    fn hash(bytestr: &PyBytes) -> PyResult<PyRistG>{
+        let bytes: &[u8] = bytestr.as_bytes();
+        let mut hasher = Sha256::new();
+        hasher.input(bytes);
+        let result = hasher.result();
+        let seed: [u8; 32] = result.as_slice().try_into().unwrap();
+        let mut rng = ChaCha20Rng::from_seed(seed);
+        let g = RistrettoPoint::random(&mut rng);
+        Ok(PyRistG{
+            g: g,
+            pp: Vec::new(),
+            pplevel : 0
+        })
+    }
+    
+    #[staticmethod]
+    fn hash_many(bytestr: &PyBytes, length: usize) -> PyResult<Vec<PyRistG>>{
+        let bytes: &[u8] = bytestr.as_bytes();
+        let mut hasher = Sha256::new();
+        hasher.input(bytes);
+        let result = hasher.result();
+        let seed: [u8; 32] = result.as_slice().try_into().unwrap();
+        let mut rng = ChaCha20Rng::from_seed(seed);
+        let mut out = Vec::with_capacity(length);
+        for i in 0..length{
+            let g = RistrettoPoint::random(&mut rng);
+            out.push(PyRistG{
+                g: g,
+                pp: Vec::new(),
+                pplevel : 0
+            });
+        }
+        Ok(out)
+    }
+    
+    #[staticmethod]
+    fn identity() -> PyResult<PyRistG> {
+        let g =  RistrettoPoint::identity();
+        Ok(PyRistG{
+            g: g,
+            pp: Vec::new(),
+            pplevel : 0
+        })
+    }
+    
+    #[staticmethod]
+    fn rand(a: Option<Vec<u32>>) -> PyResult<PyRistG> {
+        match a {
+            None => {
+                let mut rng = ChaCha20Rng::from_entropy();
+                let g = RistrettoPoint::random(&mut rng);
+                Ok(PyRistG{
+                    g: g,
+                    pp: Vec::new(),
+                    pplevel : 0
+                })
+            },
+            Some(a) => {
+                let mut seed: [u32;8] = [0,0,0,0,0,0,0,0];
+                let mut i = 0;
+                for item in a.iter(){
+                    let myu32: &u32 = item;
+                    seed[i] = *myu32;
+                    i = i + 1;
+                }
+                let mut rng = ChaCha20Rng::from_seed(swap_seed_format(seed));
+                let g = RistrettoPoint::random(&mut rng);
+                Ok(PyRistG{
+                    g: g,
+                    pp: Vec::new(),
+                    pplevel : 0
+                })
+            }
+        }
+        
+    }
+}
+
+#[pyproto]
+impl PyNumberProtocol for PyRistG {
+    fn __mul__(lhs: PyRistG, rhs: PyRistG) -> PyResult<PyRistG> {
+        let mut out = PyRistG{
+            g: RistrettoPoint::identity(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        out.g.clone_from(&lhs.g);
+        out.g.add_assign(&rhs.g);
+        Ok(out)
+    }
+    fn __imul__(&mut self, other: PyRistG) -> PyResult<()> {
+        self.add_assign(&other)?;
+        Ok(())
+    }
+    fn __truediv__(lhs: PyRistG, rhs: PyRistG) -> PyResult<PyRistG> {
+        let mut out = PyRistG{
+            g: RistrettoPoint::identity(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        out.g.clone_from(&lhs.g);
+        out.g.add_assign(&rhs.g.neg());
+        Ok(out)
+    }
+    // Somehow this is faster AND more general? Hell yeah!
+    fn __pow__(lhs: PyRistG, rhs: &PyAny, _mod: Option<&'p PyAny>)  -> PyResult<PyRistG> {
+        let mut out = PyRistG{
+            g: RistrettoPoint::identity(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        let exp = pyscalar_from_pyany(&rhs)?;
+        lhs.ppmul(&exp, &mut out).unwrap();
+        Ok(out)
+        /*let rhscel = &rhs.downcast::<PyCell<PyRistScalar>>();
+        if rhscel.is_err(){
+            let exp: BigInt = rhs.extract()?;
+            //todo: account for sign
+            let s: Scalar = Scalar::from_bytes_mod_order(exp.to_bytes_le().1.try_into().unwrap());
+            lhs.ppmul(&PyRistScalar{scalar: s}, &mut out).unwrap();
+        }
+        else {
+            //let rhscel2 = rhscel.as_ref().unwrap();
+            let exp: &PyRistScalar = &rhscel.as_ref().unwrap().borrow();
+            lhs.ppmul(&exp, &mut out).unwrap();
+        }
+        Ok(out)*/
+    }
+    /*fn __pow__(lhs: PyG1, rhs: PyFr, _mod: Option<&'p PyAny>)  -> PyResult<PyG1> {
+        let mut out = PyG1{
+            g1: G1::one(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        lhs.ppmul(&rhs, &mut out).unwrap();
+        Ok(out)
+    }*/
+}
+#[pyproto]
+impl PyObjectProtocol for PyRistG {
+    fn __richcmp__(&self, other: &PyAny, op: CompareOp) -> PyResult<bool> {
+        let eq = |a:&PyRistG ,b: &PyAny| {
+            let othercel = &b.downcast::<PyCell<PyRistG>>();
+            if othercel.is_err(){
+                false
+            }
+            else{
+                let otherg: &PyRistG = &othercel.as_ref().unwrap().borrow();
+                a.g == otherg.g
+            }
+        };
+        match op {
+            CompareOp::Eq => Ok(eq(self, other)),
+            CompareOp::Ne => Ok(!eq(self, other)),
+            CompareOp::Lt => Ok(false),
+            CompareOp::Le => Ok(false),
+            CompareOp::Gt => Ok(false),
+            CompareOp::Ge => Ok(false),
+        }
+    }
+    fn __str__(&self) -> PyResult<String> {
+        let compressed = self.g.compress();
+        Ok(format!("(s: {})",hex::encode(compressed.to_bytes())))
+    }
+    fn __repr__(&self) -> PyResult<String> {
+        let compressed = self.g.compress();
+        Ok(format!("(s: {})",hex::encode(compressed.to_bytes())))
+    }
+}
+
+#[pyclass(module = "pypairing", name = Curve25519ZR)]
+#[derive(Clone)]
+struct PyRistScalar {
+   scalar : Scalar
+}
+
+#[pymethods]
+impl PyRistScalar {
+
+    #[new]
+    fn new(s1: Option<&PyAny>) -> Self {
+        match s1 {
+            None => PyRistScalar{scalar:Scalar::one()},
+            Some(s1) => {
+                pyscalar_from_pyany(&s1).unwrap()
+            }
+        }
+    }
+
+    fn negate(&mut self) -> PyResult<()> {
+        self.scalar = self.scalar.neg();
+        Ok(())
+    }
+
+    fn inverse(&mut self) -> PyResult<()> {
+        self.scalar = self.scalar.invert();
+        Ok(())
+    }
+
+
+    fn add_assign(&mut self, other: &PyRistScalar) -> PyResult<()> {
+        self.scalar.add_assign(&other.scalar);
+        Ok(())
+    }
+
+    fn sub_assign(&mut self, other: &PyRistScalar) -> PyResult<()> {
+        self.scalar.sub_assign(&other.scalar);
+        Ok(())
+    }
+
+    fn mul_assign(&mut self, other: &PyRistScalar) -> PyResult<()> {
+        self.scalar.mul_assign(&other.scalar);
+        Ok(())
+    }
+    
+    fn pow_assign(&mut self, other: &PyAny) -> PyResult<()> {
+        let base = BigInt::from_bytes_le(Sign::Plus, &self.scalar.to_bytes());
+        let curve25519_r = BigInt::from_bytes_le(Sign::Plus, &vec![
+        0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+        0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+        ]);
+        let curve25519_r_minus_1 = BigInt::from_bytes_le(Sign::Plus, &vec![
+        0xec, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+        0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+        ]);
+        let mut exp: BigInt = other.extract()?;
+        exp = exp.mod_floor(&curve25519_r_minus_1);
+        let result = base.modpow(&exp, &curve25519_r);
+        let pyscalar = bigint_to_pyscalar(&result);
+        self.scalar = pyscalar.scalar;
+        Ok(())
+    }
+    
+    fn to_montgomery(&self) -> PyResult<PyRistScalar> {
+        let mut out = PyRistScalar{scalar: Scalar::one()};
+        out.scalar.clone_from(&self.scalar);
+        out.scalar = out.scalar.to_montgomery();
+        Ok(out)
+    }
+    
+    fn from_montgomery(&self) -> PyResult<PyRistScalar> {
+        let mut out = PyRistScalar{scalar: Scalar::one()};
+        out.scalar.clone_from(&self.scalar);
+        out.scalar = out.scalar.from_montgomery();
+        Ok(out)
+    }
+
+    fn is_zero(&self) -> bool {
+        self.scalar == Scalar::zero()
+    }
+
+    fn equals(&self, other: &PyRistScalar) -> bool {
+        self.scalar == other.scalar
+    }
+
+    /// Copy other into self
+    fn copy(&mut self, other: &PyRistScalar) -> PyResult<()> {
+        self.scalar = other.scalar;
+        Ok(())
+    }
+    
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+        Ok(PyList::new(py, self.scalar.to_bytes()))
+    }
+    
+    pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
+    {
+        let arr: [u8; 32] = list.extract()?;
+        let myscalar = Scalar::from_bytes_mod_order(arr);
+        self.scalar = myscalar;
+        Ok(())
+    }
+    
+    #[staticmethod]
+    fn hash(bytestr: &PyBytes) -> PyResult<PyRistScalar>{
+        let bytes: &[u8] = bytestr.as_bytes();
+        let mut hasher = Sha256::new();
+        hasher.input(bytes);
+        let result = hasher.result();
+        let seed: [u8; 32] = result.as_slice().try_into().unwrap();
+        let mut rng = ChaCha20Rng::from_seed(seed);
+        let s = Scalar::random(&mut rng);
+        Ok(PyRistScalar{scalar: s})
+    }
+    
+    #[staticmethod]
+    fn hash_many(bytestr: &PyBytes, length: usize) -> PyResult<Vec<PyRistScalar>>{
+        let bytes: &[u8] = bytestr.as_bytes();
+        let mut hasher = Sha256::new();
+        hasher.input(bytes);
+        let result = hasher.result();
+        let seed: [u8; 32] = result.as_slice().try_into().unwrap();
+        let mut rng = ChaCha20Rng::from_seed(seed);
+        let mut out = Vec::with_capacity(length);
+        for i in 0..length{
+            let s = Scalar::random(&mut rng);
+            out.push(PyRistScalar{scalar: s});
+        }
+        Ok(out)
+    }
+    
+    #[staticmethod]
+    fn rand() -> PyResult<PyRistScalar> {
+            let mut rng = ChaCha20Rng::from_entropy();
+            let s = Scalar::random(&mut rng);
+            Ok(PyRistScalar{scalar: s})
+    }
+    
+    #[staticmethod]
+    fn random() -> PyResult<PyRistScalar> {
+        Ok(PyRistScalar::rand()?)
+    }
+
+}
+
+#[pyproto]
+impl PyNumberProtocol for PyRistScalar {
+    
+    fn __add__(lhs: PyRistScalar, rhs: &PyAny) -> PyResult<PyRistScalar> {
+        let mut out: PyRistScalar = pyscalar_from_pyany(&rhs)?;
+        out.add_assign(&lhs);
+        Ok(out)
+    }
+    
+    fn __truediv__(lhs: PyRistScalar, rhs: &PyAny) -> PyResult<PyRistScalar> {
+        let mut out: PyRistScalar = pyscalar_from_pyany(&rhs)?;
+        out.inverse();
+        out.mul_assign(&lhs);
+        Ok(out)
+    }
+    
+    fn __mul__(lhs: PyRistScalar, rhs: &PyAny) -> PyResult<PyRistScalar> {
+        let mut out: PyRistScalar = pyscalar_from_pyany(&rhs)?;
+        //out.scalar = out.scalar.to_montgomery();
+        //let lhs_mont = PyRistScalar{scalar: lhs.scalar.to_montgomery()};
+        //out.mul_assign(&lhs_mont);
+        //out.scalar = out.scalar.from_montgomery();
+        out.mul_assign(&lhs);
+        //out.scalar = out.scalar.from_montgomery();
+        Ok(out)
+    }
+    
+    fn __neg__(&self) -> PyResult<PyRistScalar> {
+        let mut out = PyRistScalar{
+            scalar: self.scalar.neg()
+        };
+        Ok(out)
+    }
+    
+    fn __int__(&self) -> PyResult<BigInt> {
+        let bi = BigInt::from_bytes_le(Sign::Plus, &self.scalar.to_bytes());
+        Ok(bi)
+    }
+    
+    fn __pow__(lhs: PyRistScalar, rhs: &PyAny, _mod: Option<&'p PyAny>) -> PyResult<PyRistScalar> {
+        let mut out = PyRistScalar{
+            scalar: Scalar::one()
+        };
+        out.scalar.clone_from(&lhs.scalar);
+        out.pow_assign(&rhs);
+        Ok(out)
+    }
+    
+    fn __sub__(lhs: PyRistScalar, rhs: &PyAny) -> PyResult<PyRistScalar> {
+        let mut out = PyRistScalar{scalar: lhs.scalar.clone()};
+        let subend = pyscalar_from_pyany(&rhs)?;
+        out.sub_assign(&subend);
+        Ok(out)
+    }
+}
+
+#[pyproto]
+impl PyObjectProtocol for PyRistScalar {
+    fn __richcmp__(&self, other: &PyAny, op: CompareOp) -> PyResult<bool> {
+        let eq = |a:&PyRistScalar ,b: &PyAny| {
+            let otherscalar = pyscalar_from_pyany(&b);
+            if otherscalar.is_err(){
+                false
+            }
+            else{
+                a.scalar == otherscalar.unwrap().scalar
+            }
+        };
+        match op {
+            CompareOp::Eq => Ok(eq(self, other)),
+            CompareOp::Ne => Ok(!eq(self, other)),
+            CompareOp::Lt => Ok(false),
+            CompareOp::Le => Ok(false),
+            CompareOp::Gt => Ok(false),
+            CompareOp::Ge => Ok(false),
+        }
+    }
+    fn __str__(&self) -> PyResult<String> {
+        let mut scalarbytes = self.scalar.to_bytes();
+        scalarbytes.reverse();
+        Ok(format!("{}", hex::encode(scalarbytes)))
+    }
+    fn __repr__(&self) -> PyResult<String> {
+        let mut scalarbytes = self.scalar.to_bytes();
+        scalarbytes.reverse();
+        Ok(format!("{}", hex::encode(scalarbytes)))
+    }
+}
+
+
 #[pyfunction]
 fn vec_sum(a: &PyList, py: Python) -> PyResult<String>{
     let mut sum =  Fr::from_str("0").unwrap();
@@ -2024,6 +2649,27 @@ fn bigint_to_pyfrexp(bint: &BigInt) -> PyFr {
     mypyfr
 }
 
+fn bigint_to_pyscalar(bint: &BigInt) -> PyRistScalar {
+    let curve25519_r = BigInt::from_bytes_le(Sign::Plus, &vec![
+        0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+        0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+    ]);
+    let mut modr = bint.clone();
+    modr = modr.mod_floor(&curve25519_r);
+    let mut modr_bytes = modr.to_bytes_le().1;
+    let padding_len = 32 - modr_bytes.len();
+    let mut padding: Vec<u8> = vec![0;padding_len];
+    //padding.append(&mut modr_bytes);
+    modr_bytes.append(&mut padding);
+    let myscalar = Scalar::from_bytes_mod_order(modr_bytes.try_into().unwrap_or_else(|_| panic!("F's in the chat, boys")));
+    let mypyscalar = PyRistScalar{
+        scalar: myscalar
+    };
+    mypyscalar
+}
+
 fn swap_seed_format(inarr: [u32;8]) -> [u8;32] {
     let mut out: [u8;32] = [0; 32];
     for i in 0..8 {
@@ -2070,6 +2716,23 @@ fn pyfr_from_pyanyexp(any: &PyAny) -> PyResult<PyFr> {
     Ok(out)
 }
 
+fn pyscalar_from_pyany(any: &PyAny) -> PyResult<PyRistScalar> {
+    let mut out = PyRistScalar{
+        scalar: Scalar::one()
+    };
+    let anycel = &any.downcast::<PyCell<PyRistScalar>>();
+    if anycel.is_err(){
+        let bi: BigInt = any.extract()?;
+        let mypyfr = bigint_to_pyscalar(&bi);
+        out.scalar = mypyfr.scalar;
+    }
+    else{
+        let mypyscalar: &PyRistScalar = &anycel.as_ref().unwrap().borrow();
+        out.scalar.clone_from(&mypyscalar.scalar);
+    }
+    Ok(out)
+}
+
 #[pymodule]
 fn pypairing(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyG1>()?;
@@ -2080,6 +2743,8 @@ fn pypairing(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyFq6>()?;
     m.add_class::<PyFq12>()?;
     m.add_class::<PyFr>()?;
+    m.add_class::<PyRistG>()?;
+    m.add_class::<PyRistScalar>()?;
     //m.add_function(wrap_pyfunction!(vec_sum))?;
     m.add_wrapped(wrap_pyfunction!(pair))?;
     m.add_wrapped(wrap_pyfunction!(vec_sum))?;
