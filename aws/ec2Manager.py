@@ -106,6 +106,8 @@ class EC2Manager:
             ec2_resource.Instance(id=instance_id).terminate()
         if os.path.isfile(EC2Manager.current_vms_file_name):
             os.remove(EC2Manager.current_vms_file_name)
+        if os.path.isfile("awsips.log"):
+            os.remove("awsips.log")
     
     def stop_instance_by_id(self):
         instance_ids = self.get_current_vm_instance_ids()

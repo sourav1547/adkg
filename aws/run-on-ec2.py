@@ -66,6 +66,15 @@ def get_adkg_setup_commands(s3manager, instance_ids):
 
     return setup_commands
 
+# def get_drand_setup_commands(ec2manager, instance_ids):
+#     commands = ec2manager.get_setup_commands()
+#     print(commands)
+#     setup_commands = [
+#         [instance_id, commands]
+#         for i, instance_id in enumerate(instance_ids)
+#     ]
+#     return setup_commands
+
 def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
     logging.info(f"Run Id: {run_id}")
     ec2manager, s3manager = EC2Manager(), S3Manager(run_id)
@@ -85,6 +94,15 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
         instance_configs = get_instance_configs(
             instance_ips, {"k": AwsConfig.MPC_CONFIG.K, "run_id": run_id}
         )
+    elif AwsConfig.MPC_CONFIG.COMMAND.endswith("drand"):
+        with open("awsips.log", "w") as ipfile:
+            for ip in instance_ips:
+                ipfile.write(ip+"\n")
+        # setup_commands = get_drand_setup_commands(ec2manager, instance_ids)
+        # logging.info("Triggering setup commands.")
+        # print(setup_commands)
+        # run_commands_on_instances(ec2manager, setup_commands, False)
+        return
     else:
         logging.error("Application not supported to run on AWS.")
         raise SystemError
