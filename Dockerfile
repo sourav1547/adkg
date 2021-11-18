@@ -72,7 +72,8 @@ RUN pip install \
     pycrypto \
     pyzmq \
     matplotlib \
-    zfec 
+    zfec \
+    BitVector
 
 # This is needed otherwise the build for the power sum solver will fail.
 # This is a known issue in the version of libflint-dev in apt.

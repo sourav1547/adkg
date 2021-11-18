@@ -10,6 +10,7 @@ from honeybadgermpc.mpc import Mpc
 from honeybadgermpc.config import HbmpcConfig, ConfigVars
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.utils.misc import print_exception_callback
+from collections import defaultdict
 
 
 class NodeCommunicator(object):
@@ -20,6 +21,7 @@ class NodeCommunicator(object):
         self.my_id = my_id
 
         self.bytes_sent = 0
+        self.bytes_count = defaultdict(lambda:0)
         self.benchmark_logger = logging.LoggerAdapter(
             logging.getLogger("benchmark_logger"), {"node_id": my_id}
         )
@@ -60,6 +62,8 @@ class NodeCommunicator(object):
         self.benchmark_logger.info("Router task cancelled.")
         # self.zmq_context.destroy(linger=self.linger_timeout) # wait here
         self.benchmark_logger.info("Total bytes sent out: %d", self.bytes_sent)
+        for k,v in self.bytes_count.items():
+            print(f"[{self.my_id}] Bytes Sent: {k}:{v}, {round((100*v)/self.bytes_sent,2)}%")
 
     async def _setup(self):
         # Setup one router for a party, this acts as a
@@ -106,7 +110,9 @@ class NodeCommunicator(object):
                 break
             raw_msg = dumps(msg)
             self.bytes_sent += len(raw_msg)
-            # logging.debug("[SEND] TO: %d, MSG: %s", node_id, msg)
+            # logging.info("[SEND] TO: %d, MSG_TYPE: %s", node_id, msg[1][0])
+            msg_type = msg[1][0][0:1]
+            self.bytes_count[msg_type] = self.bytes_count[msg_type] + len(raw_msg)
             await send_to_node([raw_msg])
 
 

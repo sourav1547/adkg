@@ -155,10 +155,10 @@ async def qrbc(
     assert 0 <= leader < n
     assert 0 <= pid < n
 
-    k = 2 * f + 1  # Wait to reconstruct. (# noqa: E221)
-    echo_threshold = n - f  # Wait for ECHO to send READY. (# noqa: E221)
-    ready_threshold = f + 1  # Wait for READY to amplify. (# noqa: E221)
-    output_threshold = 2 * f + 1  # Wait for this many READY to output
+    k = f + 1  # Wait to reconstruct. (# noqa: E221)
+    echo_threshold = 2 * f +1   # Wait for ECHO to send R. (# noqa: E221)
+    ready_threshold = f + 1  # Wait for R to amplify. (# noqa: E221)
+    output_threshold = 2 * f + 1  # Wait for this many R to output
     # NOTE: The above thresholds  are chosen to minimize the size
     # of the erasure coding stripes, i.e. to maximize K.
     # The following alternative thresholds are more canonical
@@ -171,7 +171,6 @@ async def qrbc(
         for i in range(n):
             send(i, o)
 
-    
     if pid == leader:
         m = input
 
@@ -179,7 +178,7 @@ async def qrbc(
         logger.debug("[%d] Input received: %d bytes" % (pid, len(m)))
 
         for i in range(n):
-            send(i, ("PROPOSE", m))
+            send(i, ("P", m))
         
         if client_mode:
             return
@@ -194,7 +193,7 @@ async def qrbc(
 
     while True:  # main receive loop
             sender, msg = await receive()
-            if msg[0] == "PROPOSE" and from_leader is None:
+            if msg[0] == "P" and from_leader is None:
                 (_, m) = msg
                 if sender != leader:
                     logger.info(f"[{pid}] PROPOSE message from other than leader: {sender}")
@@ -203,12 +202,13 @@ async def qrbc(
                 valid = await predicate(m)
                 if valid:
                     _digest = hash(m)
-                    _stripes = encode(k,n, m)
+                    # TODO: Check if k is correct here or not.
+                    _stripes = encode(k,n,m)
                     from_leader = _digest
                     for i in range(n):
-                        send(i, ("ECHO", _digest, _stripes[i]))
+                        send(i, ("E", _digest, _stripes[i]))
                     
-            if msg[0] == "ECHO":
+            if msg[0] == "E":
                 (_, _digest, stripe) = msg
                 if sender in echo_senders:
                     # Received redundant ECHO message from the same sender
@@ -223,13 +223,13 @@ async def qrbc(
                 
                 if len(echo_senders) >= echo_threshold and not ready_sent:
                     ready_sent = True
-                    broadcast(("READY", ready_digest, ready_stripe))
+                    broadcast(("R", ready_digest, ready_stripe))
             
-            elif msg[0] == "READY":
+            elif msg[0] == "R":
                 (_, _digest, stripe) = msg
                 # Validation
                 if sender in ready_senders:
-                    logger.info("[{pid}] Redundant READY")
+                    logger.info("[{pid}] Redundant R")
                     continue
                     
                 ready_senders.add(sender)
@@ -237,32 +237,13 @@ async def qrbc(
                 if len(ready_senders) >= ready_threshold and not ready_sent:
                     if ready_digest is not None:
                         ready_sent = True
-                        broadcast((sid, "READY", ready_digest, ready_stripe))
+                        broadcast(("R", ready_digest, ready_stripe))
                 
                 if len(ready_senders) >= output_threshold:
                     if from_leader and ready_digest == hash(m):
                         return m
                     else:
                         mp = decode(k, n, stripes[_digest])
-                        # FIXME: I have to handle padding
                         if ready_digest == hash(mp):
                             return m
-
-                
-            
-
-            
-        
-                
-            
-            
-
-        
-
-            
-            
-            
-
-            # Update 
-
             

@@ -11,6 +11,7 @@ from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey  # noqa:F401
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPrivateKey  # noqa:F401
 import time
 import logging
+import BitVector
 
 
 class CP:
@@ -88,7 +89,7 @@ class ADKG:
     async def acss_step(self, outputs, value, acss_signal):
         #todo, need to modify send and recv
         # Need different send and recv instances for different component of the code.
-        acsstag = "ACSS"
+        acsstag = "A"
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
         self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
         self.acss_tasks = [None] * self.n
@@ -192,7 +193,7 @@ class ADKG:
                 await acss_signal.wait()
 
         async def _setup(j):
-            abatag = "ABA" + str(j)
+            abatag = "B" + str(j)
             abasend, abarecv =  self.get_send(abatag), self.subscribe_recv(abatag)
 
             def bcast(o):
@@ -213,10 +214,19 @@ class ADKG:
                 )
             )
 
+            # TODO: Optimization Send a bit-string here, instead of list of keys
+            # Expecting only 0.5 Megabytes improvement in total.
             # Only leader gets input
-            rbc_input = bytes(key_proposal) if j == self.my_id else None
+            # rbc_input = bytes(key_proposal) if j == self.my_id else None
 
-            rbctag ="RBC" + str(j)
+            rbc_input = None
+            if j == self.my_id: 
+                riv = BitVector.BitVector(size=self.n)
+                for k in key_proposal: 
+                    riv[k]=1
+                rbc_input = bytes(riv)
+
+            rbctag ="R" + str(j)
             rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
             
             rbc_outputs[j] = asyncio.create_task(
@@ -283,11 +293,12 @@ class ADKG:
         cp = CP(self.g, self.h)
         chal, res = cp.dleq_prove(secret, x, y)
 
-        key_tag = "ACS_KEY"
+        key_tag = "K"
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
         for i in range(self.n):
+            # TODO: I can do do point compression here
             send(i, (x, y, chal, res))
 
         pk_shares = []

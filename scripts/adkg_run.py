@@ -25,7 +25,7 @@ async def _run(peers, n, t, my_id, start_time):
     pc = PolyCommitFeldman(g)
     # Q: What is ProcessProgramRunner?
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
-        send, recv = runner.get_send_recv("ADKG")
+        send, recv = runner.get_send_recv("")
         logging.info(f"Starting ADKG: {(my_id)}")
         logging.info(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
 
@@ -51,6 +51,8 @@ async def _run(peers, n, t, my_id, start_time):
             adkg_task.cancel()
             benchmark_logger.info("ADKG ACSS cancelled!")
         bytes_sent = runner.node_communicator.bytes_sent
+        for k,v in runner.node_communicator.bytes_count.items():
+            logging.info(f"[{my_id}] Bytes Sent: {k}:{v} which is {round((100*v)/bytes_sent,3)}%")
         logging.info(f"[{my_id}] Total bytes sent out aa: {bytes_sent}")
 
 if __name__ == "__main__":

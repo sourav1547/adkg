@@ -23,7 +23,7 @@ async def test_adkg(test_router):
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)
-    sends, recvs, _ = test_router(n, maxdelay=10)
+    sends, recvs, _ = test_router(n, maxdelay=0.001)
     pc = PolyCommitFeldman(g)
 
     dkg_tasks = [None] * n # async task for adkg
