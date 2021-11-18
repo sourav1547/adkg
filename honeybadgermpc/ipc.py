@@ -57,9 +57,9 @@ class NodeCommunicator(object):
             if i != self.my_id:
                 self._sender_queues[i].put_nowait(NodeCommunicator.LAST_MSG)
         await asyncio.gather(*self._dealer_tasks)
-        self.benchmark_logger.info("Dealer task finished.")
+        self.benchmark_logger.debug("Dealer task finished.")
         self._router_task.cancel()
-        self.benchmark_logger.info("Router task cancelled.")
+        self.benchmark_logger.debug("Router task cancelled.")
         # self.zmq_context.destroy(linger=self.linger_timeout) # wait here
         self.benchmark_logger.info("Total bytes sent out: %d", self.bytes_sent)
         for k,v in self.bytes_count.items():

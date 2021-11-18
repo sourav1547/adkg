@@ -121,6 +121,7 @@ class ADKG:
 
         async def _recv_rbc(j):
             rbc_values[j] = await rbc_out[j]
+            rbcl = list(rbc_values[j])
 
             if not aba_inputted[j]:
                 aba_inputted[j] = True
@@ -129,11 +130,11 @@ class ADKG:
             subset = True
             while True:
                 acss_signal.clear()
-                for k in rbc_values[j]:
-                    if k not in acss_outputs.keys():
+                for k in rbcl:
+                    if k==1 and (k not in acss_outputs.keys()):
                         subset = False
                 if subset:
-                    coin_keys[j]((acss_outputs, rbc_values[j]))
+                    coin_keys[j]((acss_outputs, rbcl))
                     return
                 await acss_signal.wait()
 
@@ -177,7 +178,6 @@ class ADKG:
         coin_keys = [asyncio.Queue() for _ in range(self.n)]
 
         async def predicate(_key_proposal):
-            # if len(_key_proposal) < self.n -self.t:
             if len(_key_proposal) <= self.t:
                 return False
         
@@ -213,11 +213,6 @@ class ADKG:
                     abarecv,
                 )
             )
-
-            # TODO: Optimization Send a bit-string here, instead of list of keys
-            # Expecting only 0.5 Megabytes improvement in total.
-            # Only leader gets input
-            # rbc_input = bytes(key_proposal) if j == self.my_id else None
 
             rbc_input = None
             if j == self.my_id: 
@@ -328,10 +323,13 @@ class ADKG:
         acss_outputs = {}
         acss_signal = asyncio.Event()
 
+        acss_start_time = time.time()
         value =[ZR.rand()]
         self.acss_task = asyncio.create_task(self.acss_step(acss_outputs, value, acss_signal))
         await acss_signal.wait()
         acss_signal.clear()
+        acss_time = time.time() - acss_start_time
+        logging.info(f"ACSS time: {(acss_time)}")
         key_proposal = list(acss_outputs.keys())
         create_acs_task = asyncio.create_task(self.agreement(key_proposal, acss_outputs, acss_signal))
         acs, key_task, work_tasks = await create_acs_task
