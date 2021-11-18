@@ -5,8 +5,8 @@
 # sh get-docker.sh
 
 # Uncomment this for drand
-sudo apt install make
-sudo apt-get -y install build-essential
-sudo add-apt-repository ppa:longsleep/golang-backports
-sudo apt update
-sudo apt install golang-go
+# sudo apt install make
+# sudo apt-get -y install build-essential
+# sudo add-apt-repository ppa:longsleep/golang-backports
+# sudo apt update
+# sudo apt install golang-go

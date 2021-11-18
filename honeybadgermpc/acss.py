@@ -378,9 +378,6 @@ class Hbacss0SingleShare:
         #     send,
         # )  # (# noqa: E501)
         
-        
-
-
         # logger.debug("[%d] Starting AVID disperse", self.my_id)
         avidsend, avidrecv = self.get_send(avidtag), self.subscribe_recv(avidtag)
         avid = AVID(n, self.t, dealer_id, avidrecv, avidsend, n)

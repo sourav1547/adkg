@@ -12,6 +12,7 @@ from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey  # noqa:F401
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPrivateKey  # noqa:F401
 import time
 import logging
+import BitVector
 
 
 class CP:
@@ -89,7 +90,7 @@ class ADKG:
     async def acss_step(self, outputs, value, acss_signal):
         #todo, need to modify send and recv
         # Need different send and recv instances for different component of the code.
-        acsstag = "ACSS"
+        acsstag = "A"
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
         self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
         self.acss_tasks = [None] * self.n
@@ -121,6 +122,7 @@ class ADKG:
 
         async def _recv_rbc(j):
             rbc_values[j] = await rbc_out[j]
+            rbcl = list(rbc_values[j])
 
             if not aba_inputted[j]:
                 aba_inputted[j] = True
@@ -129,11 +131,11 @@ class ADKG:
             subset = True
             while True:
                 acss_signal.clear()
-                for k in rbc_values[j]:
-                    if k not in acss_outputs.keys():
+                for k in rbcl:
+                    if k==1 and (k not in acss_outputs.keys()):
                         subset = False
                 if subset:
-                    coin_keys[j]((acss_outputs, rbc_values[j]))
+                    coin_keys[j]((acss_outputs, rbcl))
                     return
                 await acss_signal.wait()
 
@@ -177,7 +179,6 @@ class ADKG:
         coin_keys = [asyncio.Queue() for _ in range(self.n)]
 
         async def predicate(_key_proposal):
-            # if len(_key_proposal) < self.n -self.t:
             if len(_key_proposal) <= self.t:
                 return False
         
@@ -193,7 +194,7 @@ class ADKG:
                 await acss_signal.wait()
 
         async def _setup(j):
-            abatag = "ABA" + str(j)
+            abatag = "B" + str(j)
             abasend, abarecv =  self.get_send(abatag), self.subscribe_recv(abatag)
 
             def bcast(o):
@@ -214,10 +215,14 @@ class ADKG:
                 )
             )
 
-            # Only leader gets input
-            rbc_input = bytes(key_proposal) if j == self.my_id else None
+            rbc_input = None
+            if j == self.my_id: 
+                riv = BitVector.BitVector(size=self.n)
+                for k in key_proposal: 
+                    riv[k]=1
+                rbc_input = bytes(riv)
 
-            rbctag ="RBC" + str(j)
+            rbctag ="R" + str(j)
             rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
             
             rbc_outputs[j] = asyncio.create_task(
@@ -284,11 +289,12 @@ class ADKG:
         cp = CP(self.g, self.h)
         chal, res = cp.dleq_prove(secret, x, y)
 
-        key_tag = "ACS_KEY"
+        key_tag = "K"
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
         for i in range(self.n):
+            # TODO: I can do do point compression here
             send(i, (x, y, chal, res))
 
         pk_shares = []
@@ -318,10 +324,13 @@ class ADKG:
         acss_outputs = {}
         acss_signal = asyncio.Event()
 
+        acss_start_time = time.time()
         value =[ZR.rand()]
         self.acss_task = asyncio.create_task(self.acss_step(acss_outputs, value, acss_signal))
         await acss_signal.wait()
         acss_signal.clear()
+        acss_time = time.time() - acss_start_time
+        logging.info(f"ACSS time: {(acss_time)}")
         key_proposal = list(acss_outputs.keys())
         create_acs_task = asyncio.create_task(self.agreement(key_proposal, acss_outputs, acss_signal))
         acs, key_task, work_tasks = await create_acs_task

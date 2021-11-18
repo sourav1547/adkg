@@ -63,6 +63,8 @@ async def _run(peers, n, t, my_id, start_time):
             adkg.kill()
             adkg_task.cancel()
         bytes_sent = runner.node_communicator.bytes_sent
+        for k,v in runner.node_communicator.bytes_count.items():
+            print(f"[{my_id}] Bytes Sent: {k}:{v} which is {round((100*v)/bytes_sent,3)}%")
         print(f"[{my_id}] Total bytes sent out aa: {bytes_sent}")
 
 

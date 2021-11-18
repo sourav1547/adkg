@@ -26,9 +26,9 @@ async def _run(peers, n, t, my_id, start_time):
     pc = PolyCommitFeldman(g)
     # Q: What is ProcessProgramRunner?
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
-        send, recv = runner.get_send_recv("ADKG")
-        logging.info(f"Starting ADKG: {(my_id)}")
-        logging.info(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
+        send, recv = runner.get_send_recv("")
+        logging.debug(f"Starting ADKG: {(my_id)}")
+        logging.debug(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
 
         benchmark_logger = logging.LoggerAdapter(
            logging.getLogger("benchmark_logger"), {"node_id": my_id}
@@ -42,7 +42,7 @@ async def _run(peers, n, t, my_id, start_time):
             begin_time = time.time()
             logging.info(f"ADKG start time: {(begin_time)}")
             adkg_task = asyncio.create_task(adkg.run_adkg())
-            logging.info(f"Created ADKG task, now waiting...")
+            logging.debug(f"Created ADKG task, now waiting...")
             await adkg_task
             end_time = time.time()
             adkg_time = end_time-begin_time
@@ -50,8 +50,10 @@ async def _run(peers, n, t, my_id, start_time):
             benchmark_logger.info("ADKG time: %f", adkg_time)
             adkg.kill()
             adkg_task.cancel()
-            benchmark_logger.info("ADKG ACSS cancelled!")
+            benchmark_logger.debug("ADKG ACSS cancelled!")
         bytes_sent = runner.node_communicator.bytes_sent
+        for k,v in runner.node_communicator.bytes_count.items():
+            logging.info(f"[{my_id}] Bytes Sent: {k}:{v} which is {round((100*v)/bytes_sent,3)}%")
         logging.info(f"[{my_id}] Total bytes sent out aa: {bytes_sent}")
 
 if __name__ == "__main__":

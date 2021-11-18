@@ -41,13 +41,13 @@ start_time=$((start_time+10))
 
 ## TODO: the following was used for launching a larger number
 ## of processes locally, with only a portion of them shown in tmux
-for ID in $(seq 4 13)
+for ID in $(seq 6 16)
 do
    echo
    ${CMD} -d -f ${CONFIG_PATH}.${ID}.json -time $start_time > logs/logs-${ID}.log 2>&1 &
 done
 
-sleep 3s
+# sleep 3s
 if [ -z "$3" ]
   then
     set -x
