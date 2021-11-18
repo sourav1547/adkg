@@ -194,19 +194,10 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
             assert sender in range(n)
 
             # Tag to name mapping
-            # A:1, A2=2,E=3,E2=4,X=5,AC=6
-            # AC : ACS_COIN
-            # E, E2: EST, EST2
-            # A, A2: AUX, AUX2
-            # X: AUXSET
-
-            # if msg[0] ==  "AC":
+            # AUX:1, AUX2=2, EST=3, EST2=4, AUXSET=5, ABA_COIN=6
             if tag == 6:
                 coin_recvs.put_nowait((sender, msg))
-
-            # if msg[0] == "E":
             elif tag == 3:
-                # _, r, v = msg
                 assert v in (0,1)
                 if sender in est_values[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -224,7 +215,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 # Relay after reaching first threshold
                 if len(est_values[r][v]) >= f+1 and not est_sent[r][v]:
                     est_sent[r][v] = True
-                    # broadcast(("E", r, v))
                     sent_msg = encode_msg(3,v,r)
                     broadcast(sent_msg)
                     logger.debug(
@@ -244,12 +234,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                         extra={"nodeid": pid, "epoch": r}
                     )
                     bv_signal.set()
-                
-            # elif msg[0] == "A":
             elif tag == 1:
-                # A:1, A2=2,E=3,E2=4,X=5,AC=6
-                # Aux message
-                # _, r, v = msg
                 assert v in (0,1)
                 if sender in aux_values[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -269,10 +254,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                     extra={"nodeid": pid, "epoch": r},
                 )
                 bv_signal.set()
-                        
-            # elif msg[0] == "X":
             elif tag == 5:
-            # A:1, A2=2,E=3,E2=4,X=5,AC=6
                 handle_auxset_messages(
                     sender=sender,
                     message=msg,
@@ -280,10 +262,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                     pid=pid,
                     auxset_signal=auxset_signal,
                 )
-
-            # elif msg[0] == "E2":
             elif tag == 4:
-                # _, r, v = msg
                 assert v in (0,1)
                 if sender in est_values2[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -301,7 +280,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 # Relay after reaching first threshold
                 if len(est_values2[r][v]) >= f+1 and not est_sent2[r][v]:
                     est_sent2[r][v] = True
-                    # broadcast(("E2", r, v))
                     sent_msg = encode_msg(4,v,r)
                     broadcast(sent_msg)
                     logger.debug(
@@ -321,12 +299,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                         extra={"nodeid": pid, "epoch": r}
                     )
                     bv_signal.set()
-              
-
-            # elif msg[0] == "A2":
             elif tag == 2:
-                # Aux2 message
-                # _, r, v = msg
                 assert v in (0,1)
                 if sender in aux_values2[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -364,7 +337,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
 
             if not est_sent[r][est]:
                 est_sent[r][est] = True
-                # broadcast(("E", r, est))
                 sent_msg = encode_msg(3,est,r)
                 broadcast(sent_msg)
             
@@ -378,7 +350,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 f"[{pid}] broadcast {('AUX', r, w)}", 
                 extra={"nodeid":pid, "epoch":r}
             )
-            # broadcast(("A", r, w))
             sent_msg = encode_msg(1,w,r)
             broadcast(sent_msg)
 
@@ -465,7 +436,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
             logger.debug(
                 f"[{pid}] broadcast {('AUX2', r, w)}", extra={"nodeid": pid, "epoch": r}
             )
-            # broadcast(("A2", r, w))
             sent_msg = encode_msg(2,w,r)
             broadcast(sent_msg)
 
