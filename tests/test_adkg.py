@@ -21,7 +21,7 @@ def get_avss_params(n, t):
 async def test_adkg(test_router):
     # from pypairing import ZR
     from pypairing import Curve25519ZR as ZR
-    t = 1
+    t = 3
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)
@@ -36,19 +36,15 @@ async def test_adkg(test_router):
         dkg_list[i] = dkg
         dkg_tasks[i] = asyncio.create_task(dkg.run_adkg())
     
-    await dkg_list[0].output_queue.get()
-    dkg_tasks[0].cancel()
-    dkg_list[0].kill()
-    
     outputs = await asyncio.gather(
-        *[dkg_list[i].output_queue.get() for i in range(1,n)]
+        *[dkg_list[i].output_queue.get() for i in range(n)]
     )
-    for task in dkg_tasks[1:n]:
-        task.cancel()
-    for dkg in dkg_list[1:n]:
+    for dkg in dkg_list:
         dkg.kill()
-
-    return
+    for task in dkg_tasks:
+        task.cancel()
+    
+    # return
     
     shares = []
     i = 1
