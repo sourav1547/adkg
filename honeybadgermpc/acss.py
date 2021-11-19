@@ -1,6 +1,6 @@
 import asyncio
 from pickle import dumps, loads
-from honeybadgermpc.broadcast.crypto.boldyreva import dealer
+from honeybadgermpc.broadcast.crypto.boldyreva import dealer, serialize
 # from pypairing import ZR, G1
 from pypairing import Curve25519ZR as ZR
 from honeybadgermpc.polynomial import polynomials_over
@@ -9,6 +9,7 @@ from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.broadcast.avid import AVID
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.broadcast.qrbc import qrbc
+from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs
 
 import logging
 logger = logging.getLogger(__name__)
@@ -183,9 +184,12 @@ class Hbacss0SingleShare:
         # retrieve the z
         dispersal_msg = await avid.retrieve(tag, self.my_id)
 
+        # TODO: Convert RBC messages to group elements here.
         # this function will both load information into the local variable store 
         # and verify share correctness
-        self.tagvars[tag]['all_shares_valid'] = self._handle_dealer_msgs(tag, dispersal_msg, rbc_msg)
+        data = deserialize_gs(rbc_msg)
+        # xx = (data[:-1], data[-1])
+        self.tagvars[tag]['all_shares_valid'] = self._handle_dealer_msgs(tag, dispersal_msg, data)
         if self.tagvars[tag]['all_shares_valid']:
             multicast((HbAVSSMessageType.OK, ""))
         else:
@@ -281,12 +285,16 @@ class Hbacss0SingleShare:
             z = (phis_i, witnesses[i])
             zz = SymmetricCrypto.encrypt(str(shared_key).encode(), z)
             dispersal_msg_list[i] = zz
-
-        return dumps((commitments, ephemeral_public_key)), dispersal_msg_list
+        # TODO: Convert the commitments and ephemeral key here!
+        commitments[0].append(ephemeral_public_key)
+        datab = serialize_gs(commitments[0])
+        # return dumps((commitments, ephemeral_public_key)), dispersal_msg_list
+        return bytes(datab), dispersal_msg_list
     #@profile
     def _handle_dealer_msgs(self, tag, dispersal_msg, rbc_msg):
         all_shares_valid = True
-        commitments, ephemeral_public_key = loads(rbc_msg)
+        # commitments, ephemeral_public_key = loads(rbc_msg)
+        commitments, ephemeral_public_key = [rbc_msg[:-1]], rbc_msg[-1]
         shared_key = pow(ephemeral_public_key, self.private_key)
         self.tagvars[tag]['shared_key'] = shared_key
         self.tagvars[tag]['commitments'] = commitments

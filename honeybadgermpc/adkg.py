@@ -3,16 +3,15 @@ from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.acss import Hbacss0SingleShare
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.share_recovery import interpolate_g1_at_x
+from honeybadgermpc.utils.serilization import deserialize_g, deserialize_gs, serialize_f, serialize_g
 # from pypairing import G1, ZR
 from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 import asyncio
 import hashlib
-from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey  # noqa:F401
-from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPrivateKey  # noqa:F401
 import time
 import logging
-import BitVector
+from honeybadgermpc.utils.serilization import serialize_g, deserialize_g, serialize_f, deserialize_f
 from honeybadgermpc.utils.bitmap import Bitmap
 
 
@@ -305,14 +304,18 @@ class ADKG:
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
+        xb, yb = serialize_g(x), serialize_g(y)
+        chalb, resb = serialize_f(chal), serialize_f(res)
         for i in range(self.n):
-            # TODO: I can do do point compression here
-            send(i, (x, y, chal, res))
+            send(i, (xb, yb, chalb, resb))
 
         pk_shares = []
         while True:
             (sender, msg) = await recv()
-            x, y, chal, res = msg
+            xb, yb, chalb, resb = msg
+            x, y = deserialize_g(xb), deserialize_g(yb)
+            chal, res = deserialize_f(chalb), deserialize_f(resb)
+            
             if cp.dleq_verify(x, y, chal, res):
                 pk_shares.append([sender+1, y])
                 # print("Node " + str(self.my_id) + " received key shares from "+ str(sender))
