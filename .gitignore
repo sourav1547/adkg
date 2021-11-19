@@ -13,3 +13,4 @@ conf/.DS_Store
 honeybadgermpc/.DS_Store
 pairing/.DS_Store
 tests/.DS_Store
+tests/.pytest.log

@@ -11,7 +11,7 @@ from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey  # noqa:F401
 from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPrivateKey  # noqa:F401
 import time
 import logging
-import BitVector
+from honeybadgermpc.utils.bitmap import Bitmap
 
 
 class CP:
@@ -120,8 +120,15 @@ class ADKG:
         aba_values = [0]*self.n
 
         async def _recv_rbc(j):
-            rbc_values[j] = await rbc_out[j]
-            rbcl = list(rbc_values[j])
+            # rbc_values[j] = await rbc_out[j]
+            # rbcl = list(rbc_values[j])
+
+            rbcl = await rbc_out[j]
+            rbcb = Bitmap(self.n, rbcl)
+            rbc_values[j] = []
+            for i in range(self.n):
+                if rbcb.get_bit(i):
+                    rbc_values[j].append(i)
 
             if not aba_inputted[j]:
                 aba_inputted[j] = True
@@ -130,11 +137,11 @@ class ADKG:
             subset = True
             while True:
                 acss_signal.clear()
-                for k in rbcl:
-                    if k==1 and (k not in acss_outputs.keys()):
+                for k in rbc_values[j]:
+                    if k not in acss_outputs.keys():
                         subset = False
                 if subset:
-                    coin_keys[j]((acss_outputs, rbcl))
+                    coin_keys[j]((acss_outputs, rbc_values[j]))
                     return
                 await acss_signal.wait()
 
@@ -178,13 +185,19 @@ class ADKG:
         coin_keys = [asyncio.Queue() for _ in range(self.n)]
 
         async def predicate(_key_proposal):
-            if len(_key_proposal) <= self.t:
+            kp = Bitmap(self.n, _key_proposal)
+            kpl = []
+            for ii in range(self.n):
+                if kp.get_bit(ii):
+                    kpl.append(ii)
+
+            if len(kpl) <= self.t:
                 return False
         
             while True:
                 subset = True
-                for k in _key_proposal:
-                    if k not in acss_outputs.keys():
+                for kk in kpl:
+                    if kk not in acss_outputs.keys():
                         subset = False
                 if subset:
                     acss_signal.clear()    
@@ -216,10 +229,10 @@ class ADKG:
 
             rbc_input = None
             if j == self.my_id: 
-                riv = BitVector.BitVector(size=self.n)
+                riv = Bitmap(self.n)
                 for k in key_proposal: 
-                    riv[k]=1
-                rbc_input = bytes(riv)
+                    riv.set_bit(k)
+                rbc_input = bytes(riv.array)
 
             rbctag ="R" + str(j)
             rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
