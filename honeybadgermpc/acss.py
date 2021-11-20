@@ -8,7 +8,8 @@ from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 # from honeybadgermpc.broadcast.avid import AVID
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
-from honeybadgermpc.broadcast.qrbc import qrbc
+# from honeybadgermpc.broadcast.qrbc import qrbc
+from honeybadgermpc.broadcast.optqrbc import optqrbc
 from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs, deserialize_g
 
 import logging
@@ -281,7 +282,8 @@ class Hbacss0SingleShare:
             shared_key = pow(self.public_keys[i], ephemeral_secret_key)
             phis_i = [phi[k](i + 1).__getstate__() for k in range(secret_count)]
             z = (phis_i, witnesses[i])
-            zz = SymmetricCrypto.encrypt(str(shared_key).encode(), z)
+            # zz = SymmetricCrypto.encrypt(str(shared_key).encode(), z)
+            zz = SymmetricCrypto.encrypt(str(shared_key).encode(), bytes(phis_i[0]))
             dispersal_msg_list.extend(zz)
         commitments[0].append(ephemeral_public_key)
         datab = serialize_gs(commitments[0]) # Serializing commitments
@@ -300,15 +302,16 @@ class Hbacss0SingleShare:
         self.tagvars[tag]['ephemeral_public_key'] = ephemeral_public_key
         
         try:
-            sharesb, witnesses = SymmetricCrypto.decrypt(str(shared_key).encode(), dispersal_msg)
+            sharesb = SymmetricCrypto.decrypt(str(shared_key).encode(), dispersal_msg)
         except ValueError as e:  # TODO: more specific exception
             logger.warn(f"Implicate due to failure in decrypting: {e}")
             all_shares_valid = False
         
         # Note that this only works for a share
         # FIXME: Do this appropriately
+        witnesses = [None]
         share = ZR()
-        share.__setstate__(sharesb[0])
+        share.__setstate__(list(sharesb))
         shares = [share]
         # call if decryption was successful
         if all_shares_valid:
@@ -361,7 +364,7 @@ class Hbacss0SingleShare:
 
         async def predicate(_m):
             return True
-        rbc_msg = await qrbc(
+        rbc_msg = await optqrbc(
             rbctag,
             self.my_id,
             self.n,

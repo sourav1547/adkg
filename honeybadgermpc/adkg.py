@@ -171,11 +171,11 @@ class ADKG:
                 rbc_values[j] = None
 
         rbc_signal.set()
-        return 
 
     async def agreement(self, key_proposal, acss_outputs, acss_signal):
         from honeybadgermpc.broadcast.tylerba import tylerba
-        from honeybadgermpc.broadcast.qrbc import qrbc
+        # from honeybadgermpc.broadcast.qrbc import qrbc
+        from honeybadgermpc.broadcast.optqrbc import optqrbc
 
         aba_inputs = [asyncio.Queue() for _ in range(self.n)]
         aba_outputs = [asyncio.Queue() for _ in range(self.n)]
@@ -204,7 +204,33 @@ class ADKG:
                 await acss_signal.wait()
 
         async def _setup(j):
-            abatag = "B" + str(j)
+            
+            # starting RBC
+            rbctag ="R" + str(j) # (R, msg)
+            rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
+
+            rbc_input = None
+            if j == self.my_id: 
+                riv = Bitmap(self.n)
+                for k in key_proposal: 
+                    riv.set_bit(k)
+                rbc_input = bytes(riv.array)
+
+            rbc_outputs[j] = asyncio.create_task(
+                optqrbc(
+                    rbctag,
+                    self.my_id,
+                    self.n,
+                    self.t,
+                    j,
+                    predicate,
+                    rbc_input,
+                    rbcsend,
+                    rbcrecv,
+                )
+            )
+
+            abatag = "B" + str(j) # (B, msg)
             abasend, abarecv =  self.get_send(abatag), self.subscribe_recv(abatag)
 
             def bcast(o):
@@ -224,32 +250,6 @@ class ADKG:
                     abarecv,
                 )
             )
-
-            rbc_input = None
-            if j == self.my_id: 
-                riv = Bitmap(self.n)
-                # riv = BitVector.BitVector(size=self.n)
-                for k in key_proposal: 
-                    riv.set_bit(k)
-                rbc_input = bytes(riv.array)
-
-            rbctag ="R" + str(j)
-            rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
-            
-            rbc_outputs[j] = asyncio.create_task(
-                qrbc(
-                    rbctag,
-                    self.my_id,
-                    self.n,
-                    self.t,
-                    j,
-                    predicate,
-                    rbc_input,
-                    rbcsend,
-                    rbcrecv,
-                )
-            )
-
             return aba_task
 
         work_tasks = await asyncio.gather(*[_setup(j) for j in range(self.n)])
@@ -300,7 +300,7 @@ class ADKG:
         cp = CP(self.g, self.h)
         chal, res = cp.dleq_prove(secret, x, y)
 
-        key_tag = "K"
+        key_tag = "K" # (K, msg)
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
@@ -335,7 +335,7 @@ class ADKG:
             xlist.append(xi)
         return xlist
 
-    async def run_adkg(self):
+    async def run_adkg(self, start_time):
         acss_outputs = {}
         acss_signal = asyncio.Event()
 
@@ -350,7 +350,10 @@ class ADKG:
         create_acs_task = asyncio.create_task(self.agreement(key_proposal, acss_outputs, acss_signal))
         acs, key_task, work_tasks = await create_acs_task
         await acs
-        await asyncio.gather(*work_tasks)
         output = await key_task
+        adkg_time = time.time()-start_time
+        self.benchmark_logger.info("ADKG time2: %f", adkg_time)
+        logging.info(f"ADKG time: {(adkg_time)}")
+        await asyncio.gather(*work_tasks)
         mks, sk, pk = output
         self.output_queue.put_nowait((value[0], mks, sk, pk))

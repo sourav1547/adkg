@@ -144,12 +144,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
     bv_signal = asyncio.Event()
     aux_signal = asyncio.Event()
     auxset_signal = asyncio.Event()
-
-    pk, sk = None, None
     coin_init = False
-
-    # TODO: We have to take in coin key inputs and create the coin instance here 
-    # instead of taking the coin instance as the input.
 
     def coin_bcast(o):
         broadcast(("AC", o))
@@ -181,6 +176,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
         bpk = TBLSPublicKey(n, f, pkj[j], pkj)
         bsk = TBLSPrivateKey(n, f, pkj[j], pkj, skj, j)
 
+        # FIXME: Generate coin object only once!
         coin, _ = await shared_coin(
             "COIN" + str(sid), pid, n, f, bpk, bsk, coin_bcast, coin_recvs.get
         )
@@ -478,8 +474,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 if len(values2) == 1:
                     v = next(iter(values2))
                     if v == 2:
-                        # print("Coin!!")
-                        # decide(0)
                         est = await _coin(r, coin_init)
                         coin_init = True
                     else:
@@ -507,7 +501,6 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 # print('[sid:%s] [pid:%d] QUITTING in round %d' % (sid,pid,r))
                 logger.debug(f"[{pid}] QUIT!", extra={"nodeid": pid, "epoch": r})
                 return
-
             r += 1
     finally:
         if asyncio.get_event_loop().is_running():

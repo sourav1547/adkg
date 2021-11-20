@@ -53,7 +53,7 @@ async def _run(peers, n, t, my_id, start_time):
             
             begin_time = time.time()
             logging.info(f"ADKG start time: {(begin_time)}")
-            adkg_task = asyncio.create_task(adkg.run_adkg())
+            adkg_task = asyncio.create_task(adkg.run_adkg(begin_time))
             # await adkg.output_queue.get()
             logging.info(f"Created ADKG task, now waiting...")
             await adkg_task

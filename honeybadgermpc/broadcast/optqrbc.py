@@ -2,16 +2,6 @@ from collections import defaultdict
 import logging
 import hashlib
 import math
-from honeybadgermpc.polynomial import EvalPoint
-from honeybadgermpc.reed_solomon import (
-    FFTEncoder,
-    FFTDecoder,
-    GaoRobustDecoder,
-)
-
-from honeybadgermpc.field import GF
-from honeybadgermpc.elliptic_curve import Subgroup
-
 import zfec
 
 
@@ -143,14 +133,14 @@ def hash(x):
 def ceil(x):
     return int(math.ceil(x))
 
+
 class RBCMsgType:
     PROPOSE = 1
     ECHO = 2
     READY = 3
 
-async def qrbc(
-    sid, pid, n, f, leader, predicate, input, send, receive, client_mode=False
-):
+async def optqrbc(
+    sid, pid, n, f, leader, predicate, input, send, receive):
     """
     Validated Quadradatic Reliable Broadcast from DXL21 
     """
@@ -180,14 +170,9 @@ async def qrbc(
 
         assert isinstance(m, (str, bytes))
         logger.debug("[%d] Input received: %d bytes" % (pid, len(m)))
-
-        broadcast((RBCMsgType.PROPOSE, m))
-        # for i in range(n):
-            # send(i, (RBCMsgType.PROPOSE, m))
         
-        if client_mode:
-            return
-
+        broadcast((RBCMsgType.PROPOSE, m))
+        
     stripes = defaultdict(lambda: [None for _ in range(n)])
     echo_counter = defaultdict(lambda: 0)
     echo_senders = set()
@@ -207,42 +192,36 @@ async def qrbc(
                 valid = await predicate(m)
                 if valid:
                     _digest = hash(m)
-                    # TODO: Check if k is correct here or not.
-                    _stripes = encode(k,n,m)
                     from_leader = _digest
-                    for i in range(n):
-                        send(i, (RBCMsgType.ECHO, _digest, _stripes[i]))
+                    broadcast((RBCMsgType.ECHO, _digest))
                     
             if msg[0] == RBCMsgType.ECHO:
-                (_, _digest, stripe) = msg
+                (_, _digest) = msg
                 if sender in echo_senders:
                     # Received redundant ECHO message from the same sender
                     continue
                 echo_senders.add(sender)
-                echo_counter[stripe] = echo_counter[stripe]+1
+                echo_counter[_digest] = echo_counter[_digest]+1
 
-                # TODO: Have to match the digest as well.
-                if echo_counter[stripe] >= f + 1:
-                    ready_stripe = stripe
+                if echo_counter[_digest] >= f + 1:
                     ready_digest = _digest
                 
                 if len(echo_senders) >= echo_threshold and not ready_sent:
                     ready_sent = True
-                    broadcast((RBCMsgType.READY, ready_digest, ready_stripe))
+                    broadcast((RBCMsgType.READY, ready_digest))
             
             elif msg[0] == RBCMsgType.READY:
-                (_, _digest, stripe) = msg
+                (_, _digest) = msg
                 # Validation
                 if sender in ready_senders:
                     logger.info("[{pid}] Redundant R")
                     continue
                     
                 ready_senders.add(sender)
-                stripes[_digest][sender] = stripe
                 if len(ready_senders) >= ready_threshold and not ready_sent:
                     if ready_digest is not None:
                         ready_sent = True
-                        broadcast((RBCMsgType.READY, ready_digest, ready_stripe))
+                        broadcast((RBCMsgType.READY, ready_digest))
                 
                 if len(ready_senders) >= output_threshold:
                     if from_leader and ready_digest == hash(m):
