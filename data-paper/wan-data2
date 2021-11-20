@@ -4,3 +4,7 @@ nodes,time,bw,etime,ebw
 64,14.63,6.57,14.50,5.97
 128,57.7,26.97,55.60,24.60
 # The bls12-381 data for 16 and 32 nodes are not yet updated
+
+32,,,3.3,1.51
+64,,,11.50,6.14
+128,,,44,25.02

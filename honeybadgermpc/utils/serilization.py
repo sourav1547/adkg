@@ -11,11 +11,11 @@ def deserialize_g(data):
 def deserialize_gs(data):
     g_size = 32
     n = len(data)//g_size
-    gs = []
+    gs = [None for _ in range(n)]
     for i in range(n):            
         g = G1()
         g.__setstate__(list(data[i*g_size:(i+1)*g_size]))
-        gs.append(g)
+        gs[i] = g
     return gs
 
 def serialize_gs(g_list):    

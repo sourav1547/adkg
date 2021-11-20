@@ -21,7 +21,7 @@ def get_avss_params(n, t):
 async def test_adkg(test_router):
     # from pypairing import ZR
     from pypairing import Curve25519ZR as ZR
-    t = 1
+    t = 5
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)

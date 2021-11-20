@@ -6,10 +6,10 @@ from pypairing import Curve25519ZR as ZR
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
-from honeybadgermpc.broadcast.avid import AVID
+# from honeybadgermpc.broadcast.avid import AVID
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.broadcast.qrbc import qrbc
-from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs
+from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs, deserialize_g
 
 import logging
 logger = logging.getLogger(__name__)
@@ -54,18 +54,9 @@ class Hbacss0SingleShare:
         self.field = field
         self.poly = polynomials_over(self.field)
         self.poly.clear_cache()
-        self.avid_msg_queue = asyncio.Queue()
         self.output_queue = asyncio.Queue()
         self.tagvars = {}
         self.tasks = []
-
-    async def _recv_loop(self, acsstag, q):
-        while True:
-            avid, tag, dispersal_msg_list = await q.get()
-            #self.tasks.append(
-            self.tagvars[acsstag]['tasks'].append(
-                asyncio.create_task(avid.disperse(tag, self.my_id, dispersal_msg_list))
-            )
 
     def __enter__(self):
         return self
@@ -95,7 +86,8 @@ class Hbacss0SingleShare:
         if self.public_keys[j] != pow(self.g, j_sk):
             return False
         # decrypt and verify
-        implicate_msg = await self.tagvars[tag]['avid'].retrieve(tag, j)
+        # implicate_msg = await self.tagvars[tag]['avid'].retrieve(tag, j)
+        implicate_msg = None #FIXME: IMPORTANT!!
         j_shared_key = pow(self.tagvars[tag]['ephemeral_public_key'], j_sk)
 
         # Same as the batch size
@@ -134,8 +126,10 @@ class Hbacss0SingleShare:
 
         if avss_msg[0] == HbAVSSMessageType.KDIBROADCAST:
             logger.debug("[%d] received_kdi_broadcast from sender %d", self.my_id, sender)
-            avid = self.tagvars[tag]['avid']
-            retrieved_msg = await avid.retrieve(tag, sender)
+            
+            # FIXME: IMPORTANT!! read the message from rbc output
+            # retrieved_msg = await avid.retrieve(tag, sender)
+            retrieved_msg = None
             try:
                 j_shares, j_witnesses = SymmetricCrypto.decrypt(
                     str(avss_msg[1]).encode(), retrieved_msg
@@ -166,7 +160,7 @@ class Hbacss0SingleShare:
             self.interpolated = True
             multicast((HbAVSSMessageType.OK, ""))
     #@profile    
-    async def _process_avss_msg(self, avss_id, dealer_id, rbc_msg, avid):
+    async def _process_avss_msg(self, avss_id, dealer_id, rbc_msg):
         tag = f"{dealer_id}-{avss_id}-B-AVSS"
         send, recv = self.get_send(tag), self.subscribe_recv(tag)
         self._init_recovery_vars(tag)
@@ -176,20 +170,24 @@ class Hbacss0SingleShare:
                 send(i, msg)
 
         self.tagvars[tag]['io'] = [send, recv, multicast]
-        self.tagvars[tag]['avid'] = avid
+        # self.tagvars[tag]['avid'] = avid
         implicate_sent = False
         self.tagvars[tag]['in_share_recovery'] = False
-        # get phi and public key from reliable broadcast msg
-        #commitments, ephemeral_public_key = loads(rbc_msg)
-        # retrieve the z
-        dispersal_msg = await avid.retrieve(tag, self.my_id)
+        
+        # get phi and public key from reliable broadcast msg       
+        commit_data = rbc_msg[0:32*(self.t+1)]
+        commits = deserialize_gs(commit_data) # commitments
 
-        # TODO: Convert RBC messages to group elements here.
-        # this function will both load information into the local variable store 
-        # and verify share correctness
-        data = deserialize_gs(rbc_msg)
-        # xx = (data[:-1], data[-1])
-        self.tagvars[tag]['all_shares_valid'] = self._handle_dealer_msgs(tag, dispersal_msg, data)
+        ephkey_data = rbc_msg[32*(self.t+1):32*(self.t+2)]
+        ephkey = deserialize_g(ephkey_data) # ephemeral public key
+
+        # AVID messages
+        # TODO: Put this into a function
+        dispersal_msg_raw = rbc_msg[32*(self.t+2):]
+        dlen = len(dispersal_msg_raw)//self.n
+        dispersal_msg = dispersal_msg_raw[self.my_id*dlen : (self.my_id+1)*dlen]
+        
+        self.tagvars[tag]['all_shares_valid'] = self._handle_dealer_msgs(tag, dispersal_msg, ([commits], ephkey))
         if self.tagvars[tag]['all_shares_valid']:
             multicast((HbAVSSMessageType.OK, ""))
         else:
@@ -277,35 +275,41 @@ class Hbacss0SingleShare:
 
         ephemeral_secret_key = self.field.random()
         ephemeral_public_key = pow(self.g, ephemeral_secret_key)
-        dispersal_msg_list = [None] * n
+        dispersal_msg_list = bytearray()
         witnesses = self.poly_commit.double_batch_create_witness(phi, r, self.n)
         for i in range(n):
             shared_key = pow(self.public_keys[i], ephemeral_secret_key)
-            phis_i = [phi[k](i + 1) for k in range(secret_count)]
+            phis_i = [phi[k](i + 1).__getstate__() for k in range(secret_count)]
             z = (phis_i, witnesses[i])
             zz = SymmetricCrypto.encrypt(str(shared_key).encode(), z)
-            dispersal_msg_list[i] = zz
-        # TODO: Convert the commitments and ephemeral key here!
+            dispersal_msg_list.extend(zz)
         commitments[0].append(ephemeral_public_key)
-        datab = serialize_gs(commitments[0])
-        # return dumps((commitments, ephemeral_public_key)), dispersal_msg_list
-        return bytes(datab), dispersal_msg_list
+        datab = serialize_gs(commitments[0]) # Serializing commitments
+        
+        # TODO: Note that this only works for hbACSS
+        datab.extend(dispersal_msg_list) # Appending the AVID messages
+        return bytes(datab)
+    
     #@profile
     def _handle_dealer_msgs(self, tag, dispersal_msg, rbc_msg):
         all_shares_valid = True
-        # commitments, ephemeral_public_key = loads(rbc_msg)
-        commitments, ephemeral_public_key = [rbc_msg[:-1]], rbc_msg[-1]
+        commitments, ephemeral_public_key = rbc_msg
         shared_key = pow(ephemeral_public_key, self.private_key)
         self.tagvars[tag]['shared_key'] = shared_key
         self.tagvars[tag]['commitments'] = commitments
         self.tagvars[tag]['ephemeral_public_key'] = ephemeral_public_key
         
         try:
-            shares, witnesses = SymmetricCrypto.decrypt(str(shared_key).encode(), dispersal_msg)
+            sharesb, witnesses = SymmetricCrypto.decrypt(str(shared_key).encode(), dispersal_msg)
         except ValueError as e:  # TODO: more specific exception
             logger.warn(f"Implicate due to failure in decrypting: {e}")
             all_shares_valid = False
-
+        
+        # Note that this only works for a share
+        # FIXME: Do this appropriately
+        share = ZR()
+        share.__setstate__(sharesb[0])
+        shares = [share]
         # call if decryption was successful
         if all_shares_valid:
             if self.poly_commit.batch_verify_eval(
@@ -343,21 +347,14 @@ class Hbacss0SingleShare:
         n = self.n
         rbctag = f"{dealer_id}-{avss_id}-B-RBC"
         acsstag = f"{dealer_id}-{avss_id}-B-AVSS"
-        avidtag = f"{dealer_id}-{avss_id}-B-AVID"
 
         self.tagvars[acsstag] = {}
-        self.tagvars[acsstag]['avid_msg_queue'] = asyncio.Queue()
         self.tagvars[acsstag]['tasks'] = []
-        avid_recv_task = asyncio.create_task(self._recv_loop(acsstag, self.tagvars[acsstag]['avid_msg_queue']))
-        self.tasks.append(avid_recv_task)
-
 
         broadcast_msg = None
-        dispersal_msg_list = None
         if self.my_id == dealer_id:
             # broadcast_msg: phi & public key for reliable broadcast
-            # dispersal_msg_list: the list of payload z
-            broadcast_msg, dispersal_msg_list = self._get_dealer_msg(values, n)
+            broadcast_msg = self._get_dealer_msg(values, n)
 
         send, recv = self.get_send(rbctag), self.subscribe_recv(rbctag)
         logger.debug("[%d] Starting reliable broadcast", self.my_id)
@@ -375,27 +372,10 @@ class Hbacss0SingleShare:
             send,
             recv,
         )
-        # rbc_msg = await reliablebroadcast(
-        #     rbctag,
-        #     self.my_id,
-        #     n,
-        #     self.t,
-        #     dealer_id,
-        #     broadcast_msg,
-        #     recv,
-        #     send,
-        # )  # (# noqa: E501)
-        
-        # logger.debug("[%d] Starting AVID disperse", self.my_id)
-        avidsend, avidrecv = self.get_send(avidtag), self.subscribe_recv(avidtag)
-        avid = AVID(n, self.t, dealer_id, avidrecv, avidsend, n)
-
-        # start disperse in the background
-        self.tagvars[acsstag]['avid_msg_queue'].put_nowait((avid, avidtag, dispersal_msg_list))
 
         # avss processing
         # logger.debug("starting acss")
-        await self._process_avss_msg(avss_id, dealer_id, rbc_msg, avid)
+        await self._process_avss_msg(avss_id, dealer_id, rbc_msg)
         
         #acss is done, cancel ongoing tasks
         #self.subscribe_recv_task.cancel()
