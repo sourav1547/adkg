@@ -2,6 +2,12 @@ from collections import defaultdict
 import logging
 import hashlib
 import math
+from pickle import dumps
+import zlib
+import gzip
+import bz2
+import lzma
+
 from honeybadgermpc.polynomial import EvalPoint
 from honeybadgermpc.reed_solomon import (
     FFTEncoder,
@@ -18,6 +24,10 @@ import zfec
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
+class QRBCMessageType:
+    Propose = 8
+    Echo = 9
+    READY = 10
 
 #####################
 # def encode(k, n, m):
@@ -173,12 +183,16 @@ async def qrbc(
 
     if pid == leader:
         m = input
+        # compress1 = zlib.compress(input)
+        # compress2 = gzip.compress(input)
+        # compress3 = bz2.compress(input)
+        # compress4 = lzma.compress(input)
 
-        assert isinstance(m, (str, bytes))
-        logger.debug("[%d] Input received: %d bytes" % (pid, len(m)))
+        # # assert isinstance(m, (str, bytes))
+        # logging.info("[%d] RBC send: %d bytes, zlib %d bytes, gzip %d bytes, bz2 %d bytes, lzma %d bytes" % (pid, len(m), len(compress1), len(compress2), len(compress3), len(compress4)))
 
         for i in range(n):
-            send(i, ("P", m))
+            send(i, (QRBCMessageType.Propose, m))
         
         if client_mode:
             return
@@ -193,7 +207,7 @@ async def qrbc(
 
     while True:  # main receive loop
             sender, msg = await receive()
-            if msg[0] == "P" and from_leader is None:
+            if msg[0] == QRBCMessageType.Propose and from_leader is None:
                 (_, m) = msg
                 if sender != leader:
                     logger.info(f"[{pid}] PROPOSE message from other than leader: {sender}")
@@ -204,11 +218,18 @@ async def qrbc(
                     _digest = hash(m)
                     # TODO: Check if k is correct here or not.
                     _stripes = encode(k,n,m)
+                    # input = dumps(_stripes)
+                    # compress1 = zlib.compress(input)
+                    # compress2 = gzip.compress(input)
+                    # compress3 = bz2.compress(input)
+                    # compress4 = lzma.compress(input)
+                    # logging.info("RBC send: %d bytes, %d bytes, zlib %d bytes, gzip %d bytes, bz2 %d bytes, lzma %d bytes" % (len(_stripes), len(input),  len(compress1), len(compress2), len(compress3), len(compress4)))
+
                     from_leader = _digest
                     for i in range(n):
-                        send(i, ("E", _digest, _stripes[i]))
+                        send(i, (QRBCMessageType.Echo, _digest, _stripes[i]))
                     
-            if msg[0] == "E":
+            if msg[0] == QRBCMessageType.Echo:
                 (_, _digest, stripe) = msg
                 if sender in echo_senders:
                     # Received redundant ECHO message from the same sender
@@ -223,9 +244,9 @@ async def qrbc(
                 
                 if len(echo_senders) >= echo_threshold and not ready_sent:
                     ready_sent = True
-                    broadcast(("R", ready_digest, ready_stripe))
+                    broadcast((QRBCMessageType.READY, ready_digest, ready_stripe))
             
-            elif msg[0] == "R":
+            elif msg[0] == QRBCMessageType.READY:
                 (_, _digest, stripe) = msg
                 # Validation
                 if sender in ready_senders:
@@ -237,7 +258,7 @@ async def qrbc(
                 if len(ready_senders) >= ready_threshold and not ready_sent:
                     if ready_digest is not None:
                         ready_sent = True
-                        broadcast(("R", ready_digest, ready_stripe))
+                        broadcast((QRBCMessageType.READY, ready_digest, ready_stripe))
                 
                 if len(ready_senders) >= output_threshold:
                     if from_leader and ready_digest == hash(m):

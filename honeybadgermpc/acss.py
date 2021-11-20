@@ -20,13 +20,13 @@ logger.setLevel(logging.ERROR)
 
 
 class HbAVSSMessageType:
-    OK = "OK"
-    IMPLICATE = "IMPLICATE"
-    READY = "READY"
-    RECOVERY = "RECOVERY"
-    RECOVERY1 = "RECOVERY1"
-    RECOVERY2 = "RECOVERY2"
-    KDIBROADCAST = "KDIBROADCAST"
+    OK = 1
+    IMPLICATE = 2
+    READY = 3
+    RECOVERY = 4
+    RECOVERY1 = 5
+    RECOVERY2 = 6
+    KDIBROADCAST = 7
 
 class Hbacss0SingleShare:
     #@profile
