@@ -138,6 +138,10 @@ class RBCMsgType:
     PROPOSE = 1
     ECHO = 2
     READY = 3
+    TERMINATE = 4
+    ADD_TRIGGER = 5
+    ADD_DISPERSE = 6
+    ADD_RECONSTRUCT = 7
 
 async def optqrbc(
     sid, pid, n, f, leader, predicate, input, send, receive):
@@ -173,27 +177,41 @@ async def optqrbc(
         
         broadcast((RBCMsgType.PROPOSE, m))
         
-    stripes = defaultdict(lambda: [None for _ in range(n)])
+    stripes = [None for _ in range(n)]
     echo_counter = defaultdict(lambda: 0)
+    ready_counter = defaultdict(lambda: 0)
     echo_senders = set()
     ready_senders = set()
     ready_sent = False
-    from_leader = None
     ready_digest = None
+    leader_hash = None
+    reconstructed_hash = None
+    leader_msg = None
+    reconstructed_msg = None
+
+    add_ready_sent = False
+    terminate_senders = set()
+    add_trigger_senders = set()
+    add_disperse_senders = set()
+    add_reconstruct_senders = set()
+    add_disperse_counter = defaultdict(lambda: 0)
+    committed_hash = None
+    committed = False
 
     while True:  # main receive loop
             sender, msg = await receive()
-            if msg[0] == RBCMsgType.PROPOSE and from_leader is None:
-                (_, m) = msg
+            if msg[0] == RBCMsgType.PROPOSE and leader_hash is None:
+                (_, leader_msg) = msg
                 if sender != leader:
                     logger.info(f"[{pid}] PROPOSE message from other than leader: {sender}")
                     continue
             
-                valid = await predicate(m)
+                valid = await predicate(leader_msg)
                 if valid:
-                    _digest = hash(m)
-                    from_leader = _digest
-                    broadcast((RBCMsgType.ECHO, _digest))
+                    leader_hash = hash(leader_msg)
+                    broadcast((RBCMsgType.ECHO, leader_hash))
+                    if leader_hash == committed_hash:
+                        broadcast((RBCMsgType.TERMINATE))
                     
             if msg[0] == RBCMsgType.ECHO:
                 (_, _digest) = msg
@@ -202,32 +220,85 @@ async def optqrbc(
                     continue
                 echo_senders.add(sender)
                 echo_counter[_digest] = echo_counter[_digest]+1
-
-                if echo_counter[_digest] >= f + 1:
-                    ready_digest = _digest
                 
-                if len(echo_senders) >= echo_threshold and not ready_sent:
+                if echo_counter[_digest] >= echo_threshold and not ready_sent:
                     ready_sent = True
                     broadcast((RBCMsgType.READY, ready_digest))
             
             elif msg[0] == RBCMsgType.READY:
                 (_, _digest) = msg
-                # Validation
                 if sender in ready_senders:
                     logger.info("[{pid}] Redundant R")
                     continue
-                    
                 ready_senders.add(sender)
-                if len(ready_senders) >= ready_threshold and not ready_sent:
-                    if ready_digest is not None:
-                        ready_sent = True
-                        broadcast((RBCMsgType.READY, ready_digest))
+                ready_counter[_digest] = ready_counter[_digest]+1
+                if ready_counter[_digest] >= ready_threshold and not ready_sent:
+                    ready_sent = True
+                    broadcast((RBCMsgType.READY, _digest))
                 
-                if len(ready_senders) >= output_threshold:
-                    if from_leader and ready_digest == hash(m):
-                        return m
+                if ready_counter[_digest] >= output_threshold:
+                    committed_hash = _digest
+                    if _digest == leader_hash:
+                        committed = True
+                        broadcast((RBCMsgType.TERMINATE))
+                    elif _digest == reconstructed_hash:
+                        committed = True
+                        broadcast((RBCMsgType.TERMINATE))
                     else:
-                        mp = decode(k, n, stripes[_digest])
-                        if ready_digest == hash(mp):
-                            return m
-            
+                        broadcast((RBCMsgType.ADD_TRIGGER))
+                        
+
+            elif msg[0] == RBCMsgType.TERMINATE:
+                if sender in terminate_senders:
+                    logger.info("[{pid}] Redundant TERMINATE")
+                    continue
+                terminate_senders.add(sender)
+                if len(terminate_senders) >= n:
+                    if committed_hash == leader_hash:
+                        return leader_msg
+                    elif committed_hash == reconstructed_hash:
+                        return reconstructed_msg
+                    else:
+                        logger.info("[{pid}] RBC ERROR")
+
+ 
+            elif msg[0] == RBCMsgType.ADD_TRIGGER:
+                if sender in add_trigger_senders:
+                    logger.info("[{pid}] Redundant ADD_TRIGGER")
+                    continue
+                add_trigger_senders.add(sender)
+                if committed:
+                    stripes = encode(k,n,m)
+                    send(sender, (RBCMsgType.ADD_DISPERSE, stripes[sender], stripes[pid]))
+
+            elif msg[0] == RBCMsgType.ADD_DISPERSE:
+                if committed:
+                    continue
+                (_, my_stripe, sender_stripe) = msg
+                if sender in add_disperse_senders:
+                    logger.info("[{pid}] Redundant ADD_DISPERSE")
+                    continue
+                add_disperse_senders.add(sender)
+                add_reconstruct_senders.add(sender)
+                add_disperse_counter[my_stripe] = add_disperse_counter[my_stripe]+1
+                stripes[sender] = sender_stripe
+
+                if add_disperse_senders[my_stripe] >= f + 1 and not add_ready_sent:
+                    add_ready_sent = True
+                    broadcast((RBCMsgType.ADD_RECONSTRUCT, my_stripe))
+
+            elif msg[0] == RBCMsgType.ADD_RECONSTRUCT:
+                if committed:
+                    continue
+                (_, stripe) = msg
+                if sender in add_reconstruct_senders:
+                    logger.info("[{pid}] Redundant ADD_RECONSTRUCT")
+                    continue
+                add_reconstruct_senders.add(sender)
+                stripes[sender] = stripe
+                
+                if len(add_reconstruct_senders) >= output_threshold:
+                    reconstructed_msg = decode(k, n, stripes)
+                    reconstructed_hash = hash(reconstructed_msg)
+                    if reconstructed_hash == committed_hash:
+                        broadcast((RBCMsgType.TERMINATE))
