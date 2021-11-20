@@ -2,22 +2,12 @@ from collections import defaultdict
 import logging
 import hashlib
 import math
-from honeybadgermpc.polynomial import EvalPoint
-from honeybadgermpc.reed_solomon import (
-    FFTEncoder,
-    FFTDecoder,
-    GaoRobustDecoder,
-)
-
-from honeybadgermpc.field import GF
-from honeybadgermpc.elliptic_curve import Subgroup
-
+# from pickle import dumps
 import zfec
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
-
 
 #####################
 # def encode(k, n, m):
@@ -149,8 +139,7 @@ class RBCMsgType:
     READY = 3
 
 async def qrbc(
-    sid, pid, n, f, leader, predicate, input, send, receive, client_mode=False
-):
+    sid, pid, n, f, leader, predicate, input, send, receive):
     """
     Validated Quadradatic Reliable Broadcast from DXL21 
     """
@@ -177,17 +166,16 @@ async def qrbc(
 
     if pid == leader:
         m = input
+        # compress1 = zlib.compress(input)
+        # compress2 = gzip.compress(input)
+        # compress3 = bz2.compress(input)
+        # compress4 = lzma.compress(input)
 
-        assert isinstance(m, (str, bytes))
-        logger.debug("[%d] Input received: %d bytes" % (pid, len(m)))
+        # # assert isinstance(m, (str, bytes))
+        # logging.info("[%d] RBC send: %d bytes, zlib %d bytes, gzip %d bytes, bz2 %d bytes, lzma %d bytes" % (pid, len(m), len(compress1), len(compress2), len(compress3), len(compress4)))
 
         broadcast((RBCMsgType.PROPOSE, m))
-        # for i in range(n):
-            # send(i, (RBCMsgType.PROPOSE, m))
         
-        if client_mode:
-            return
-
     stripes = defaultdict(lambda: [None for _ in range(n)])
     echo_counter = defaultdict(lambda: 0)
     echo_senders = set()
@@ -209,6 +197,13 @@ async def qrbc(
                     _digest = hash(m)
                     # TODO: Check if k is correct here or not.
                     _stripes = encode(k,n,m)
+                    # input = dumps(_stripes)
+                    # compress1 = zlib.compress(input)
+                    # compress2 = gzip.compress(input)
+                    # compress3 = bz2.compress(input)
+                    # compress4 = lzma.compress(input)
+                    # logging.info("RBC send: %d bytes, %d bytes, zlib %d bytes, gzip %d bytes, bz2 %d bytes, lzma %d bytes" % (len(_stripes), len(input),  len(compress1), len(compress2), len(compress3), len(compress4)))
+
                     from_leader = _digest
                     for i in range(n):
                         send(i, (RBCMsgType.ECHO, _digest, _stripes[i]))

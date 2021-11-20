@@ -8,7 +8,7 @@ from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 # from honeybadgermpc.broadcast.avid import AVID
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
-# from honeybadgermpc.broadcast.qrbc import qrbc
+from honeybadgermpc.broadcast.qrbc import qrbc
 from honeybadgermpc.broadcast.optqrbc import optqrbc
 from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs, deserialize_g
 
@@ -21,13 +21,13 @@ logger.setLevel(logging.ERROR)
 
 
 class HbAVSSMessageType:
-    OK = "OK"
-    IMPLICATE = "IMPLICATE"
-    READY = "READY"
-    RECOVERY = "RECOVERY"
-    RECOVERY1 = "RECOVERY1"
-    RECOVERY2 = "RECOVERY2"
-    KDIBROADCAST = "KDIBROADCAST"
+    OK = 1
+    IMPLICATE = 2
+    READY = 3
+    RECOVERY = 4
+    RECOVERY1 = 5
+    RECOVERY2 = 6
+    KDIBROADCAST = 7
 
 class Hbacss0SingleShare:
     #@profile
@@ -364,7 +364,7 @@ class Hbacss0SingleShare:
 
         async def predicate(_m):
             return True
-        rbc_msg = await optqrbc(
+        rbc_msg = await qrbc(
             rbctag,
             self.my_id,
             self.n,

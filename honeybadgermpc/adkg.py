@@ -174,7 +174,7 @@ class ADKG:
 
     async def agreement(self, key_proposal, acss_outputs, acss_signal):
         from honeybadgermpc.broadcast.tylerba import tylerba
-        # from honeybadgermpc.broadcast.qrbc import qrbc
+        from honeybadgermpc.broadcast.qrbc import qrbc
         from honeybadgermpc.broadcast.optqrbc import optqrbc
 
         aba_inputs = [asyncio.Queue() for _ in range(self.n)]
@@ -217,7 +217,7 @@ class ADKG:
                 rbc_input = bytes(riv.array)
 
             rbc_outputs[j] = asyncio.create_task(
-                optqrbc(
+                qrbc(
                     rbctag,
                     self.my_id,
                     self.n,
