@@ -3,6 +3,8 @@ from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from honeybadgermpc.adkg import ADKG
 import asyncio
+import uvloop
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 def get_avss_params(n, t):
@@ -21,7 +23,7 @@ def get_avss_params(n, t):
 async def test_adkg(test_router):
     # from pypairing import ZR
     from pypairing import Curve25519ZR as ZR
-    t = 5
+    t = 1
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)

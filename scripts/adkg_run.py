@@ -7,6 +7,7 @@ from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 import asyncio
 import time
 import logging
+import uvloop
 
 logger = logging.getLogger("benchmark_logger")
 logger.setLevel(logging.ERROR)
@@ -61,9 +62,8 @@ if __name__ == "__main__":
     logging.info("Running ADKG ...")
     HbmpcConfig.load_config()
 
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_event_loop()
-    
+    loop = uvloop.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
         loop.run_until_complete(
             _run(
