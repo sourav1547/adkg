@@ -15,8 +15,7 @@ logger.setLevel(logging.ERROR)
 # Uncomment this when you want logs from this file.
 # logger.setLevel(logging.NOTSET)
 
-
-class MsgType:
+class ABAMsgType:
     AUX = 1
     AUX2 = 2
     EST = 3
@@ -79,7 +78,7 @@ async def wait_for_auxset_values(
         v=1
     elif values == set((0,1)):
         v=2
-    broadcast(encode_msg(MsgType.AUXSET,v,epoch))
+    broadcast(encode_msg(ABAMsgType.AUXSET,v,epoch))
 
     while True:
         logger.debug(
@@ -200,9 +199,9 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
             )
             assert sender in range(n)
 
-            if tag == MsgType.ABA_COIN:
+            if tag == ABAMsgType.ABA_COIN:
                 coin_recvs.put_nowait((sender, msg))
-            elif tag == MsgType.EST:
+            elif tag == ABAMsgType.EST:
                 assert v in (0,1)
                 if sender in est_values[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -220,7 +219,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 # Relay after reaching first threshold
                 if len(est_values[r][v]) >= f+1 and not est_sent[r][v]:
                     est_sent[r][v] = True
-                    broadcast(encode_msg(MsgType.EST,v,r))
+                    broadcast(encode_msg(ABAMsgType.EST,v,r))
                     logger.debug(
                         f"[{pid}] broadcast {('EST', r, v)}",
                         extra={"nodeid":pid, "epoch": r},
@@ -238,7 +237,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                         extra={"nodeid": pid, "epoch": r}
                     )
                     bv_signal.set()
-            elif tag == MsgType.AUX:
+            elif tag == ABAMsgType.AUX:
                 assert v in (0,1)
                 if sender in aux_values[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -258,7 +257,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                     extra={"nodeid": pid, "epoch": r},
                 )
                 bv_signal.set()
-            elif tag == MsgType.AUXSET:
+            elif tag == ABAMsgType.AUXSET:
                 handle_auxset_messages(
                     sender=sender,
                     message=msg,
@@ -266,7 +265,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                     pid=pid,
                     auxset_signal=auxset_signal,
                 )
-            elif tag == MsgType.EST2:
+            elif tag == ABAMsgType.EST2:
                 assert v in (0,1)
                 if sender in est_values2[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -284,7 +283,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 # Relay after reaching first threshold
                 if len(est_values2[r][v]) >= f+1 and not est_sent2[r][v]:
                     est_sent2[r][v] = True
-                    broadcast(encode_msg(MsgType.EST2,v,r))
+                    broadcast(encode_msg(ABAMsgType.EST2,v,r))
                     logger.debug(
                         f"[{pid}] broadcast {('EST2', r, v)}",
                         extra={"nodeid":pid, "epoch": r},
@@ -302,7 +301,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                         extra={"nodeid": pid, "epoch": r}
                     )
                     bv_signal.set()
-            elif tag == MsgType.AUX2:
+            elif tag == ABAMsgType.AUX2:
                 assert v in (0,1)
                 if sender in aux_values2[r][v]:
                     # FIXME: raise or continue? For now will raise just
@@ -340,7 +339,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
 
             if not est_sent[r][est]:
                 est_sent[r][est] = True
-                broadcast(encode_msg(MsgType.EST,est,r))
+                broadcast(encode_msg(ABAMsgType.EST,est,r))
             
             while len(bin_values[r]) == 0:
                 # Block until a value is output
@@ -352,7 +351,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
                 f"[{pid}] broadcast {('AUX', r, w)}", 
                 extra={"nodeid":pid, "epoch":r}
             )
-            broadcast(encode_msg(MsgType.AUX,w,r))
+            broadcast(encode_msg(ABAMsgType.AUX,w,r))
 
             values = None
             logger.debug(
@@ -424,7 +423,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
 
             if not est_sent2[r][est2]:
                 est_sent2[r][est2] = True
-                broadcast(encode_msg(MsgType.EST2,est2,r))
+                broadcast(encode_msg(ABAMsgType.EST2,est2,r))
 
             while len(bin_values2[r]) == 0:
                 # block until a value2 is output
@@ -435,7 +434,7 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
             logger.debug(
                 f"[{pid}] broadcast {('AUX2', r, w)}", extra={"nodeid": pid, "epoch": r}
             )
-            broadcast(encode_msg(MsgType.AUX2,w,r))
+            broadcast(encode_msg(ABAMsgType.AUX2,w,r))
 
             values2 = None
             logger.debug(
