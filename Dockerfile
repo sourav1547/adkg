@@ -73,7 +73,8 @@ RUN pip install \
     pyzmq \
     matplotlib \
     zfec \
-    uvloop
+    uvloop \
+    line_profiler
 
 # This is needed otherwise the build for the power sum solver will fail.
 # This is a known issue in the version of libflint-dev in apt.

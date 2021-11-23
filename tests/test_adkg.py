@@ -8,7 +8,7 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from pypairing import ZR
 import time
 
-def get_avss_params(n, t):
+def get_avss_params(n):
     from pypairing import G1, ZR
     g = G1.rand()
     h = G1.rand()
@@ -21,10 +21,10 @@ def get_avss_params(n, t):
 
 @mark.asyncio
 async def test_adkg(test_router):
-    t = 3
+    t = 1
     n = 3 * t + 1
 
-    g, h, pks, sks = get_avss_params(n, t)
+    g, h, pks, sks = get_avss_params(n)
     sends, recvs, _ = test_router(n, maxdelay=0.001)
     pc = PolyCommitFeldman(g)
 
