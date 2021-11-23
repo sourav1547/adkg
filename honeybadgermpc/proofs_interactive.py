@@ -1,12 +1,5 @@
 #from honeybadgermpc.betterpairing import ZR, G1
 from pypairing import ZR, G1
-from honeybadgermpc.proofs import MerkleTree
-import pickle
-import math
-import hashlib
-import asyncio
-import random
-
 
 # Interactive Version for a normal inner product prover
 class inner_product_prover:

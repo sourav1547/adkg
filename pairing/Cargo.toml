@@ -29,6 +29,8 @@ num-bigint = "0.2.6"
 num-traits = "0.2.11"
 rand_core = "0.5"
 rand_chacha = "0.2.2"
+curve25519-dalek = { path = "src/curve25519-dalek"}
+num-integer = "0.1"
 
 [dev-dependencies.rand_xorshift]
 version = "0.2"

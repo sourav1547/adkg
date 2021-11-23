@@ -1,12 +1,10 @@
 from pytest import mark
 from random import randint
-from contextlib import ExitStack
 from pickle import dumps
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from honeybadgermpc.acss import Hbacss0SingleShare
 #from adkg.mpc import TaskProgramRunner
-from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.utils.misc import print_exception_callback
 import asyncio
 
@@ -23,7 +21,7 @@ def get_avss_params(n, t):
 
 @mark.asyncio
 async def test_hbacss0(test_router):
-    from pypairing import G1, ZR
+    from pypairing import ZR
     t = 2
     n = 3 * t + 1
 

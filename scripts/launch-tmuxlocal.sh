@@ -47,7 +47,7 @@ do
    ${CMD} -d -f ${CONFIG_PATH}.${ID}.json -time $start_time > logs/logs-${ID}.log 2>&1 &
 done
 
-sleep 3s
+# sleep 3s
 if [ -z "$3" ]
   then
     set -x
@@ -65,7 +65,7 @@ elif [ "$3" == "dealer" ]
   then
     set -x
     rm -rf sharedata/
-    tmux new-session     "${CMD} -d -f ${CONFIG_PATH}.0.json; sh" \; \
+    tmux new-session     "${CMD} -d -f ${CONFIG_PATH}.0.json > xxxxxxxx.out; sh" \; \
         splitw -h -p 50 "${CMD} -d -f ${CONFIG_PATH}.1.json; sh" \; \
         splitw -v -p 50 "sleep 2; ${CMD} -d -f ${CONFIG_PATH}.2.json; sh" \; \
         selectp -t 0 \; \

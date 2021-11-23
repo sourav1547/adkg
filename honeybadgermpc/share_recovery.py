@@ -1,6 +1,5 @@
 import logging
 from pypairing import ZR, G1
-#from honeybadgermpc.betterpairing import ZR, G1
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_dummy import SimulatedPclProof, SimulatedPclCom
 logger = logging.getLogger(__name__)

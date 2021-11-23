@@ -6,10 +6,10 @@ from itertools import zip_longest
 from honeybadgermpc.ntl import fft as fft_cpp
 from honeybadgermpc.ntl import fft_interpolate as fft_interpolate_cpp
 
-from .betterpairing import ZR as bpZR
+# from .betterpairing import ZR as bpZR
 from pypairing import ZR
 from .elliptic_curve import Subgroup
-from .field import GF, GFElement
+from .field import GF
 
 
 def strip_trailing_zeros(a):
@@ -38,8 +38,9 @@ def mysum(iterable):
 
 
 def polynomials_over(field):
-    assert type(field) is GF or field == ZR or field == bpZR
-    field_type = GFElement if type(field) is GF else field
+    # assert type(field) is GF or field == ZR or field == bpZR
+    # field_type = GFElement if type(field) is GF else field
+    field_type = field
     if field in _poly_cache:
         return _poly_cache[field]
 

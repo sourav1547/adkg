@@ -15,7 +15,7 @@ def print_exception_callback(future):
 
 
 @TypeCheck()
-def wrap_send(tag: str, send: Callable):  # noqa: F821
+def wrap_send(tag, send: Callable):  # noqa: F821
     """Given a `send` function which takes a destination and message,
     this returns a modified function which sends the tag with the object.
     """

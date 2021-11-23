@@ -4,7 +4,7 @@ ADKG tutorial.
 Instructions:
    run this with
 ```
-scripts/launch-tmuxlocal.sh apps/tutorial/adkg-tutorial.py conf/adkg/local
+sh scripts/launch-tmuxlocal.sh apps/tutorial/adkg-tutorial.py conf/adkg/local
 ```
 """
 from honeybadgermpc.config import HbmpcConfig
@@ -14,6 +14,7 @@ from pypairing import G1, ZR
 import asyncio
 import time
 import logging
+import uvloop
 
 logger = logging.getLogger("benchmark_logger")
 logger.setLevel(logging.ERROR)
@@ -35,7 +36,7 @@ async def _run(peers, n, t, my_id, start_time):
 
     from honeybadgermpc.ipc import ProcessProgramRunner
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
-        send, recv = runner.get_send_recv("ADKG")
+        send, recv = runner.get_send_recv("")
         logging.info(f"Starting ADKG: {(my_id)}")
         logging.info(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
 
@@ -51,7 +52,7 @@ async def _run(peers, n, t, my_id, start_time):
             
             begin_time = time.time()
             logging.info(f"ADKG start time: {(begin_time)}")
-            adkg_task = asyncio.create_task(adkg.run_adkg())
+            adkg_task = asyncio.create_task(adkg.run_adkg(begin_time))
             # await adkg.output_queue.get()
             logging.info(f"Created ADKG task, now waiting...")
             await adkg_task
@@ -72,10 +73,8 @@ if __name__ == "__main__":
     logging.info("Running ADKG ...")
     HbmpcConfig.load_config()
     
-    
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_event_loop()
-    loop.set_debug(True)
+    loop = uvloop.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
         loop.run_until_complete(
             _run(

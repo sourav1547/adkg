@@ -31,7 +31,7 @@ class SymmetricCrypto(object):
         assert len(key) == 32
         iv = Random.new().read(AES.block_size)
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        ciphertext = iv + cipher.encrypt(SymmetricCrypto.pad(dumps(plaintext)))
+        ciphertext = iv + cipher.encrypt(SymmetricCrypto.pad(plaintext))
         return ciphertext
 
     @staticmethod
@@ -41,5 +41,5 @@ class SymmetricCrypto(object):
         assert len(key) == 32
         iv = ciphertext[:16]
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        plaintext = loads(SymmetricCrypto.unpad(cipher.decrypt(ciphertext[16:])))
+        plaintext = SymmetricCrypto.unpad(cipher.decrypt(ciphertext[16:]))
         return plaintext

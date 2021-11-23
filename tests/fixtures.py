@@ -64,9 +64,7 @@ def polynomial(galois_field):
 
 @fixture
 def rust_field():
-    # from honeybadgermpc.betterpairing import ZR
     from pypairing import ZR
-
     return ZR
 
 

@@ -751,7 +751,7 @@ pub mod g1 {
     }
 
     #[derive(Copy, Clone)]
-    pub struct G1Compressed([u8; 48]);
+    pub struct G1Compressed(pub [u8; 48]);
 
     impl AsRef<[u8]> for G1Compressed {
         fn as_ref(&self) -> &[u8] {

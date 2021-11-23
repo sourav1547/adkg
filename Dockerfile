@@ -73,7 +73,7 @@ RUN pip install \
     pyzmq \
     matplotlib \
     zfec \
-    BitVector
+    uvloop
 
 # This is needed otherwise the build for the power sum solver will fail.
 # This is a known issue in the version of libflint-dev in apt.
@@ -211,5 +211,5 @@ RUN pip install -e .['dev']
 FROM pre-dev AS dev
 COPY . .
 
-# RUN pip install debugpy
+RUN pip install debugpy
 # ENTRYPOINT [ "python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m"]

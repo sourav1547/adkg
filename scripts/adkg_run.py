@@ -6,6 +6,7 @@ from pypairing import G1, ZR
 import asyncio
 import time
 import logging
+import uvloop
 
 logger = logging.getLogger("benchmark_logger")
 logger.setLevel(logging.ERROR)
@@ -23,7 +24,6 @@ def get_avss_params(n):
 async def _run(peers, n, t, my_id, start_time):
     g, h, pks, sks = get_avss_params(n)
     pc = PolyCommitFeldman(g)
-    # Q: What is ProcessProgramRunner?
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("")
         logging.debug(f"Starting ADKG: {(my_id)}")
@@ -40,7 +40,7 @@ async def _run(peers, n, t, my_id, start_time):
                 time.sleep(0.1)
             begin_time = time.time()
             logging.info(f"ADKG start time: {(begin_time)}")
-            adkg_task = asyncio.create_task(adkg.run_adkg())
+            adkg_task = asyncio.create_task(adkg.run_adkg(begin_time))
             logging.debug(f"Created ADKG task, now waiting...")
             await adkg_task
             end_time = time.time()
@@ -49,7 +49,6 @@ async def _run(peers, n, t, my_id, start_time):
             benchmark_logger.info("ADKG time: %f", adkg_time)
             adkg.kill()
             adkg_task.cancel()
-            benchmark_logger.debug("ADKG ACSS cancelled!")
         bytes_sent = runner.node_communicator.bytes_sent
         for k,v in runner.node_communicator.bytes_count.items():
             logging.info(f"[{my_id}] Bytes Sent: {k}:{v} which is {round((100*v)/bytes_sent,3)}%")
@@ -60,9 +59,8 @@ if __name__ == "__main__":
     logging.info("Running ADKG ...")
     HbmpcConfig.load_config()
 
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_event_loop()
-    
+    loop = uvloop.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
         loop.run_until_complete(
             _run(
