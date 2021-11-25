@@ -213,4 +213,4 @@ FROM pre-dev AS dev
 COPY . .
 
 RUN pip install debugpy
-# ENTRYPOINT [ "python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m"]
+ENTRYPOINT [ "python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m"]

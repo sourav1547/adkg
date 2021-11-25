@@ -21,9 +21,9 @@ import asyncio
         (3, 6, 10),
         (3, 6, 12)
     ])
-async def test_haven(test_router, t, p, n):
-    from pypairing import G1, ZR
-    # from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+async def x_test_haven(test_router, t, p, n):
+    # from pypairing import G1, ZR
+    from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 
     g = G1.rand()
     sends, recvs, _ = test_router(n)
@@ -66,13 +66,10 @@ async def test_haven(test_router, t, p, n):
 @mark.parametrize(
     "t, p, n",
     [
-        (2, 2, 7),
-        (2, 3, 7),
-        (3, 6, 10),
-        (3, 6, 12)
+        (1, 3, 4)
     ])
 async def test_haven_hybrid(test_router, t, p, n):
-    #from pypairing import G1, ZR
+    from pypairing import G1, ZR
     from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 
     g = G1.rand()

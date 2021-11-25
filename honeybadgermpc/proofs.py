@@ -1,5 +1,5 @@
-from pypairing import ZR, G1, hashg1s as hashg1list, hashfrs as hashzrlist, dotprod as inner_product, hashg1sbn as hashg1listbn
-# from pypairing import Curve25519ZR as ZR, Curve25519G as G1, hashcurve25519gsbn as hashg1list, hashcurve25519zrs as hashzrlist, curve25519dotprod as inner_product, hashcurve25519gsbn as hashg1listbn
+# from pypairing import ZR, G1, hashg1s as hashg1list, hashfrs as hashzrlist, dotprod as inner_product, hashg1sbn as hashg1listbn
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1, hashcurve25519gsbn as hashg1list, hashcurve25519zrs as hashzrlist, curve25519dotprod as inner_product, hashcurve25519gsbn as hashg1listbn
 import pickle
 import math
 import hashlib

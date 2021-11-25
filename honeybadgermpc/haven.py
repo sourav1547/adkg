@@ -1,7 +1,7 @@
 import asyncio
 from pickle import dumps, loads
-from pypairing import ZR, G1
-# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+# from pypairing import ZR, G1
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.proofs import MerkleTree
