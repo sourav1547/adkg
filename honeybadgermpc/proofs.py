@@ -1,10 +1,9 @@
-#from honeybadgermpc.betterpairing import ZR, G1, hashg1list, hashzrlist, hash_list_to_bytes, inner_product
-from pypairing import ZR, G1, hashg1s as hashg1list, hashfrs as hashzrlist, dotprod as inner_product, hashg1sbn as hashg1listbn
-from honeybadgermpc.betterpairing import hash_list_to_bytes
+#from pypairing import ZR, G1, hashg1s as hashg1list, hashfrs as hashzrlist, dotprod as inner_product, hashg1sbn as hashg1listbn
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1, hashcurve25519gsbn as hashg1list, hashcurve25519zrs as hashzrlist, curve25519dotprod as inner_product, hashcurve25519gsbn as hashg1listbn
 import pickle
 import math
 import hashlib
-
+from hashlib import sha256
 
 class MerkleTree:
     def __init__(self, leaves=None):
@@ -69,7 +68,6 @@ class MerkleTree:
                 tmp = MerkleTree.hash(tmp + br)
             tindex >>= 1
         return tmp == root_hash
-
 
 # Inner product (aka dot product) argument from Bulletproofs paper. Not zero knowledge!
 # g and h are vectors of G1 elements, a and b are vectors that form the inner product
@@ -291,6 +289,7 @@ def verify_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
 # Inner product argument where one vector (b_vec) is known by both parties
 # Precomputing u is recommended
 def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
+    #@profile
     def recursive_proofs(g_vec, a_vec, b_vecs, u, n, P_vec, transcript):
         if n == 1:
             proofs = [None] * len(b_vecs)
@@ -838,7 +837,6 @@ def prove_double_batch_inner_product_one_known_but_differenter(a_vecs, b_vecs, c
             #        proofsteps[j][i].append(na)
             nas = [a_vecs[i][-1] * -1 for i in range(numpolys)]
             proofsteps = [ [ [nas[i]] for i in range(numpolys)] for j in range(numverifiers)]
-            
         n_p = n // 2
         #cl_vec = [ [ 0 for _ in range(numpolys)] for _ in range(numverifiers)]
         #cr_vec = [ [ 0 for _ in range(numpolys)] for _ in range(numverifiers)]
@@ -873,7 +871,7 @@ def prove_double_batch_inner_product_one_known_but_differenter(a_vecs, b_vecs, c
             #smash each list of lists into a single list (list() causes the map operation to execute)
             _ = list(map(g1lists[j].extend, [P_vec[j], L_vec[j], R_vec[j]]))
         leaves = [pickle.dumps(
-                [zr_hashes[j], hashg1listbn(g1lists[j])]
+                [zr_hashes[j], hashg1list(g1lists[j])]
             ) for j in range(numverifiers)]
         tree.append_many(leaves)
         roothash = tree.get_root_hash()
@@ -930,7 +928,6 @@ def prove_double_batch_inner_product_one_known_but_differenter(a_vecs, b_vecs, c
     numpolys = len(a_vecs)
     iprods = [ [ inner_product(a_vecs[i], b_vecs[j]) for i in range(numpolys)] for j in range(numverifiers)]
     P_vecs = [ [ comms[i] * u.pow(iprods[j][i]) for i in range(numpolys)] for j in range(numverifiers)]
-
     transcript = pickle.dumps(u)
     proofs, treeparts = recursive_proofs(g_vec, a_vecs, b_vecs, u, t, P_vecs, transcript)
 
@@ -983,12 +980,12 @@ def verify_double_batch_inner_product_one_known_but_differenter(comms, iprods, b
         g1list = []
         _ = list(map(g1list.extend, [Ps, Ls, Rs]))
         if nas is None:
-            leaf = pickle.dumps([hashzrlist(b_vec), hashg1listbn(g1list)])
+            leaf = pickle.dumps([hashzrlist(b_vec), hashg1list(g1list)])
         else:
-            leaf = pickle.dumps([hashzrlist(b_vec + nas), hashg1listbn(g1list)])
+            leaf = pickle.dumps([hashzrlist(b_vec + nas), hashg1list(g1list)])
         if not MerkleTree.verify_membership(leaf, branch, roothash):
             return False
-        transcript += pickle.dumps([hashg1listbn(g_vec), roothash])
+        transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
         xi = x ** -1
         x2 = x*x
@@ -1016,3 +1013,38 @@ def verify_double_batch_inner_product_one_known_but_differenter(comms, iprods, b
     #    Ps.append(comms[i] * u.pow(iprods[i]))
     transcript = pickle.dumps(u)
     return recursive_verify(g_vec, b_vec, u, proofs, treeparts, n, Ps, transcript)
+
+def hash_list_to_bytes(inlist):
+    sumstr = ""
+    for item in inlist:
+        if type(item) is not str:
+            entry = str(item)
+            sumstr.join(entry)
+        else:
+            sumstr.join(item)
+    hashout = sha256(sumstr.encode()).digest()
+    return hashout
+
+def dleq_derive_chal(x, y, a1, a2):
+        commit = str(x)+str(y)+str(a1)+str(a2)
+        try:
+            commit = commit.encode()
+        except AttributeError:
+            pass 
+        hs =  hashlib.sha256(commit).digest()
+        return ZR.hash(hs)
+
+def dleq_verify(base1, base2, x, y, proof):
+    chal, res = proof
+    a1 = (x**chal)*(base1**res)
+    a2 = (y**chal)*(base2**res)
+    eLocal = dleq_derive_chal(x, a1, y, a2)
+    return eLocal == chal
+
+#zkPoK of alpha s.t. base1**alpha=x, base2**alpha=y
+def dleq_prove(base1, base2, x, y, alpha):
+    w = ZR.random()
+    a1 = base1**w
+    a2 = base2**w
+    e = dleq_derive_chal(x, a1, y, a2)
+    return  [e, w - e*alpha] # return (challenge, response)

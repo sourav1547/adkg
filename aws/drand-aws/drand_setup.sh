@@ -3,9 +3,9 @@
 # sudo apt install make;
 # sudo apt-get -y install build-essential;
 # sudo add-apt-repository ppa:longsleep/golang-backports;
-# sudo apt update;
-
-# sudo apt install golang-go;
+# sudo apt -y update;
+# sudo apt -y install golang-go;
+# exit 1
 
 # # killall drand
 
@@ -24,9 +24,11 @@ rm -rf drand;
 git clone https://github.com/sourav1547/drand.git;
 # git clone https://github.com/VinithKrishnan/drand.git;
 cd drand;
-# # # git checkout v1.2.5
+git checkout fix/log;
+# git pull origin fix/log
 make;
 
+# sleep 30s
 # IP=`ip address show | \
 #     grep "inet .* brd" | \
 #     sed 's/ brd.*//g' | \

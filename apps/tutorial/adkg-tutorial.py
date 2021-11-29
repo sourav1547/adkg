@@ -4,12 +4,13 @@ ADKG tutorial.
 Instructions:
    run this with
 ```
-scripts/launch-tmuxlocal.sh apps/tutorial/adkg-tutorial.py conf/adkg/local
+sh scripts/launch-tmuxlocal.sh apps/tutorial/adkg-tutorial.py conf/adkg/local
 ```
 """
 from honeybadgermpc.config import HbmpcConfig
 from honeybadgermpc.adkg import ADKG
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
+# from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
+from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
 # from pypairing import G1, ZR
 from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 import asyncio
@@ -23,7 +24,7 @@ logger.setLevel(logging.ERROR)
 logger.setLevel(logging.NOTSET)
 
 def get_avss_params(n):
-    g, h = G1.hash(b'g'), G1.rand(b'h')   
+    g, h = G1.hash(b"honeybadgerg"), G1.hash(b'h')
     public_keys, private_keys = [None] * n, [None] * n
     for i in range(n):
         private_keys[i] = ZR.hash(bytes(i))
@@ -33,7 +34,8 @@ def get_avss_params(n):
 
 async def _run(peers, n, t, my_id, start_time):
     g, h, pks, sks = get_avss_params(n)
-    pc = PolyCommitFeldman(g)
+    # pc = PolyCommitFeldman(g)
+    pc = PolyCommitBulletproofBlind()
 
     from honeybadgermpc.ipc import ProcessProgramRunner
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:

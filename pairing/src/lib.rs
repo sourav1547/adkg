@@ -52,9 +52,10 @@ extern crate rand_chacha;
 pub mod tests;
 
 pub mod bls12_381;
-use bls12_381::{G1, G1Affine, G2, Fr, Fq, Fq2, Fq6, Fq12, FqRepr, FrRepr};
+use bls12_381::{G1, G1Affine, G1Compressed, G2, Fr, Fq, Fq2, Fq6, Fq12, FqRepr, FrRepr};
 use group::CurveProjective;
 use group::CurveAffine;
+use group::EncodedPoint;
 
 use ff::{Field,  PrimeField, PrimeFieldDecodingError, PrimeFieldRepr, ScalarEngine, SqrtField};
 use std::error::Error;
@@ -114,6 +115,7 @@ fn hex_to_bin (hexstr: &String) -> String
     }
     out
 }
+
 
 //We are currently using pairing v 0.16.0. The code is copied here rather than imported so that
 //some private struct fields can be manipulated.
@@ -392,9 +394,11 @@ impl PyG1 {
     }
     
     //Serialize into affine coordinates so that equal points serialize the same
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let aff = self.g1.into_affine();
-        let fqx = FqRepr::from(aff.x);
+        let compressed = aff.into_compressed();
+        Ok(PyBytes::new(py, compressed.as_ref()))
+        /*let fqx = FqRepr::from(aff.x);
         let fqy = FqRepr::from(aff.y);
         let arr1: &[u64] = fqx.as_ref();
         let arr2: &[u64] = fqy.as_ref();
@@ -403,12 +407,24 @@ impl PyG1 {
             end[0] = 1;
         }
         let arr = [arr1, arr2, &end].concat();
-        Ok(PyList::new(py, arr))
+        let u8arr = unsafe{arr.align_to::<u8>().1};
+        Ok(PyBytes::new(py, &u8arr))*/
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
     {
-        let arr: [u64; 13] = list.extract()?;
+        //let arr: [u64; 13] = list.extract()?;
+        let u8arr: &[u8] = list.extract()?;
+        let bytes: [u8;48] = u8arr.try_into().expect("invalid initialization");
+        let compressed = G1Compressed(bytes);
+        let aff = compressed.into_affine().unwrap();
+        self.g1 = aff.into_projective();
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+        /*let arr = unsafe{u8arr.align_to::<u64>().1};
         let fqxr = FqRepr(arr[0..6].try_into().expect("invalid initialization"));
         let fqyr = FqRepr(arr[6..12].try_into().expect("invalid initialization"));
         let fqx = Fq::from_repr(fqxr).unwrap();
@@ -421,7 +437,7 @@ impl PyG1 {
             infinity: inf
         };
         self.g1 = ga.into_projective();
-        Ok(())
+        Ok(())*/
     }
     
     //Creates preprocessing elements to allow fast scalar multiplication.
@@ -1141,16 +1157,19 @@ impl PyFr {
         Ok(format!("{}",self.fr))
     }
     
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let frrep = FrRepr::from(self.fr);
         let arr: &[u64] = frrep.as_ref();
-        Ok(PyList::new(py, arr))
+        let u8arr = unsafe{arr.align_to::<u8>().1};
+        Ok(PyBytes::new(py, &u8arr))
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
     {
-        let arr: [u64; 4] = list.extract()?;
-        let myfr = Fr::from_repr(FrRepr(arr)).unwrap();
+        let u8arr: [u8; 32] = list.extract()?;
+        //let arr: [u64; 4] = list.extract()?;
+        let arr = unsafe{u8arr.align_to::<u64>().1};
+        let myfr = Fr::from_repr(FrRepr(arr[0..4].try_into().expect("invalid initialization"))).unwrap();
         self.fr = myfr;
         Ok(())
     }
@@ -1493,7 +1512,7 @@ impl PyFq12 {
         }
     }
 
-    fn rand(&mut self, a: Vec<u32>) -> PyResult<()>{
+    fn randomize(&mut self, a: Vec<u32>) -> PyResult<()>{
         let mut seed: [u32;8] = [0,0,0,0,0,0,0,0];
         let mut i = 0;
         for item in a.iter(){
@@ -1712,6 +1731,38 @@ impl PyFq12 {
         }
         Ok(())
     }
+    
+        #[staticmethod]
+    fn rand(a: Option<Vec<u32>>) -> PyResult<PyFq12> {
+        match a {
+            None => {
+                let mut rng = ChaCha20Rng::from_entropy();
+                let fq12 = Fq12::random(&mut rng);
+                Ok(PyFq12{
+                    fq12: fq12,
+                    pp: Vec::new(),
+                    pplevel : 0
+                })
+            },
+            Some(a) => {
+                let mut seed: [u32;8] = [0,0,0,0,0,0,0,0];
+                let mut i = 0;
+                for item in a.iter(){
+                    let myu32: &u32 = item;
+                    seed[i] = *myu32;
+                    i = i + 1;
+                }
+                let mut rng = ChaCha20Rng::from_seed(swap_seed_format(seed));
+                let fq12 = Fq12::random(&mut rng);
+                Ok(PyFq12{
+                    fq12: fq12,
+                    pp: Vec::new(),
+                    pplevel : 0
+                })
+            }
+        }
+        
+    }
 }
 
 #[pyproto]
@@ -1862,20 +1913,9 @@ impl PyRistG {
     }
     
     //Serialize into affine coordinates so that equal points serialize the same
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let compressed = self.g.compress();
-        Ok(PyList::new(py, compressed.to_bytes()))
-        /*let aff = self.g1.into_affine();
-        let fqx = FqRepr::from(aff.x);
-        let fqy = FqRepr::from(aff.y);
-        let arr1: &[u64] = fqx.as_ref();
-        let arr2: &[u64] = fqy.as_ref();
-        let mut end: [u64;1] = [0;1];
-        if aff.infinity {
-            end[0] = 1;
-        }
-        let arr = [arr1, arr2, &end].concat();
-        Ok(PyList::new(py, arr))*/
+        Ok(PyBytes::new(py, &compressed.to_bytes()))
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
@@ -2237,8 +2277,8 @@ impl PyRistScalar {
         Ok(())
     }
     
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
-        Ok(PyList::new(py, self.scalar.to_bytes()))
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
+        Ok(PyBytes::new(py, &self.scalar.to_bytes()))
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
@@ -2289,6 +2329,10 @@ impl PyRistScalar {
         Ok(PyRistScalar::rand()?)
     }
 
+    #[staticmethod]
+    fn zero() -> PyResult<PyRistScalar> {
+        Ok(PyRistScalar{scalar: Scalar::zero()})
+    }
 }
 
 #[pyproto]
@@ -2417,6 +2461,24 @@ fn hashfrs(a: &PyList) -> PyResult<String>{
     Ok(format!("{}",text))
 }
 
+#[pyfunction]
+fn hashcurve25519zrs(a: &PyList) -> PyResult<String>{
+    let mut string =  String::from("");
+    for item in a.iter(){
+        let itemcel: &PyCell<PyRistScalar> = item.downcast()?;
+        let myfr: &PyRistScalar = &itemcel.borrow();
+        string.push_str(&myfr.__str__().unwrap())
+    }
+    let bytes = string.into_bytes();
+    let mut hasher = Sha256::new();
+    hasher.input(bytes);
+    let result = hasher.result();
+    let text = hex::encode(&result[..]);
+    Ok(format!("{}",text))
+}
+
+
+
 /*#[pyfunction]
 fn hashg1s(a: &PyList) -> PyResult<String>{
     //let mut string =  String::from("");
@@ -2466,6 +2528,35 @@ fn hashg1sbn(mut a: Vec<PyG1>) -> PyResult<String>{
         for num in arr {
             hasher.input(num.to_be_bytes());
         }
+    }
+    let result = hasher.result();
+    let text = hex::encode(&result[..]);
+    Ok(format!("{}",text))
+}
+
+#[pyfunction]
+fn hashcurve25519gs(mut a: Vec<PyRistG>) -> PyResult<String>{
+    let mut hasher = Sha256::new();
+    for point in a {
+        hasher.input(point.g.compress().to_bytes());
+    }
+    let result = hasher.result();
+    let text = hex::encode(&result[..]);
+    Ok(format!("{}",text))
+}
+
+#[pyfunction]
+fn hashcurve25519gsbn(mut a: Vec<PyRistG>) -> PyResult<String>{
+    let mut hasher = Sha256::new();
+    let mut uncompressed = Vec::with_capacity(a.len());
+    for g in a.iter(){
+        uncompressed.push(g.g);
+    }
+    //this doubles as a part of compressing for cost reasons, but that doesn't matter here 
+    //(as long as we're consistent about it)
+    let compressed = RistrettoPoint::double_and_compress_batch(&uncompressed);
+    for point in compressed {
+        hasher.input(point.to_bytes());
     }
     let result = hasher.result();
     let text = hex::encode(&result[..]);
@@ -2541,6 +2632,24 @@ fn dotprod(a: &PyList, b: &PyList) -> PyResult<PyFr>{
         temp.clone_from(&aif.fr);
         temp.mul_assign(&bif.fr);
         output.fr.add_assign(&temp);
+    }
+    Ok(output)
+}
+
+#[pyfunction]
+fn curve25519dotprod(a: &PyList, b: &PyList) -> PyResult<PyRistScalar>{
+    let mut output = PyRistScalar{ scalar: Scalar::zero()};
+    let mut temp = Scalar::zero();
+    for (ai, bi) in a.iter().zip(b){
+        //let aif: &PyFr = ai.try_into().unwrap();
+        //let bif: &PyFr = bi.try_into().unwrap();
+        let aicel: &PyCell<PyRistScalar> = ai.downcast()?;
+        let aif: &PyRistScalar = &aicel.borrow();
+        let bicel: &PyCell<PyRistScalar> = bi.downcast()?;
+        let bif: &PyRistScalar = &bicel.borrow();
+        temp.clone_from(&aif.scalar);
+        temp.mul_assign(&bif.scalar);
+        output.scalar.add_assign(&temp);
     }
     Ok(output)
 }
@@ -2753,6 +2862,11 @@ fn pypairing(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(hashg1sbn))?;
     m.add_wrapped(wrap_pyfunction!(dotprod))?;
     m.add_wrapped(wrap_pyfunction!(condense_list))?;
+
+    m.add_wrapped(wrap_pyfunction!(hashcurve25519zrs))?;
+    m.add_wrapped(wrap_pyfunction!(hashcurve25519gs))?;
+    m.add_wrapped(wrap_pyfunction!(hashcurve25519gsbn))?;
+    m.add_wrapped(wrap_pyfunction!(curve25519dotprod))?;
     Ok(())
 }
 

@@ -102,7 +102,7 @@ class Hbacss0SingleShare:
             logger.warn("Implicate confirmed, bad encryption:", e)
             return True
         return not self.poly_commit.batch_verify_eval(
-            commitments, j + 1, j_shares, j_witnesses
+            commitments, j + 1, j_shares, j_witnesses, self.t
         )
 
     def _init_recovery_vars(self, tag):
@@ -139,7 +139,7 @@ class Hbacss0SingleShare:
                 logger.debug("Implicate confirmed, bad encryption:", e)
             commitments = self.tagvars[tag]['commitments']
             if (self.poly_commit.batch_verify_eval(commitments,
-                                                   sender + 1, j_shares, j_witnesses)):
+                                                   sender + 1, j_shares, j_witnesses, self.t)):
                 if not self.saved_shares[sender]:
                     self.saved_shared_actual_length += 1
                     self.saved_shares[sender] = j_shares
@@ -277,7 +277,7 @@ class Hbacss0SingleShare:
         ephemeral_secret_key = self.field.random()
         ephemeral_public_key = pow(self.g, ephemeral_secret_key)
         dispersal_msg_list = bytearray()
-        witnesses = self.poly_commit.double_batch_create_witness(phi, r, self.n)
+        witnesses = self.poly_commit.double_batch_create_witness(phi, r, self.n, self.t)
         for i in range(n):
             shared_key = pow(self.public_keys[i], ephemeral_secret_key)
             phis_i = [phi[k](i + 1).__getstate__() for k in range(secret_count)]

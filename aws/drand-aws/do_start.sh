@@ -16,9 +16,9 @@ for((i=0;i<$N;i++))
 do
     ip=${IPS[$i]}
     if [ $i == $Nm1 ]; then
-        ssh -i $node ubuntu@$ip 'timeout 300 bash -ls --' < ./aws/drand-aws/start.sh $ip "$LeaderAddr:7090" $N "leader" &
+        ssh -i $node ubuntu@$ip 'timeout 2000 bash -ls --' < ./aws/drand-aws/start.sh $ip "$LeaderAddr:7090" $N "leader" &
     else
-        ssh -i $node ubuntu@$ip 'timeout 300 bash -ls --' < ./aws/drand-aws/start.sh $ip "$LeaderAddr:7090" $N &
+        ssh -i $node ubuntu@$ip 'timeout 2000 bash -ls --' < ./aws/drand-aws/start.sh $ip "$LeaderAddr:7090" $N &
     fi
 done
 
