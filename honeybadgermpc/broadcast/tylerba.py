@@ -152,8 +152,8 @@ async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, recei
     coin_recvs = asyncio.Queue()
 
     async def _coin(r, coin_init):
-        # from pypairing import G1, ZR
-        from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+        from pypairing import G1, ZR
+        # from pypairing import Curve25519ZR as ZR, Curve25519G as G1
         if not coin_init:
             acss_outputs, rbc_values = await coin_keys()
         

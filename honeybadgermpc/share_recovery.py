@@ -1,7 +1,6 @@
 import logging
-# from pypairing import ZR, G1
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
-#from honeybadgermpc.betterpairing import ZR, G1
+from pypairing import ZR, G1
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.poly_commit_dummy import SimulatedPclProof, SimulatedPclCom
 logger = logging.getLogger(__name__)
@@ -9,10 +8,6 @@ logger.setLevel(logging.ERROR)
 
 # Uncomment this when you want logs from this file.
 logger.setLevel(logging.NOTSET)
-
-# from honeybadgermpc.betterpairing import ZR, G1
-# todo change zr to pypairing.ZR
-
 
 # assumes there's a total of t+1 secrets
 class HbACSS1Recoverer:

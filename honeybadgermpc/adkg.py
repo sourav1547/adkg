@@ -4,13 +4,14 @@ from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.share_recovery import interpolate_g1_at_x
 from honeybadgermpc.poly_commit_hybrid import PolyCommitHybrid
 from honeybadgermpc.haven import HybridHavenAVSS
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import G1, ZR
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 import asyncio
 import hashlib
 import time
 import logging
-from honeybadgermpc.utils.serialization import serialize_g, deserialize_g, serialize_f, deserialize_f
+from honeybadgermpc.utils.serialization import serialize_g, deserialize_g, serialize_f, deserialize_f, serialize_gs
 from honeybadgermpc.utils.bitmap import Bitmap
 
 
@@ -20,19 +21,11 @@ class CP:
         self.h = h
 
     def dleq_derive_chal(self, x, y, a1, a2):
-        commit = str(x)+str(y)+str(a1)+str(a2)
-        try:
-            commit = commit.encode()
-        except AttributeError:
-            pass 
-        # TODO: Convert the hash output to a field element.
-        hs =  hashlib.sha256(commit).digest() 
+        hs =  hashlib.sha256(serialize_gs([x,y,a1,a2])).digest() 
         return ZR.hash(hs)
 
     def dleq_verify(self, x, y, chal, res):
-        # a1 = (x**chal)*(self.g**res)
         a1 = x.pow(chal)*(self.g.pow(res))
-        # a2 = (y**chal)*(self.h**res)
         a2 = y.pow(chal)*(self.h.pow(res))
         eLocal = self.dleq_derive_chal(x, a1, y, a2)
         if eLocal == chal:
@@ -41,9 +34,7 @@ class CP:
 
     def dleq_prove(self, alpha, x, y):
         w = ZR.random()
-        # a1 = self.g**w
         a1 = self.g.pow(w)
-        # a2 = self.h**w
         a2 = self.h.pow(w)
         e = self.dleq_derive_chal(x, a1, y, a2)
         return  e, w - e*alpha # return (challenge, response)

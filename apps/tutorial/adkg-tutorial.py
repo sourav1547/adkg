@@ -12,8 +12,8 @@ from honeybadgermpc.adkg import ADKG
 # from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
 from honeybadgermpc.poly_commit_hybrid import PolyCommitHybrid
-# from pypairing import G1, ZR
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import G1, ZR
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 import asyncio
 import time
 import logging

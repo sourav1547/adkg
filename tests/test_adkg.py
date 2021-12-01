@@ -9,7 +9,8 @@ import asyncio
 import uvloop
 import time
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import G1, ZR
 
 
 def get_avss_params(n, t):
@@ -36,9 +37,9 @@ async def test_adkg(test_router, t):
     sends, recvs, _ = test_router(n, maxdelay=0.001)
     pc = PolyCommitBulletproofBlind(crs, 2*t)
     pc2 = PolyCommitHybrid(crs, 2*t)
-    h.preprocess(8)
-    pc.preprocess_prover()
-    pc2.preprocess_prover()
+    # h.preprocess(8)
+    # pc.preprocess_prover()
+    # pc2.preprocess_prover()
 
     start_time = time.time()
     dkg_tasks = [None] * n # async task for adkg

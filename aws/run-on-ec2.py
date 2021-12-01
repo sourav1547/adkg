@@ -127,7 +127,7 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
         run_commands_on_instances(ec2manager, setup_commands, False)
 
     if not only_setup:
-        start_time = int(time.time()) + 90 # starting 1 minute in future
+        start_time = int(time.time()) + 30 # starting 1 minute in future
         logging.info("Setup commands executed successfully.")
         instance_commands = [
             [

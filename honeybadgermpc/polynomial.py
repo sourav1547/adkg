@@ -6,9 +6,6 @@ from itertools import zip_longest
 from honeybadgermpc.ntl import fft as fft_cpp
 from honeybadgermpc.ntl import fft_interpolate as fft_interpolate_cpp
 
-# from .betterpairing import ZR as bpZR
-# from pypairing import ZR
-from pypairing import Curve25519ZR as ZR
 from .elliptic_curve import Subgroup
 from .field import GF, GFElement
 

@@ -1,8 +1,8 @@
 import asyncio
 from pickle import dumps, loads
 from honeybadgermpc.broadcast.crypto.boldyreva import dealer, serialize
-# from pypairing import ZR, G1
-from pypairing import Curve25519ZR as ZR
+from pypairing import ZR, G1
+# from pypairing import Curve25519ZR as ZR
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast

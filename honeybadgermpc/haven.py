@@ -1,14 +1,14 @@
 import asyncio
 from hashlib import sha256
 from pickle import dumps, loads
-#from pypairing import ZR, G1
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import ZR, G1
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.proofs import MerkleTree
 import time
 import hashlib
-from honeybadgermpc.utils.serialization import serialize_gs, deserialize_gs
+from honeybadgermpc.utils.serialization import serialize_gs
 from honeybadgermpc.utils.serializer import serialize, deserialize
 
 import logging
@@ -233,6 +233,8 @@ class HybridHavenAVSS(HavenAVSS):
         # TODO: Can we do batch validation here? One idea is: take integer linear combination of all the polynomials.
         #if not self.poly_commit.batch_verify_eval(S_Com_list, self.my_id+1, y_list_i, S_Com_proofs_i, self.t):
         for j in range(self.n):
+            if j == self.my_id:
+                continue
             if not self.poly_commit.verify_eval(S_Com_list[j], self.my_id+1, y_list_i[j], S_Com_proofs_i[j]):
                 return
         
@@ -246,9 +248,14 @@ class HybridHavenAVSS(HavenAVSS):
         # TODO: Can we ask the dealer for T_Com_i and check whether S*T=R or not? This will save us from taking inverse
         # TODO: I think each node needs to validate T_Com_i for all nodes. Can we do batching here?
         # TODO: To check for each index except yours. I am not sure whether this step can be done in O(n^2) step or not
-        T_Com_i = R_Com_bp / S_Com_list[self.my_id]
-        if not self.poly_commit.verify_eval(T_Com_i, self.my_id+1, self.field(0), T_i_proof):
-            return
+
+        # T_Com_i = R_Com_bp / S_Com_list[self.my_id]
+        # FIXME: This for loop is just a place holder to measure the computation time
+        # T_Com_i = R_Com_bp * S_Com_list[self.my_id].pow(-1)
+        for i in range(self.n):
+            T_Com_i = R_Com_bp * S_Com_list[self.my_id].pow(-1)
+            if not self.poly_commit.verify_eval(T_Com_i, self.my_id+1, self.field(0), T_i_proof):
+                return
         
         self.commitments[C] = R_Com[1] # Feldmann commitment
         self.shares[C] = y_list_i[self.my_id]
@@ -286,7 +293,8 @@ class HybridHavenAVSS(HavenAVSS):
         
         for i in range(n):
             # TODO: To check if there is any other way to compute T_Com_i more efficiently
-            T_Com_i = R_Com_bp / S_Com_list[i]
+            # T_Com_i = R_Com_bp / S_Com_list[i]
+            T_Com_i = R_Com_bp * S_Com_list[i].pow(-1)
             T_i = R - S_list[i]
             #S_Com has an h**r component. Need to flip to -r since it's in the denominator
             T_i_proof = self.poly_commit.create_witness(T_Com_i, T_i, i+1, r * -1)
