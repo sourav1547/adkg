@@ -37,17 +37,16 @@ echo ">>> Command to be executed: '${CMD}'"
 # sudo sh scripts/latency-control.sh start 50ms 10ms
 
 start_time=$(date +%s)
-start_time=$((start_time+10))
+start_time=$((start_time+120))
 
 ## TODO: the following was used for launching a larger number
 ## of processes locally, with only a portion of them shown in tmux
-for ID in $(seq 4 13)
+for ID in $(seq 4 16)
 do
    echo
    ${CMD} -d -f ${CONFIG_PATH}.${ID}.json -time $start_time > logs/logs-${ID}.log 2>&1 &
 done
 
-# sleep 3s
 if [ -z "$3" ]
   then
     set -x

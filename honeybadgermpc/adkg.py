@@ -45,11 +45,11 @@ class CP:
         return  e, w - e*alpha # return (challenge, response)
 
 class ADKG:
-    def __init__(self, public_keys, private_key, g, h, n, t, my_id, send, recv, pc, field=ZR):
+    def __init__(self, public_keys, private_key, g, h, n, t, my_id, send, recv, pc, pc2=None, field=ZR):
         self.public_keys, self.private_key, self.g, self.h = (public_keys, private_key, g, h)
         self.n, self.t, self.my_id = (n, t, my_id)
         self.p = 2*self.t # This is the degree.
-        self.send, self.recv, self.pc, self.field = (send, recv, pc, field)
+        self.send, self.recv, self.pc, self.pc2, self.field = (send, recv, pc, pc2, field)
         self.poly = polynomials_over(self.field)
         self.poly.clear_cache() #FIXME: Not sure why we need this.
         # Create a mechanism to split the `recv` channels based on `tag`
@@ -91,8 +91,6 @@ class ADKG:
 
         acsstag = "A"
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
-
-        self.pc2 = PolyCommitHybrid()
         self.acss = HybridHavenAVSS(self.n, self.t, self.p, self.my_id, acsssend, acssrecv, self.pc, self.pc2)
         self.acss_tasks = [None] * self.n
         
@@ -105,11 +103,8 @@ class ADKG:
         while True:
             msg = await self.acss.output_queue.get()
             (dealer, _, share, commitments) = msg
-            # await self.acss.output_queue.get()
             outputs[dealer] = [share, commitments]
-            # if len(outputs) >= self.n - self.t:
             if len(outputs) > self.t:
-                # print("Player " + str(self.my_id) + " Got shares from: " + str([output for output in outputs]))
                 acss_signal.set()
 
             if len(outputs) == self.n:
@@ -332,22 +327,20 @@ class ADKG:
         send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
-        # xb, yb = serialize_g(x), serialize_g(y)
-        # chalb, resb = serialize_f(chal), serialize_f(res)
+        xb, yb = serialize_g(x), serialize_g(y)
+        chalb, resb = serialize_f(chal), serialize_f(res)
         for i in range(self.n):
-            # send(i, (xb, yb, chalb, resb))
-            send(i, (x, y, chal, res))
+            send(i, (xb, yb, chalb, resb))
 
         pk_shares = []
         while True:
             (sender, msg) = await recv()
-            xr, yr, chalr, resr = msg
-            # xb, yb, chalb, resb = msg
-            # x, y = deserialize_g(xb), deserialize_g(yb)
-            # chal, res = deserialize_f(chalb), deserialize_f(resb)
+            xb, yb, chalb, resb = msg
+            x, y = deserialize_g(xb), deserialize_g(yb)
+            chal, res = deserialize_f(chalb), deserialize_f(resb)
             
-            if cp.dleq_verify(xr, yr, chalr, resr):
-                pk_shares.append([sender+1, yr])
+            if cp.dleq_verify(x, y, chal, res):
+                pk_shares.append([sender+1, y])
                 # print("Node " + str(self.my_id) + " received key shares from "+ str(sender))
             if len(pk_shares) > self.p:
                 break
@@ -368,7 +361,6 @@ class ADKG:
     async def run_adkg(self, start_time):
         acss_outputs = {}
         acss_signal = asyncio.Event()
-
         acss_start_time = time.time()
         value =ZR.random()
         self.acss_task = asyncio.create_task(self.acss_hybrid_step(acss_outputs, value, acss_signal))

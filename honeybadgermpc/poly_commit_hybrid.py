@@ -11,18 +11,21 @@ class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
         PolyCommitBulletproofBlind.__init__(self, crs, degree_max)
 
     def commit(self, phi, r):
-        bp, feldman, proofs = [], [], []
+        bp, feldman, proofs, bp_c = [], [], [], G1.identity()
         for i in range(len(phi.coeffs)):
-            bp.append(self.gs[i] ** phi.coeffs[i])
+            temp_prod = self.gs[i] ** phi.coeffs[i]
+            bp_c *= temp_prod
+            bp.append(temp_prod)
             feldman.append(self.gs[0] ** phi.coeffs[i])
             proofs.append(dleq_prove(self.gs[i], self.gs[0], bp[i], feldman[i], phi.coeffs[i]))
-        return [bp, feldman, proofs]
+        return [bp, feldman, proofs], bp_c
 
     def verify_commit(self, c):
         bp, feldman, proofs = c
         if len(bp) != len(feldman) or len(bp) != len(proofs):
             return False
         for i in range(len(bp)):
+            # TODO: we can do batch verification here!
             if not dleq_verify(self.gs[i], self.gs[0], bp[i], feldman[i], proofs[i]):
                 return False
         return True

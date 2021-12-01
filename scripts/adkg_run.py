@@ -3,6 +3,7 @@ from honeybadgermpc.ipc import ProcessProgramRunner
 from honeybadgermpc.adkg import ADKG
 # from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
+from honeybadgermpc.poly_commit_hybrid import PolyCommitHybrid
 # from pypairing import G1, ZR
 from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 import asyncio
@@ -15,18 +16,27 @@ logger.setLevel(logging.ERROR)
 # Uncomment this when you want logs from this file.
 logger.setLevel(logging.NOTSET)
 
-def get_avss_params(n):
-    g, h = G1.hash(b"honeybadgerg"), G1.hash(b'h')   
+def get_avss_params(n, t):
+    gs = G1.hash_many(b"honeybadgerg", 2*t+1)
+    hs = G1.hash(b"honeybadgerh")
+    u = G1.hash(b"honeybadgeru")
+    crs = [gs, hs, u]
+    g, h = gs[0], G1.hash(b'h')   
     public_keys, private_keys = [None] * n, [None] * n
     for i in range(n):
         private_keys[i] = ZR.hash(bytes(i))
         public_keys[i] = pow(g, private_keys[i])
-    return g, h, public_keys, private_keys
+    return g, h, public_keys, private_keys, crs
 
 async def _run(peers, n, t, my_id, start_time):
-    g, h, pks, sks = get_avss_params(n)
+    g, h, pks, sks, crs = get_avss_params(n,t)
     # pc = PolyCommitFeldman(g)
-    pc = PolyCommitBulletproofBlind()
+    # h.preprocess(8)
+    pc = PolyCommitBulletproofBlind(crs, 2*t)
+    pc2 = PolyCommitHybrid(crs, 2*t)
+    pc.preprocess_prover()
+    pc2.preprocess_prover()
+
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("")
         logging.debug(f"Starting ADKG: {(my_id)}")
@@ -36,7 +46,7 @@ async def _run(peers, n, t, my_id, start_time):
            logging.getLogger("benchmark_logger"), {"node_id": my_id}
         )
 
-        with ADKG(pks, sks[my_id], g, h, n, t, my_id, send, recv, pc) as adkg:
+        with ADKG(pks, sks[my_id], g, h, n, t, my_id, send, recv, pc, pc2) as adkg:
             while True:
                 if time.time() > start_time:
                     break
