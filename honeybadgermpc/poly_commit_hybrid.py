@@ -3,7 +3,7 @@
 from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
 from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from pypairing import Curve25519ZR as ZR, Curve25519G as G1
-from honeybadgermpc.proofs import dleq_prove, dleq_verify
+from honeybadgermpc.proofs import dleq_batch_prove, dleq_batch_verify
 
 
 class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
@@ -11,25 +11,21 @@ class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
         PolyCommitBulletproofBlind.__init__(self, crs, degree_max)
 
     def commit(self, phi, r):
-        bp, feldman, proofs, bp_c = [], [], [], G1.identity()
+        bp, feldman, bp_c = [], [], G1.identity()
         for i in range(len(phi.coeffs)):
             # temp_prod = self.gs[i] ** phi.coeffs[i]
             temp_prod = self.gs[i].pow(phi.coeffs[i])
             bp_c *= temp_prod
             bp.append(temp_prod)
             feldman.append(self.gs[0].pow(phi.coeffs[i]))
-            proofs.append(dleq_prove(self.gs[i], self.gs[0], bp[i], feldman[i], phi.coeffs[i]))
-        return [bp, feldman, proofs], bp_c
+        batched_proof = dleq_batch_prove(self.gs, self.gs[0], bp, feldman, phi.coeffs)
+        return [bp, feldman, batched_proof], bp_c
 
     def verify_commit(self, c):
         bp, feldman, proofs = c
-        if len(bp) != len(feldman) or len(bp) != len(proofs):
+        if len(bp) != len(feldman) or len(bp) != len(proofs[1]):
             return False
-        for i in range(len(bp)):
-            # TODO: we can do batch verification here!
-            if not dleq_verify(self.gs[i], self.gs[0], bp[i], feldman[i], proofs[i]):
-                return False
-        return True
+        return dleq_batch_verify(self.gs, self.gs[0],bp, feldman, proofs)
 
     def create_witness(self, phi, i, r):
         return PolyCommitFeldman.create_witness(self, phi, i, r)
