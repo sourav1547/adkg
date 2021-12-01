@@ -506,13 +506,23 @@ impl PyG1 {
         Ok(self.pplevel)
     }
 
-    fn pow(&self, rhs: PyFr)  -> PyResult<PyG1> {
+    fn pow(&self, rhs: &PyAny)  -> PyResult<PyG1> {
         let mut out = PyG1{
             g1: G1::one(),
             pp: Vec::new(),
             pplevel : 0
         };
-        self.ppmul(&rhs, &mut out).unwrap();
+        let rhscel = &rhs.downcast::<PyCell<PyFr>>();
+        if rhscel.is_err(){
+            let exp: BigInt = rhs.extract()?;
+            let pyfrexp = bigint_to_pyfr(&exp);
+            self.ppmul(&pyfrexp, &mut out).unwrap();
+        }
+        else {
+            //let rhscel2 = rhscel.as_ref().unwrap();
+            let exp: &PyFr = &rhscel.as_ref().unwrap().borrow();
+            self.ppmul(&exp, &mut out).unwrap();
+        }
         Ok(out)
     }
 
@@ -824,6 +834,26 @@ impl PyG2 {
             self.pplevel = 0;
         }
         Ok(())
+    }
+    
+    fn pow(&self, rhs: &PyAny)  -> PyResult<PyG2> {
+        let mut out = PyG2{
+            g2: G2::one(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        let rhscel = &rhs.downcast::<PyCell<PyFr>>();
+        if rhscel.is_err(){
+            let exp: BigInt = rhs.extract()?;
+            let pyfrexp = bigint_to_pyfr(&exp);
+            self.ppmul(&pyfrexp, &mut out).unwrap();
+        }
+        else {
+            //let rhscel2 = rhscel.as_ref().unwrap();
+            let exp: &PyFr = &rhscel.as_ref().unwrap().borrow();
+            self.ppmul(&exp, &mut out).unwrap();
+        }
+        Ok(out)
     }
 
     /// a.equals(b)
@@ -2001,7 +2031,7 @@ impl PyRistG {
         Ok(self.pplevel)
     }
 
-    fn pow(&self, rhs: PyRistScalar)  -> PyResult<PyRistG> {
+    /*fn pow(&self, rhs: PyRistScalar)  -> PyResult<PyRistG> {
         let mut out = PyRistG{
             g: RistrettoPoint::identity(),
             pp: Vec::new(),
@@ -2009,7 +2039,19 @@ impl PyRistG {
         };
         self.ppmul(&rhs, &mut out).unwrap();
         Ok(out)
+    }*/
+    
+    fn pow(&self, rhs: &PyAny)  -> PyResult<PyRistG> {
+        let mut out = PyRistG{
+            g: RistrettoPoint::identity(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        let exp = pyscalar_from_pyany(&rhs)?;
+        self.ppmul(&exp, &mut out).unwrap();
+        Ok(out)
     }
+    
     //todo: they have their own from hash function
     #[staticmethod]
     fn hash(bytestr: &PyBytes) -> PyResult<PyRistG>{
@@ -2329,10 +2371,6 @@ impl PyRistScalar {
         Ok(PyRistScalar::rand()?)
     }
 
-    #[staticmethod]
-    fn zero() -> PyResult<PyRistScalar> {
-        Ok(PyRistScalar{scalar: Scalar::zero()})
-    }
 }
 
 #[pyproto]

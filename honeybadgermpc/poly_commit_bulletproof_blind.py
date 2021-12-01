@@ -79,7 +79,8 @@ class PolyCommitBulletproofBlind:
                 sy_prods[j] += s_vec[i] * self.y_vecs[j][i]
             T_vec[j] = self.gs[0].pow(sy_prods[j])
         rho = ZR.random()
-        S *= self.h ** rho
+        # S *= self.h ** rho
+        S *= self.h.pow(rho)
         # Fiat Shamir
         tree = MerkleTree()
         for j in range(n):
@@ -93,7 +94,8 @@ class PolyCommitBulletproofBlind:
         d_vec = [phi.coeffs[j] + s_vec[j] * challenge for j in range(t + 1)]
         D = G1.identity()
         for j in range(t + 1):
-            D *= self.gs[j] ** d_vec[j]
+            # D *= self.gs[j] ** d_vec[j]
+            D *= self.gs[j].pow(d_vec[j])
         mu = r + rho * challenge
         comm, t_hats, iproofs = prove_batch_inner_product_one_known(
             d_vec, self.y_vecs, crs=[self.gs, self.u]

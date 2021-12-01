@@ -6,15 +6,18 @@ class PolyCommitFeldman:
         self.g = crs
 
     def commit(self, phi, *args):
-        return [self.g ** coeff for coeff in phi.coeffs]
+        # return [self.g ** coeff for coeff in phi.coeffs]
+        return [self.g.pow(coeff) for coeff in phi.coeffs]
 
     def verify_eval(self, c, i, phi_at_i, *args):
         exp = ZR(1)
         lhs = G1.identity()
         for j in range(len(c)):
-            lhs *= c[j]**exp
+            # lhs *= c[j]**exp
+            lhs *= c[j].pow(exp)
             exp *= i
-        return lhs == self.g ** phi_at_i
+        # return lhs == self.g ** phi_at_i
+        return lhs == self.g.pow(phi_at_i)
 
     def create_witness(*args):
         return None

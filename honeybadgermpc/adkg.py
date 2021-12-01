@@ -30,8 +30,10 @@ class CP:
         return ZR.hash(hs)
 
     def dleq_verify(self, x, y, chal, res):
-        a1 = (x**chal)*(self.g**res)
-        a2 = (y**chal)*(self.h**res)
+        # a1 = (x**chal)*(self.g**res)
+        a1 = x.pow(chal)*(self.g.pow(res))
+        # a2 = (y**chal)*(self.h**res)
+        a2 = y.pow(chal)*(self.h.pow(res))
         eLocal = self.dleq_derive_chal(x, a1, y, a2)
         if eLocal == chal:
             return True
@@ -39,8 +41,10 @@ class CP:
 
     def dleq_prove(self, alpha, x, y):
         w = ZR.random()
-        a1 = self.g**w
-        a2 = self.h**w
+        # a1 = self.g**w
+        a1 = self.g.pow(w)
+        # a2 = self.h**w
+        a2 = self.h.pow(w)
         e = self.dleq_derive_chal(x, a1, y, a2)
         return  e, w - e*alpha # return (challenge, response)
 
@@ -314,12 +318,14 @@ class ADKG:
                 await acss_signal.wait()
                 acss_signal.clear()
         
-        secret = ZR.zero()
+        secret = ZR(0)
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
         
-        x = self.g**secret
-        y = self.h**secret
+        # x = self.g**secret
+        x = self.g.pow(secret)
+        # y = self.h**secret
+        y = self.h.pow(secret)
         cp = CP(self.g, self.h)
         chal, res = cp.dleq_prove(secret, x, y)
 

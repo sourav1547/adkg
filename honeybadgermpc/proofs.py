@@ -80,7 +80,7 @@ def prove_inner_product(a_vec, b_vec, comm=None, crs=None):
         proofstep = []
         if n % 2 == 1:
             na, nb = a_vec[-1] * -1, b_vec[-1] * -1
-            P *= g_vec[-1] ** (na) * h_vec[-1] ** (nb) * u ** (-na * nb)
+            P *= g_vec[-1].pow(na) * h_vec[-1].pow(nb) * u.pow(-na * nb)
             proofstep.append(na)
             proofstep.append(nb)
         n_p = n // 2
@@ -91,24 +91,24 @@ def prove_inner_product(a_vec, b_vec, comm=None, crs=None):
         for i in range(n_p):
             cl += a_vec[:n_p][i] * b_vec[n_p:][i]
             cr += a_vec[n_p:][i] * b_vec[:n_p][i]
-            L *= g_vec[n_p:][i] ** a_vec[:n_p][i] * h_vec[:n_p][i] ** b_vec[n_p:][i]
-            R *= g_vec[:n_p][i] ** a_vec[n_p:][i] * h_vec[n_p:][i] ** b_vec[:n_p][i]
-        L *= u ** cl
-        R *= u ** cr
+            L *= g_vec[n_p:][i].pow(a_vec[:n_p][i]) * h_vec[:n_p][i].pow(b_vec[n_p:][i])
+            R *= g_vec[:n_p][i].pow(a_vec[n_p:][i]) * h_vec[n_p:][i].pow(b_vec[:n_p][i])
+        L *= u.pow(cl)
+        R *= u.pow(cr)
         # Fiat Shamir L, R, state...
         #transcript += pickle.dumps([g_vec, h_vec, u, P, L, R])
         transcript += pickle.dumps(hashg1list(g_vec + h_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, h_vec_p, a_vec_p, b_vec_p = [], [], [], []
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i] ** xi * g_vec[n_p:][i] ** x)
-            h_vec_p.append(h_vec[:n_p][i] ** x * h_vec[n_p:][i] ** xi)
+            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
+            h_vec_p.append(h_vec[:n_p][i].pow(x) * h_vec[n_p:][i].pow(xi))
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L ** (x * x) * P * R ** (xi * xi)
+        P_p = L.pow(x * x) * P * R.pow(xi * xi)
         proof = recursive_proof(
             g_vec_p, h_vec_p, u, a_vec_p, b_vec_p, n_p, P_p, transcript
         )
@@ -132,11 +132,11 @@ def prove_inner_product(a_vec, b_vec, comm=None, crs=None):
     else:
         comm = G1.identity()
         for i in range(n):
-            comm *= g_vec[i] ** a_vec[i] * h_vec[i] ** b_vec[i]
+            comm *= g_vec[i].pow(a_vec[i]) * h_vec[i].pow(b_vec[i])
     iprod = ZR(0)
     for i in range(n):
         iprod += a_vec[i] * b_vec[i]
-    P = comm * u ** iprod
+    P = comm * u.pow(iprod)
     transcript = b""
     return [
         comm,
@@ -149,23 +149,23 @@ def verify_inner_product(comm, iprod, proof, crs=None):
     def recursive_verify(g_vec, h_vec, u, proof, n, P, transcript):
         if n == 1:
             a, b = proof[0][0], proof[0][1]
-            return P == g_vec[0] ** a * h_vec[0] ** b * u ** (a * b)
+            return P == g_vec[0].pow(a) * h_vec[0].pow(b) * u.pow(a * b)
         if n % 2 == 1:
             [na, nb, L, R] = proof[-1]
-            P *= g_vec[-1] ** (na) * h_vec[-1] ** (nb) * u ** (-na * nb)
+            P *= g_vec[-1].pow(na) * h_vec[-1].pow(nb) * u.pow(-na * nb)
         else:
             [L, R] = proof[-1]
         #transcript += pickle.dumps([g_vec, h_vec, u, P, L, R])
         transcript += pickle.dumps(hashg1list(g_vec + h_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         n_p = n // 2
         g_vec_p = []
         h_vec_p = []
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i] ** xi * g_vec[n_p:][i] ** x)
-            h_vec_p.append(h_vec[:n_p][i] ** x * h_vec[n_p:][i] ** xi)
-        P_p = L ** (x * x) * P * R ** (xi * xi)
+            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
+            h_vec_p.append(h_vec[:n_p][i].pow(x) * h_vec[n_p:][i].pow(xi))
+        P_p = L.pow(x * x) * P * R.pow(xi * xi)
         return recursive_verify(g_vec_p, h_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]
@@ -176,7 +176,7 @@ def verify_inner_product(comm, iprod, proof, crs=None):
         u = G1.hash(b"honeybadgeru")
     else:
         [g_vec, h_vec, u] = crs
-    P = comm * u ** iprod
+    P = comm * u.pow(iprod)
     transcript = b""
     return recursive_verify(g_vec, h_vec, u, iproof, n, P, transcript)
 
@@ -191,7 +191,7 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
         proofstep = []
         if n % 2 == 1:
             na = a_vec[-1] * -1
-            P *= g_vec[-1] ** (na) * u ** (na * b_vec[-1])
+            P *= g_vec[-1].pow(na) * u.pow(na * b_vec[-1])
             proofstep.append(na)
         n_p = n // 2
         cl = ZR(0)
@@ -201,23 +201,23 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
         for i in range(n_p):
             cl += a_vec[:n_p][i] * b_vec[n_p:][i]
             cr += a_vec[n_p:][i] * b_vec[:n_p][i]
-            L *= g_vec[n_p:][i] ** a_vec[:n_p][i]
-            R *= g_vec[:n_p][i] ** a_vec[n_p:][i]
-        L *= u ** cl
-        R *= u ** cr
+            L *= g_vec[n_p:][i].pow(a_vec[:n_p][i])
+            R *= g_vec[:n_p][i].pow(a_vec[n_p:][i])
+        L *= u.pow(cl)
+        R *= u.pow(cr)
         # Fiat Shamir L, R, state...
         #transcript += pickle.dumps([g_vec, u, P, L, R])
         transcript += pickle.dumps(hashg1list(g_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p, b_vec_p = [], [], []
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i] ** xi * g_vec[n_p:][i] ** x)
+            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L ** (x * x) * P * R ** (xi * xi)
+        P_p = L.pow(x * x) * P * R.pow(xi * xi)
         proof = recursive_proof(g_vec_p, a_vec_p, b_vec_p, u, n_p, P_p, transcript)
         proofstep.append(L)
         proofstep.append(R)
@@ -237,11 +237,11 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
     else:
         comm = G1.identity()
         for i in range(n):
-            comm *= g_vec[i] ** a_vec[i]
+            comm *= g_vec[i].pow(a_vec[i])
     iprod = ZR(0)
     for i in range(n):
         iprod += a_vec[i] * b_vec[i]
-    P = comm * u ** iprod
+    P = comm * u.pow(iprod)
     transcript = b""
     return [
         comm,
@@ -254,23 +254,23 @@ def verify_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
     def recursive_verify(g_vec, b_vec, u, proof, n, P, transcript):
         if n == 1:
             a, b = proof[0][0], b_vec[0]
-            return P == g_vec[0] ** a * u ** (a * b)
+            return P == g_vec[0].pow(a) * u.pow(a * b)
         if n % 2 == 1:
             [na, L, R] = proof[-1]
-            P *= g_vec[-1] ** (na) * u ** (na * b_vec[-1])
+            P *= g_vec[-1].pow(na) * u.pow(na * b_vec[-1])
         else:
             [L, R] = proof[-1]
         #transcript += pickle.dumps([g_vec, u, P, L, R])
         transcript += pickle.dumps(hashg1list(g_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         n_p = n // 2
         g_vec_p = []
         b_vec_p = []
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i] ** xi * g_vec[n_p:][i] ** x)
+            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L ** (x * x) * P * R ** (xi * xi)
+        P_p = L.pow(x * x) * P * R.pow(xi * xi)
         return recursive_verify(g_vec_p, b_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]
@@ -281,7 +281,7 @@ def verify_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
     else:
         [g_vec, u] = crs
         g_vec = g_vec[:n]
-    P = comm * u ** iprod
+    P = comm * u.pow(iprod)
     transcript = b""
     return recursive_verify(g_vec, b_vec, u, iproof, n, P, transcript)
 
@@ -300,7 +300,7 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
         if n % 2 == 1:
             na = a_vec[-1] * -1
             for j in range(len(P_vec)):
-                P_vec[j] *= g_vec[-1] ** (na) * u ** (na * b_vecs[j][-1])
+                P_vec[j] *= g_vec[-1].pow(na) * u.pow(na * b_vecs[j][-1])
                 proofsteps[j].append(na)
         n_p = n // 2
         cl_vec = [ZR(0) for _ in range(len(b_vecs))]
@@ -310,16 +310,16 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
         L_vec = [None] * len(b_vecs)
         R_vec = [None] * len(b_vecs)
         for i in range(n_p):
-            La *= g_vec[n_p:][i] ** a_vec[:n_p][i]
-            Ra *= g_vec[:n_p][i] ** a_vec[n_p:][i]
+            La *= g_vec[n_p:][i].pow(a_vec[:n_p][i])
+            Ra *= g_vec[:n_p][i].pow(a_vec[n_p:][i])
         for j in range(len(b_vecs)):
             #for i in range(n_p):
             #    cl_vec[j] += a_vec[:n_p][i] * b_vecs[j][n_p:][i]
             #    cr_vec[j] += a_vec[n_p:][i] * b_vecs[j][:n_p][i]
             cl_vec[j] = inner_product(a_vec[:n_p], b_vecs[j][n_p:2*n_p])
             cr_vec[j] = inner_product(a_vec[n_p:2*n_p], b_vecs[j][:n_p])
-            L_vec[j] = La * (u ** cl_vec[j])
-            R_vec[j] = Ra * (u ** cr_vec[j])
+            L_vec[j] = La * u.pow(cl_vec[j])
+            R_vec[j] = Ra * u.pow(cr_vec[j])
         # Fiat Shamir
         # Make a merkle tree over everything that varies between verifiers
         # TODO: na should be in the transcript
@@ -338,21 +338,21 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
             proofsteps[j].append(branch)
         transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p = [], []
         b_vecs_p = [[] for _ in range(len(b_vecs))]
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i] ** xi * g_vec[n_p:][i] ** x)
+            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
             for j in range(len(b_vecs)):
                 b_vecs_p[j].append(b_vecs[j][:n_p][i] * xi + b_vecs[j][n_p:][i] * x)
         x2, xi2 = x * x, xi * xi
-        Lax2Raxi2 = La ** x2 * Ra ** xi2
+        Lax2Raxi2 = La.pow(x2) * Ra.pow(xi2)
         for j in range(len(P_vec)):
             # Instead of doing L_vec[j]**(x2)*P_vec[j]*R_vec[j]**(xi2), save computation
-            P_vec[j] *= Lax2Raxi2 * u ** (x2 * cl_vec[j] + xi2 * cr_vec[j])
+            P_vec[j] *= Lax2Raxi2 * u.pow(x2 * cl_vec[j] + xi2 * cr_vec[j])
         proofs = recursive_proofs(g_vec_p, a_vec_p, b_vecs_p, u, n_p, P_vec, transcript)
         for j in range(len(proofs)):
             proofsteps[j].append(L_vec[j])
@@ -370,13 +370,13 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
     if comm is None:
         comm = G1.identity()
         for i in range(n):
-            comm *= g_vec[i] ** a_vec[i]
+            comm *= g_vec[i].pow(a_vec[i])
     iprods = [ZR(0) for _ in range(len(b_vecs))]
     P_vec = [None] * len(b_vecs)
     for j in range(len(b_vecs)):
         for i in range(n):
             iprods[j] += a_vec[i] * b_vecs[j][i]
-        P_vec[j] = comm * u ** iprods[j]
+        P_vec[j] = comm * u.pow(iprods[j])
     transcript = pickle.dumps(u)
     proofs = recursive_proofs(g_vec, a_vec, b_vecs, u, n, P_vec, transcript)
     for j in range(len(proofs)):
@@ -390,10 +390,10 @@ def verify_batch_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
     def recursive_verify(g_vec, b_vec, u, proof, n, P, transcript):
         if n == 1:
             a, b = proof[0][0], b_vec[0]
-            return P == g_vec[0] ** a * u.pow(a * b)
+            return P == g_vec[0].pow(a) * u.pow(a * b)
         if n % 2 == 1:
             [na, roothash, branch, L, R] = proof[-1]
-            P *= g_vec[-1] ** (na) * u.pow(na * b_vec[-1])
+            P *= g_vec[-1].pow(na) * u.pow(na * b_vec[-1])
         else:
             [roothash, branch, L, R] = proof[-1]
         leaf = hash_list_to_bytes(
@@ -405,14 +405,14 @@ def verify_batch_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
             return False
         transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         n_p = n // 2
         g_vec_p = []
         b_vec_p = []
         for i in range(n_p):
             g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L ** (x * x) * P * R ** (xi * xi)
+        P_p = L.pow(x * x) * P * R.pow(xi * xi)
         return recursive_verify(g_vec_p, b_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]
@@ -496,7 +496,7 @@ def prove_double_batch_inner_product_one_known(a_vecs, b_vecs, comms=None, crs=N
             proofsteps[j].append(branch)
         transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -613,7 +613,7 @@ def verify_double_batch_inner_product_one_known(comms, iprods, b_vec, proofs, cr
                 return False
         transcript += pickle.dumps([hashg1list(g_vec), last_roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         x2 = x*x
         xi2 = xi*xi
         n_p = n // 2
@@ -624,7 +624,7 @@ def verify_double_batch_inner_product_one_known(comms, iprods, b_vec, proofs, cr
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
         Ps_p = []
         for i in range(len(proofs)):
-            Ps_p.append(Ls[i] ** (x2) * Ps[i] * Rs[i] ** (xi2))
+            Ps_p.append(Ls[i].pow(x2) * Ps[i] * Rs[i].pow(xi2))
         proofs_p = []
         for i in range(len(proofs)):
             proofs_p.append(proofs[i][:-1])
@@ -729,7 +729,7 @@ def prove_double_batch_inner_product_one_known_but_different(a_vecs, b_vecs, com
                 proofsteps[j][i].append(branch)
         transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -878,7 +878,7 @@ def prove_double_batch_inner_product_one_known_but_differenter(a_vecs, b_vecs, c
         treesteps = [ [roothash, tree.get_branch(j)] for j in range(numverifiers)]
         transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -987,7 +987,7 @@ def verify_double_batch_inner_product_one_known_but_differenter(comms, iprods, b
             return False
         transcript += pickle.dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x ** -1
+        xi = x**(-1)
         x2 = x*x
         xi2 = xi*xi
         n_p = n // 2
@@ -1026,25 +1026,25 @@ def hash_list_to_bytes(inlist):
     return hashout
 
 def dleq_derive_chal(x, y, a1, a2):
-        commit = str(x)+str(y)+str(a1)+str(a2)
-        try:
-            commit = commit.encode()
-        except AttributeError:
-            pass 
-        hs =  hashlib.sha256(commit).digest()
-        return ZR.hash(hs)
+    commit = str(x)+str(y)+str(a1)+str(a2)
+    try:
+        commit = commit.encode()
+    except AttributeError:
+        pass 
+    hs =  hashlib.sha256(commit).digest()
+    return ZR.hash(hs)
 
 def dleq_verify(base1, base2, x, y, proof):
     chal, res = proof
-    a1 = (x**chal)*(base1**res)
-    a2 = (y**chal)*(base2**res)
+    a1 = (x.pow(chal))*(base1.pow(res))
+    a2 = (y.pow(chal))*(base2.pow(res))
     eLocal = dleq_derive_chal(x, a1, y, a2)
     return eLocal == chal
 
 #zkPoK of alpha s.t. base1**alpha=x, base2**alpha=y
 def dleq_prove(base1, base2, x, y, alpha):
     w = ZR.random()
-    a1 = base1**w
-    a2 = base2**w
+    a1 = base1.pow(w)
+    a2 = base2.pow(w)
     e = dleq_derive_chal(x, a1, y, a2)
     return  [e, w - e*alpha] # return (challenge, response)

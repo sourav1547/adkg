@@ -13,10 +13,11 @@ class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
     def commit(self, phi, r):
         bp, feldman, proofs, bp_c = [], [], [], G1.identity()
         for i in range(len(phi.coeffs)):
-            temp_prod = self.gs[i] ** phi.coeffs[i]
+            # temp_prod = self.gs[i] ** phi.coeffs[i]
+            temp_prod = self.gs[i].pow(phi.coeffs[i])
             bp_c *= temp_prod
             bp.append(temp_prod)
-            feldman.append(self.gs[0] ** phi.coeffs[i])
+            feldman.append(self.gs[0].pow(phi.coeffs[i]))
             proofs.append(dleq_prove(self.gs[i], self.gs[0], bp[i], feldman[i], phi.coeffs[i]))
         return [bp, feldman, proofs], bp_c
 

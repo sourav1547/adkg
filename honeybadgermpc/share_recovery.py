@@ -117,7 +117,7 @@ def interpolate_g1_at_x(coords, x, order=-1):
     s = set(xs[0:order])
     out = G1.identity()
     for i in range(order):
-        out *= (sortedcoords[i][1] ** (lagrange_at_x(s, xs[i], x)))
+        out *= (sortedcoords[i][1].pow(lagrange_at_x(s, xs[i], x)))
     return out
 
 # Duplicate functionality
