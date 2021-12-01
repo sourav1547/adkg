@@ -42,9 +42,9 @@ async def _run(peers, n, t, my_id, start_time):
     # pc = PolyCommitFeldman(g)
     pc = PolyCommitBulletproofBlind(crs, 2*t)
     pc2 = PolyCommitHybrid(crs, 2*t)
-    h.preprocess(8)
-    pc.preprocess_prover()
-    pc2.preprocess_prover()
+    # h.preprocess(8)
+    # pc.preprocess_prover()
+    # pc2.preprocess_prover()
 
     from honeybadgermpc.ipc import ProcessProgramRunner
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:

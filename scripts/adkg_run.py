@@ -34,8 +34,8 @@ async def _run(peers, n, t, my_id, start_time):
     # h.preprocess(8)
     pc = PolyCommitBulletproofBlind(crs, 2*t)
     pc2 = PolyCommitHybrid(crs, 2*t)
-    pc.preprocess_prover()
-    pc2.preprocess_prover()
+    # pc.preprocess_prover()
+    # pc2.preprocess_prover()
 
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("")

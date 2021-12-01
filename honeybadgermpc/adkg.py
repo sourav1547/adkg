@@ -10,7 +10,7 @@ import asyncio
 import hashlib
 import time
 import logging
-from honeybadgermpc.utils.serilization import serialize_g, deserialize_g, serialize_f, deserialize_f
+from honeybadgermpc.utils.serialization import serialize_g, deserialize_g, serialize_f, deserialize_f
 from honeybadgermpc.utils.bitmap import Bitmap
 
 

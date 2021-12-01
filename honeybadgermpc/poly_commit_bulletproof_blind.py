@@ -292,8 +292,8 @@ class PolyCommitBulletproofBlind:
     def preprocess_prover(self, level=8):
         self.u.preprocess(level)
         self.h.preprocess(level)
-        for g in self.gs:
-            g.preprocess(level)
+        # for g in self.gs:
+            # g.preprocess(level)
         # 0 to length-1
         for i in range(len(self.gs) - 1):
             self.y_vecs.append([ZR(i + 1) ** j for j in range(len(self.gs))])

@@ -8,7 +8,8 @@ from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.proofs import MerkleTree
 import time
 import hashlib
-from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs
+from honeybadgermpc.utils.serialization import serialize_gs, deserialize_gs
+from honeybadgermpc.utils.serializer import serialize, deserialize
 
 import logging
 logger = logging.getLogger(__name__)
@@ -69,7 +70,8 @@ class HavenAVSS:
         consensus_C = None
 
         while True:
-            sender, avss_msg  = await recv()
+            sender, avss_msg_raw  = await recv()
+            avss_msg = deserialize(avss_msg_raw)
             if avss_msg[0] == HavenMessageType.SEND and not dealer_msg_handled:
                 self._handle_dealer_msg(tag, avss_msg[1], send)
                 dealer_msg_handled = True
@@ -93,7 +95,7 @@ class HavenAVSS:
                 echo_sets[C].add(sender)
                 echo_coords[C].append((sender+1, y_list_j_i))
                 if len(echo_sets[C]) == 2 * self.t + 1 and not ready_sent:
-                    multicast((HavenMessageType.READY, C))
+                    multicast(serialize((HavenMessageType.READY, C)))
                     ready_sent = True
                 if waiting_for_echoes and C == consensus_C and len(echo_sets[C]) == self.t + 1:
                     self.output_queue.put_nowait((dealer_id, avss_id, [self.shares[C]], self.commitments[C]))
@@ -109,7 +111,7 @@ class HavenAVSS:
                     ready_sets[C] = set()
                 ready_sets[C].add(sender)
                 if len(ready_sets[C]) == self.t + 1 and not ready_sent:
-                    multicast((HavenMessageType.READY, C))
+                    multicast(serialize((HavenMessageType.READY, C)))
                     ready_sent = True
                 if len(ready_sets[C]) == 2 * self.t + 1 and not waiting_for_echoes:
                     if len(echo_sets[C]) < self.t + 1:
@@ -253,7 +255,7 @@ class HybridHavenAVSS(HavenAVSS):
         # TODO: Verify Feldman commitment of the share
 
         for j in range(self.n):
-            send(j, (HavenMessageType.ECHO, (C, S_Com_list[j], S_Com_proofs_i[j], y_list_i[j])))
+            send(j, serialize((HavenMessageType.ECHO, (C, S_Com_list[j], S_Com_proofs_i[j], y_list_i[j]))))
         return
 
     def _get_dealer_msg(self, value, n):
@@ -288,5 +290,5 @@ class HybridHavenAVSS(HavenAVSS):
             T_i = R - S_list[i]
             #S_Com has an h**r component. Need to flip to -r since it's in the denominator
             T_i_proof = self.poly_commit.create_witness(T_Com_i, T_i, i+1, r * -1)
-            out_messages[i] = (HavenMessageType.SEND, (C, R_Com, S_Com_list, S_Com_proofs[i], T_i_proof, y_lists[i]))
+            out_messages[i] = serialize((HavenMessageType.SEND, (C, R_Com, S_Com_list, S_Com_proofs[i], T_i_proof, y_lists[i])))
         return out_messages

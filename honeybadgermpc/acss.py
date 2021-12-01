@@ -10,7 +10,7 @@ from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 from honeybadgermpc.broadcast.qrbc import qrbc
 from honeybadgermpc.broadcast.optqrbc import optqrbc
-from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs, deserialize_g
+from honeybadgermpc.utils.serialization import serialize_gs, deserialize_gs, deserialize_g
 
 import logging
 logger = logging.getLogger(__name__)
