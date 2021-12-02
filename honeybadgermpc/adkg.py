@@ -1,10 +1,11 @@
 from inspect import CO_NESTED
+from pickle import dumps
 from honeybadgermpc.acss import Hbacss0SingleShare
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.share_recovery import interpolate_g1_at_x
 from honeybadgermpc.poly_commit_hybrid import PolyCommitHybrid
 from honeybadgermpc.haven import HybridHavenAVSS
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1, curve25519multiexp as multiexp
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 import asyncio
 import hashlib
@@ -19,33 +20,18 @@ class CP:
         self.g  = g
         self.h = h
 
-    def dleq_derive_chal(self, x, y, a1, a2):
-        commit = str(x)+str(y)+str(a1)+str(a2)
-        try:
-            commit = commit.encode()
-        except AttributeError:
-            pass 
-        # TODO: Convert the hash output to a field element.
-        hs =  hashlib.sha256(commit).digest() 
-        return ZR.hash(hs)
-
     def dleq_verify(self, x, y, chal, res):
-        # a1 = (x**chal)*(self.g**res)
-        a1 = x.pow(chal)*(self.g.pow(res))
-        # a2 = (y**chal)*(self.h**res)
-        a2 = y.pow(chal)*(self.h.pow(res))
-        eLocal = self.dleq_derive_chal(x, a1, y, a2)
-        if eLocal == chal:
-            return True
-        return False
+        # a1 = x.pow(chal)*(self.g.pow(res))
+        a1 = multiexp([x,self.g], [chal, res])
+        # a2 = y.pow(chal)*(self.h.pow(res))
+        a2 = multiexp([y,self.h], [chal, res])
+        return chal == ZR.hash(hashlib.sha256(dumps((x,y,a1,a2))).digest())
 
     def dleq_prove(self, alpha, x, y):
         w = ZR.random()
-        # a1 = self.g**w
         a1 = self.g.pow(w)
-        # a2 = self.h**w
         a2 = self.h.pow(w)
-        e = self.dleq_derive_chal(x, a1, y, a2)
+        e = ZR.hash(hashlib.sha256(dumps((x,y,a1,a2))).digest())
         return  e, w - e*alpha # return (challenge, response)
 
 class ADKG:

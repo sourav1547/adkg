@@ -1,5 +1,5 @@
-# from pypairing import ZR, G1, hashg1s as hashg1list, hashfrs as hashzrlist, dotprod as inner_product, hashg1sbn as hashg1listbn
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1, hashcurve25519gsbn as hashg1list, hashcurve25519zrs as hashzrlist, curve25519dotprod as inner_product, hashcurve25519gsbn as hashg1listbn
+# from pypairing import ZR, G1, hashg1s as hashg1list, hashfrs as hashzrlist, dotprod as inner_product, hashg1sbn as hashg1listbn, blsmultiexp as multiexp
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1, hashcurve25519gsbn as hashg1list, hashcurve25519zrs as hashzrlist, curve25519dotprod as inner_product, hashcurve25519gsbn as hashg1listbn,curve25519multiexp as multiexp
 from pickle import dumps 
 import math
 import hashlib
@@ -100,7 +100,7 @@ def prove_inner_product(a_vec, b_vec, comm=None, crs=None):
         #transcript += dumps([g_vec, h_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + h_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, h_vec_p, a_vec_p, b_vec_p = [], [], [], []
@@ -159,7 +159,7 @@ def verify_inner_product(comm, iprod, proof, crs=None):
         #transcript += dumps([g_vec, h_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + h_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         n_p = n // 2
         g_vec_p = []
         h_vec_p = []
@@ -210,7 +210,7 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
         #transcript += dumps([g_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p, b_vec_p = [], [], []
@@ -255,23 +255,20 @@ def verify_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
     def recursive_verify(g_vec, b_vec, u, proof, n, P, transcript):
         if n == 1:
             a, b = proof[0][0], b_vec[0]
-            return P == g_vec[0].pow(a) * u.pow(a * b)
+            return P == multiexp([g_vec[0], u], [a, a*b])
         if n % 2 == 1:
             [na, L, R] = proof[-1]
-            P *= g_vec[-1].pow(na) * u.pow(na * b_vec[-1])
+            P *= multiexp([g_vec[-1], u], [na, na * b_vec[-1]])
         else:
             [L, R] = proof[-1]
         #transcript += dumps([g_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         n_p = n // 2
-        g_vec_p = []
-        b_vec_p = []
-        for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
-            b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L.pow(x * x) * P * R.pow(xi * xi)
+        g_vec_p = [multiexp([g_vec[:n_p][i], g_vec[n_p:][i]], [xi,x]) for i in range(n_p)]
+        b_vec_p = [b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x for i in range(n_p)]
+        P_p = multiexp([L, R], [x*x, xi*xi]) * P
         return recursive_verify(g_vec_p, b_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]
@@ -301,26 +298,19 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
         if n % 2 == 1:
             na = a_vec[-1] * -1
             for j in range(len(P_vec)):
-                P_vec[j] *= g_vec[-1].pow(na) * u.pow(na * b_vecs[j][-1])
+                P_vec[j] *= multiexp([g_vec[-1], u], [na, na * b_vecs[j][-1]])
                 proofsteps[j].append(na)
         n_p = n // 2
         cl_vec = [ZR(0) for _ in range(len(b_vecs))]
         cr_vec = [ZR(0) for _ in range(len(b_vecs))]
-        La = G1.identity()
-        Ra = G1.identity()
-        L_vec = [None] * len(b_vecs)
-        R_vec = [None] * len(b_vecs)
-        for i in range(n_p):
-            La *= g_vec[n_p:][i].pow(a_vec[:n_p][i])
-            Ra *= g_vec[:n_p][i].pow(a_vec[n_p:][i])
-        for j in range(len(b_vecs)):
-            #for i in range(n_p):
-            #    cl_vec[j] += a_vec[:n_p][i] * b_vecs[j][n_p:][i]
-            #    cr_vec[j] += a_vec[n_p:][i] * b_vecs[j][:n_p][i]
-            cl_vec[j] = inner_product(a_vec[:n_p], b_vecs[j][n_p:2*n_p])
-            cr_vec[j] = inner_product(a_vec[n_p:2*n_p], b_vecs[j][:n_p])
-            L_vec[j] = La * u.pow(cl_vec[j])
-            R_vec[j] = Ra * u.pow(cr_vec[j])
+        La = multiexp(g_vec[n_p:], a_vec[:n_p])
+        Ra = multiexp(g_vec[:n_p], a_vec[n_p:])
+        
+        cl_vec = [inner_product(a_vec[:n_p], b_vecs[j][n_p:2*n_p]) for j in range(len(b_vecs))]
+        cr_vec = [inner_product(a_vec[n_p:2*n_p], b_vecs[j][:n_p]) for j in range(len(b_vecs))]
+        L_vec = [La * u.pow(cl_vec[j]) for j in range(len(b_vecs))]
+        R_vec = [Ra * u.pow(cr_vec[j]) for j in range(len(b_vecs))]
+
         # Fiat Shamir
         # Make a merkle tree over everything that varies between verifiers
         # TODO: na should be in the transcript
@@ -339,16 +329,14 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
             proofsteps[j].append(branch)
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p = [], []
-        b_vecs_p = [[] for _ in range(len(b_vecs))]
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
+            g_vec_p.append(multiexp([g_vec[:n_p][i], g_vec[n_p:][i]],[xi, x]))
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
-            for j in range(len(b_vecs)):
-                b_vecs_p[j].append(b_vecs[j][:n_p][i] * xi + b_vecs[j][n_p:][i] * x)
+        b_vecs_p = [[b_vecs[j][:n_p][i] * xi + b_vecs[j][n_p:][i] * x for i in range(n_p)] for j in range(len(b_vecs))]
         x2, xi2 = x * x, xi * xi
         Lax2Raxi2 = La.pow(x2) * Ra.pow(xi2)
         for j in range(len(P_vec)):
@@ -369,15 +357,9 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
         [g_vec, u] = crs
         g_vec = g_vec[:n]
     if comm is None:
-        comm = G1.identity()
-        for i in range(n):
-            comm *= g_vec[i].pow(a_vec[i])
-    iprods = [ZR(0) for _ in range(len(b_vecs))]
-    P_vec = [None] * len(b_vecs)
-    for j in range(len(b_vecs)):
-        for i in range(n):
-            iprods[j] += a_vec[i] * b_vecs[j][i]
-        P_vec[j] = comm * u.pow(iprods[j])
+        comm = multiexp(g_vec, a_vec)
+    iprods = [inner_product(a_vec, b_vecs[j]) for j in range(len(b_vecs))]
+    P_vec = [comm * u.pow(iprods[j]) for j in range(len(b_vecs))]
     transcript = dumps(u)
     proofs = recursive_proofs(g_vec, a_vec, b_vecs, u, n, P_vec, transcript)
     for j in range(len(proofs)):
@@ -391,10 +373,10 @@ def verify_batch_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
     def recursive_verify(g_vec, b_vec, u, proof, n, P, transcript):
         if n == 1:
             a, b = proof[0][0], b_vec[0]
-            return P == g_vec[0].pow(a) * u.pow(a * b)
+            return P == multiexp([g_vec[0], u], [a, a*b])
         if n % 2 == 1:
             [na, roothash, branch, L, R] = proof[-1]
-            P *= g_vec[-1].pow(na) * u.pow(na * b_vec[-1])
+            P *= multiexp([g_vec[-1], u], [na, na * b_vec[-1]])
         else:
             [roothash, branch, L, R] = proof[-1]
         leaf = hash_list_to_bytes(
@@ -406,14 +388,11 @@ def verify_batch_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
             return False
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         n_p = n // 2
-        g_vec_p = []
-        b_vec_p = []
-        for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
-            b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L.pow(x * x) * P * R.pow(xi * xi)
+        g_vec_p = [multiexp([g_vec[:n_p][i], g_vec[n_p:][i]], [xi,x]) for i in range(n_p)]
+        b_vec_p = [b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x for i in range(n_p)]
+        P_p = multiexp([L, R], [x*x, xi*xi]) * P
         return recursive_verify(g_vec_p, b_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]
@@ -497,7 +476,7 @@ def prove_double_batch_inner_product_one_known(a_vecs, b_vecs, comms=None, crs=N
             proofsteps[j].append(branch)
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1) / x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -1048,25 +1027,18 @@ def dleq_prove(base1, base2, x, y, alpha):
 
 def dleq_batch_prove(base1s, base2, xs, ys, alphas, hbase=b''):
     n = len(base1s)
-    data = [None]*2*n
     w = [ZR.rand() for _ in range(n)]
-    for i in range(n):
-        a1s = base1s[i].pow(w[i])
-        a2s = base2.pow(w[i])
-        data[2*i] = a1s
-        data[2*i+1] = a2s
-    chal = ZR.hash(hashlib.sha256(dumps((data,xs,ys))).digest())
+    a1s = [base1s[i].pow(w[i]) for i in range(n)]
+    a2s = [base2.pow(w[i]) for i in range(n)]
+
+    chal = ZR.hash(hashlib.sha256(dumps((a1s,a2s,xs,ys))).digest())
     resp = [w[i]-chal*alphas[i] for i in range(n)]
     return (chal, resp)
 
 def dleq_batch_verify(base1s, base2, xs, ys, proofs, hbase=b''):
     chal, resps = proofs
     n = len(base1s)
-    data = [None]*2*n
-
-    for i in range(n):
-        data[2*i] = (xs[i].pow(chal))*(base1s[i].pow(resps[i]))
-        data[2*i+1] = (ys[i].pow(chal))*(base2.pow(resps[i]))
+    a1s = [multiexp([xs[i], base1s[i]], [chal, resps[i]]) for i in range(n)]
+    a2s = [multiexp([ys[i], base2], [chal, resps[i]]) for i in range(n)]
     
-    eLocal = ZR.hash(hashlib.sha256(dumps((data,xs,ys))).digest())
-    return eLocal == chal
+    return chal == ZR.hash(hashlib.sha256(dumps((a1s,a2s,xs,ys))).digest())

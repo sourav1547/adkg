@@ -216,7 +216,7 @@ class HybridHavenAVSS(HavenAVSS):
 
     def _handle_dealer_msg(self, tag, dealer_msg, send):
         try:
-            (C, R_Com, S_Com_list, S_Com_proofs_i, T_i_proof, y_list_i) = dealer_msg
+            (C, R_Com, S_Com_list, S_Com_proofs_i, T_proofs, y_list_i) = dealer_msg
         except Exception:
             return
         
@@ -244,15 +244,13 @@ class HybridHavenAVSS(HavenAVSS):
             R_Com_bp *= item
         
         # TODO: Can we ask the dealer for T_Com_i and check whether S*T=R or not? This will save us from taking inverse
-        # TODO: I think each node needs to validate T_Com_i for all nodes. Can we do batching here?
-        # TODO: To check for each index except yours. I am not sure whether this step can be done in O(n^2) step or not
-        T_Com_i = R_Com_bp / S_Com_list[self.my_id]
-        if not self.poly_commit.verify_eval(T_Com_i, self.my_id+1, self.field(0), T_i_proof):
-            return
+        T_Com_list = [R_Com_bp / S_Com_list[i] for i in range(self.n)]
+        for i in range(self.n):
+            if not self.poly_commit.verify_eval(T_Com_list[i], i+1, self.field(0), T_proofs[i]):
+                return
         
         self.commitments[C] = R_Com[1] # Feldmann commitment
         self.shares[C] = y_list_i[self.my_id]
-        # TODO: Verify Feldman commitment of the share
 
         for j in range(self.n):
             send(j, serialize((HavenMessageType.ECHO, (C, S_Com_list[j], S_Com_proofs_i[j], y_list_i[j]))))
@@ -283,12 +281,12 @@ class HybridHavenAVSS(HavenAVSS):
         S_Com_proofs = [self.poly_commit.batch_create_witness(S_Com_list[i], S_list[i], n, r) for i in range(n)]
         #switch index order of a doubly-indexed list
         S_Com_proofs = [list(a) for a in zip(*S_Com_proofs)]
+
+
+        T_Com_list = [R_Com_bp / S_Com_list[i] for i in range(n)]
+        T_list = [R - S_list[i] for i in range(n)]
+        T_proofs = [self.poly_commit.create_witness(T_Com_list[i], T_list[i], i+1, r * -1) for i in range(n)]
         
         for i in range(n):
-            # TODO: To check if there is any other way to compute T_Com_i more efficiently
-            T_Com_i = R_Com_bp / S_Com_list[i]
-            T_i = R - S_list[i]
-            #S_Com has an h**r component. Need to flip to -r since it's in the denominator
-            T_i_proof = self.poly_commit.create_witness(T_Com_i, T_i, i+1, r * -1)
-            out_messages[i] = serialize((HavenMessageType.SEND, (C, R_Com, S_Com_list, S_Com_proofs[i], T_i_proof, y_lists[i])))
+            out_messages[i] = serialize((HavenMessageType.SEND, (C, R_Com, S_Com_list, S_Com_proofs[i], T_proofs, y_lists[i])))
         return out_messages

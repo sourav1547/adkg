@@ -65,10 +65,15 @@ use rand_chacha::ChaCha20Rng;
 use rand_core::SeedableRng;
 use sha2::{Sha256, Sha512, Digest};
 extern crate curve25519_dalek;
+//pub mod curve25519_dalek;
 use curve25519_dalek::scalar::Scalar;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::ristretto::CompressedRistretto;
-use curve25519_dalek::traits::Identity;
+use curve25519_dalek::traits::{Identity, VartimeMultiscalarMul};
+use curve25519_dalek::edwards::EdwardsPoint;
+use curve25519_dalek::backend::serial::curve_models::{
+    AffineNielsPoint, CompletedPoint, ProjectiveNielsPoint, ProjectivePoint,
+};
 use std::ops::MulAssign;
 use std::ops::AddAssign;
 use std::ops::SubAssign;
@@ -1861,7 +1866,7 @@ impl PyObjectProtocol for PyFq12 {
 #[derive(Clone)]
 struct PyRistG {
    g : RistrettoPoint,
-   pp : Vec<RistrettoPoint>,
+   pp : Vec<AffineNielsPoint>, //was RistrettoPoint 
    pplevel : usize
 }
 
@@ -1959,7 +1964,7 @@ impl PyRistG {
     
     //Creates preprocessing elements to allow fast scalar multiplication.
     //Level determines extent of precomputation
-    fn preprocess(&mut self, level: usize) -> PyResult<()> {
+    /*fn preprocess(&mut self, level: usize) -> PyResult<()> {
         self.pplevel = level;
         //Everything requires a different kind of int (and only works with that kind)
         let mut base: u64 = 2;
@@ -2017,6 +2022,81 @@ impl PyRistG {
                 }
                 if i == 255 && buffer != 0{
                     out.g.add_assign(&self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel) + (buffer-1)]);
+                    buffer = 0;
+                }
+            }
+            if buffer != 0{
+                 panic!("I KNEW IT");
+            }
+        }
+        Ok(())
+    }*/
+    
+    fn preprocess(&mut self, level: usize) -> PyResult<()> {
+        self.pplevel = level;
+        //Everything requires a different kind of int (and only works with that kind)
+        let mut base: u64 = 2;
+        //calling pow on a u64 only accepts a u32 parameter for reasons undocumented
+        base = base.pow(level as u32);
+        let ppsize = (base - 1) * ((252 + level as u64 - 1)/(level as u64));
+        self.pp = Vec::with_capacity(ppsize as usize);
+        let factor = Scalar::from(base);
+        self.pp.push(self.g.0.to_affine_niels());
+        for i in 1..base-1
+        {
+            //Yes, I really need to expicitly cast the indexing variable...
+            //let mut next = self.pp[i as usize -1].clone();
+            let next = &self.g.0 + &self.pp[i as usize -1];
+            //next.add_assign(&self.g);
+            self.pp.push(next.to_extended().to_affine_niels());
+        }
+        //(x + y - 1) / y is a way to round up the integer division x/y
+        for i in base-1..(base - 1) * ((252 + level as u64 - 1)/(level as u64)) {
+            //let mut next = self.pp[i as usize - (base-1) as usize].clone();
+            //Wait, so add_assign takes a borrowed object but mul_assign doesn't?!?!?!?
+            let temp = &EdwardsPoint::identity() + &self.pp[i as usize - (base-1) as usize];
+            let mut next = temp.to_extended();
+            next.mul_assign(factor);
+            self.pp.push(next.to_affine_niels());
+        }
+        //It's not really Ok. This is terrible.
+        Ok(())
+    }
+ 
+    fn ppmul(&self, prodend: &PyRistScalar, out: &mut PyRistG) -> PyResult<()>
+    {
+        if self.pp.len() == 0
+        {
+            out.g = self.g.clone();
+            out.g.mul_assign(prodend.scalar);
+        }
+        else
+        {
+            let zero = Scalar::zero();
+            out.g.mul_assign(zero);
+            let mut scalarbytes = prodend.scalar.to_bytes();
+            scalarbytes.reverse();
+            let hexstr = hex::encode(scalarbytes);
+            let binstr = hex_to_bin(&hexstr);
+            let mut buffer = 0usize;
+            for (i, c) in binstr.chars().rev().enumerate()
+            {
+                if i%self.pplevel == 0 && buffer != 0
+                {
+                    //(2**level - 1)*(i/level - 1) + (buffer - 1)
+                    let temp = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    out.g.0 = temp.to_extended();
+                    //out.g.0 = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    buffer = 0;
+                }
+                if c == '1'
+                {
+                    buffer = buffer + 2usize.pow((i%self.pplevel) as u32);
+                }
+                if i == 255 && buffer != 0{
+                    let temp = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    //out.g.0 = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    out.g.0 = temp.to_extended();
                     buffer = 0;
                 }
             }
@@ -2693,6 +2773,42 @@ fn curve25519dotprod(a: &PyList, b: &PyList) -> PyResult<PyRistScalar>{
 }
 
 #[pyfunction]
+fn blsmultiexp(gs: &PyList, zrs: &PyList) -> PyResult<PyG1>{
+    let mut output = PyG1{ g1: G1::zero(), pp: Vec::new(), pplevel:0 };
+    let mut temp = Scalar::zero();
+    for (ai, bi) in gs.iter().zip(zrs){
+        //let aif: &PyFr = ai.try_into().unwrap();
+        //let bif: &PyFr = bi.try_into().unwrap();
+        let aicel: &PyCell<PyG1> = ai.downcast()?;
+        let aif: &PyG1 = &aicel.borrow();
+        let temp = aif.pow(bi)?;
+        output.add_assign(&temp);
+    }
+    Ok(output)
+}
+
+#[pyfunction]
+fn curve25519multiexp(gs: &PyList, zrs: &PyList) -> PyResult<PyRistG>{
+    let mut scalars: Vec<Scalar> = Vec::new();
+    let mut points: Vec<RistrettoPoint> = Vec::new();
+    for (ai, bi) in gs.iter().zip(zrs){
+        //let aif: &PyFr = ai.try_into().unwrap();
+        //let bif: &PyFr = bi.try_into().unwrap();
+        let aicel: &PyCell<PyRistG> = ai.downcast()?;
+        let aif: &PyRistG = &aicel.borrow();
+        points.push(aif.g);
+        let bicel: &PyCell<PyRistScalar> = bi.downcast()?;
+        let bif: &PyRistScalar = &bicel.borrow();
+        scalars.push(bif.scalar);
+    }
+    Ok(PyRistG{
+        g: RistrettoPoint::vartime_multiscalar_mul(scalars, points), 
+        pp: Vec::new(),
+        pplevel : 0
+    })
+}
+
+#[pyfunction]
 fn condense_list<'p>(inlist: &PyList, x: &PyFr, py: Python<'p>) -> PyResult<&'p PyList> {
     //let l: &PyList = PyList::empty(py);
     //let weed = PyFr{
@@ -2900,11 +3016,13 @@ fn pypairing(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(hashg1sbn))?;
     m.add_wrapped(wrap_pyfunction!(dotprod))?;
     m.add_wrapped(wrap_pyfunction!(condense_list))?;
+    m.add_wrapped(wrap_pyfunction!(blsmultiexp))?;
 
     m.add_wrapped(wrap_pyfunction!(hashcurve25519zrs))?;
     m.add_wrapped(wrap_pyfunction!(hashcurve25519gs))?;
     m.add_wrapped(wrap_pyfunction!(hashcurve25519gsbn))?;
     m.add_wrapped(wrap_pyfunction!(curve25519dotprod))?;
+    m.add_wrapped(wrap_pyfunction!(curve25519multiexp))?;
     Ok(())
 }
 
