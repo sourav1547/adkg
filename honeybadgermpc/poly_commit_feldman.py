@@ -1,17 +1,28 @@
-#from pypairing import ZR, G1
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import ZR, G1
+#from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+
+from pypairing import ZR as blsZR, G1 as blsG1, blsmultiexp
+from pypairing import Curve25519ZR, Curve25519G, curve25519multiexp
 
 class PolyCommitFeldman:
-    def __init__(self, crs):
+    def __init__(self, crs, group=None):
         self.g = crs
+        if group is None:
+            self.group, self.field = G1, ZR
+        elif group is blsG1:
+            self.group = group
+            self.field = blsZR
+        elif group is Curve25519G:
+            self.group = group
+            self.field = Curve25519ZR
 
     def commit(self, phi, *args):
         # return [self.g ** coeff for coeff in phi.coeffs]
         return [self.g.pow(coeff) for coeff in phi.coeffs]
 
     def verify_eval(self, c, i, phi_at_i, *args):
-        exp = ZR(1)
-        lhs = G1.identity()
+        exp = self.field(1)
+        lhs = self.group.identity()
         for j in range(len(c)):
             lhs *= c[j].pow(exp)
             exp *= i

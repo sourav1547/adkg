@@ -1,6 +1,6 @@
 # from honeybadgermpc.betterpairing import ZR, G1
-#from pypairing import ZR, G1, blsmultiexp as multiexp
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1, curve25519multiexp as multiexp
+from pypairing import ZR, G1, blsmultiexp as multiexp
+#from pypairing import Curve25519ZR as ZR, Curve25519G as G1, curve25519multiexp as multiexp
 from honeybadgermpc.proofs import (
     prove_inner_product_one_known,
     verify_inner_product_one_known,
@@ -13,41 +13,53 @@ from honeybadgermpc.proofs import (
     verify_double_batch_inner_product_one_known_but_differenter,
     MerkleTree,
 )
-import pickle
-
+from pypairing import ZR as blsZR, G1 as blsG1, blsmultiexp
+from pypairing import Curve25519ZR, Curve25519G, curve25519multiexp
+from pickle import dumps
 
 class PolyCommitBulletproofBlind:
-    def __init__(self, crs=None, degree_max=33):
+    def __init__(self, crs=None, degree_max=33, group=None):
+        if group is None:
+            self.group, self.field, self.multexp = G1, ZR, multiexp
+        elif group is blsG1:
+            self.group = group
+            self.field = blsZR
+            self.multiexp = blsmultiexp
+        elif group is Curve25519G:
+            self.group = group
+            self.field = Curve25519ZR
+            self.multiexp = curve25519multiexp
         if crs is None:
             n = degree_max + 1
-            self.gs = G1.hash_many(b"honeybadgerg", n)
-            self.h = G1.hash(b"honeybadgerh")
-            self.u = G1.hash(b"honeybadgeru")
+            self.gs = self.group.hash_many(b"honeybadgerg", n)
+            self.h = self.group.hash(b"honeybadgerh")
+            self.u = self.group.hash(b"honeybadgeru")
         else:
             assert len(crs) == 3
             [self.gs, self.h, self.u] = crs
         self.y_vecs = []
 
     def commit(self, phi, r):
-        c = multiexp(self.gs, phi.coeffs)
+        c = self.multiexp(self.gs, phi.coeffs)
         c *= self.h.pow(r)
         return c
 
     def create_witness(self, c, phi, i, r):
         t = len(phi.coeffs) - 1
-        y_vec = [ZR(i) ** j for j in range(t + 1)]
-        s_vec = [ZR.random() for _ in range(t + 1)]
-        sy_prod = ZR(0)
-        S = multiexp(self.gs, s_vec)
+        y_vec = [self.field(i) ** j for j in range(t + 1)]
+        s_vec = [self.field.random() for _ in range(t + 1)]
+        sy_prod = self.field(0)
+        #S = self.group.identity()
+        S = self.multiexp(self.gs, s_vec)
         for j in range(t + 1):
             sy_prod += s_vec[j] * y_vec[j]
         T = self.gs[0].pow(sy_prod)
-        rho = ZR.random()
+        rho = self.field.random()
         S *= self.h.pow(rho)
         # Fiat Shamir
-        challenge = ZR.hash(pickle.dumps([self.gs, self.h, self.u, S, T]))
+        challenge = self.field.hash(dumps([self.gs, self.h, self.u, S, T]))
         d_vec = [phi.coeffs[j] + s_vec[j] * challenge for j in range(t + 1)]
-        D = multiexp(self.gs, d_vec)
+        D = self.multiexp(self.gs, d_vec)
         mu = r + rho * challenge
         comm, t_hat, iproof = prove_inner_product_one_known(
             d_vec, y_vec, crs=[self.gs, self.u]
@@ -60,34 +72,33 @@ class PolyCommitBulletproofBlind:
         if len(self.y_vecs) < n:
             i = len(self.y_vecs)
             while i < n:
-                self.y_vecs.append([ZR(i + 1) ** j for j in range(t + 1)])
+                self.y_vecs.append([self.field(i + 1) ** j for j in range(t + 1)])
                 i += 1
-        s_vec = [ZR.random() for _ in range(t + 1)]
-        sy_prods = [ZR(0) for _ in range(n)]
-        S = multiexp(self.gs, s_vec)
+        s_vec = [self.field.random() for _ in range(t + 1)]
+        sy_prods = [self.field(0) for _ in range(n)]
+        S = self.multiexp(self.gs, s_vec)
         T_vec = [None] * n
         witnesses = [[] for _ in range(n)]
         for j in range(n):
             for i in range(t + 1):
                 sy_prods[j] += s_vec[i] * self.y_vecs[j][i]
             T_vec[j] = self.gs[0].pow(sy_prods[j])
-        rho = ZR.random()
-        S *= self.h.pow(rho)
-        
+        rho = self.field.random()
+        S *= self.h ** rho
         # Fiat Shamir
         tree = MerkleTree()
         for j in range(n):
-            tree.append(pickle.dumps(T_vec[j]))
+            tree.append(dumps(T_vec[j]))
         roothash = tree.get_root_hash()
         for j in range(n):
             branch = tree.get_branch(j)
             witnesses[j].append(roothash)
             witnesses[j].append(branch)
-        challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
+        challenge = self.field.hash(dumps([roothash, self.gs, self.h, self.u, S]))
         d_vec = [phi.coeffs[j] + s_vec[j] * challenge for j in range(t + 1)]
-        D = multiexp(self.gs, d_vec)
+        D = self.multiexp(self.gs, d_vec)
         mu = r + rho * challenge
-        _, t_hats, iproofs = prove_batch_inner_product_one_known(
+        comm, t_hats, iproofs = prove_batch_inner_product_one_known(
             d_vec, self.y_vecs, crs=[self.gs, self.u]
         )
         for j in range(len(witnesses)):
@@ -108,11 +119,11 @@ class PolyCommitBulletproofBlind:
         if len(self.y_vecs) < numverifiers:
             i = len(self.y_vecs)
             while i < numverifiers:
-                self.y_vecs.append([ZR(i + 1) ** j for j in range(t + 1)])
+                self.y_vecs.append([self.field(i + 1) ** j for j in range(t + 1)])
                 i += 1
         # length t
-        s_vec = [ZR.random() for _ in range(t + 1)]
-        sy_prods = [ZR(0) for _ in range(numverifiers)]
+        s_vec = [self.field.random() for _ in range(t + 1)]
+        sy_prods = [self.field(0) for _ in range(numverifiers)]
         S = G1.identity()
         T_vec = [None] * numverifiers
         witnesses = [[] for _ in range(numpolys * numverifiers)]
@@ -122,19 +133,19 @@ class PolyCommitBulletproofBlind:
             for i in range(t + 1):
                 sy_prods[j] += s_vec[i] * self.y_vecs[j][i]
             T_vec[j] = self.gs[0].pow(sy_prods[j])
-        rho = ZR.random()
+        rho = self.field.random()
         S *= self.h ** rho
         # Fiat Shamir
         tree = MerkleTree()
         for j in range(numverifiers):
-            tree.append(pickle.dumps(T_vec[j]))
+            tree.append(dumps(T_vec[j]))
         roothash = tree.get_root_hash()
         for i in range(len(phis)):
             for j in range(numverifiers):
                 branch = tree.get_branch(j)
                 witnesses[i * numverifiers + j].append(roothash)
                 witnesses[i * numverifiers + j].append(branch)
-        challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
+        challenge = self.field.hash(dumps([roothash, self.gs, self.h, self.u, S]))
         d_vecs = []
         for i in range(len(phis)):
             d_vecs.append([phis[i].coeffs[j] + s_vec[j] * challenge for j in range(t + 1)])
@@ -168,12 +179,12 @@ class PolyCommitBulletproofBlind:
         if len(self.y_vecs) < numverifiers:
             i = len(self.y_vecs)
             while i < numverifiers:
-                self.y_vecs.append([ZR(i + 1) ** j for j in range(t + 1)])
+                self.y_vecs.append([self.field(i + 1) ** j for j in range(t + 1)])
                 i += 1
         # length t
-        s_vec = [ZR.random() for _ in range(t + 1)]
-        sy_prods = [ZR(0) for _ in range(numverifiers)]
-        S = G1.identity()
+        s_vec = [self.field.random() for _ in range(t + 1)]
+        sy_prods = [self.field(0) for _ in range(numverifiers)]
+        S = self.group.identity()
         T_vec = [None] * numverifiers
         witnesses = [[] for _ in range(numverifiers)]
         for i in range(t + 1):
@@ -182,22 +193,22 @@ class PolyCommitBulletproofBlind:
             for i in range(t + 1):
                 sy_prods[j] += s_vec[i] * self.y_vecs[j][i]
             T_vec[j] = self.gs[0].pow(sy_prods[j])
-        rho = ZR.random()
+        rho = self.field.random()
         S *= self.h.pow(rho)
         # Fiat Shamir
         tree = MerkleTree()
         for j in range(numverifiers):
-            tree.append(pickle.dumps(T_vec[j]))
+            tree.append(dumps(T_vec[j]))
         roothash = tree.get_root_hash()
         for j in range(numverifiers):
             branch = tree.get_branch(j)
             witnesses[j].append(roothash)
             witnesses[j].append(branch)
-        challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
+        challenge = self.field.hash(dumps([roothash, self.gs, self.h, self.u, S]))
         d_vecs = []
         for i in range(len(phis)):
             d_vecs.append([phis[i].coeffs[j] + s_vec[j] * challenge for j in range(t + 1)])
-        Ds = [G1.identity() for _ in range(len(phis))]
+        Ds = [self.group.identity() for _ in range(len(phis))]
         _ = [[Ds[i].__imul__(self.gs[j].pow(d_vecs[i][j])) for j in range(t + 1)] for i in range(len(phis))]
         mu = r + rho * challenge
         comms, t_hats, iproofs = prove_double_batch_inner_product_one_known_but_differenter(
@@ -206,19 +217,20 @@ class PolyCommitBulletproofBlind:
         for j in range(numverifiers):
             witnesses[j] += [t, S, T_vec[j], Ds, mu, t_hats[j], iproofs[j]]
         return witnesses
-
+    #@profile
     def verify_eval(self, c, i, phi_at_i, witness):
         t = witness[-1][0] - 1
-        y_vec = [ZR(i) ** j for j in range(t + 1)]
+        y_vec = [self.field(0)]
+        y_vec = [self.field(i) ** j for j in range(t + 1)]
         if len(witness) == 6:
             [S, T, D, mu, t_hat, iproof] = witness
-            challenge = ZR.hash(pickle.dumps([self.gs, self.h, self.u, S, T]))
+            challenge = self.field.hash(dumps([self.gs, self.h, self.u, S, T]))
         else:
             [roothash, branch, S, T, D, mu, t_hat, iproof] = witness
-            if not MerkleTree.verify_membership(pickle.dumps(T), branch, roothash):
+            if not MerkleTree.verify_membership(dumps(T), branch, roothash):
                 return False
-            challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
-        ret = self.gs[0].pow(t_hat) == multiexp([self.gs[0], T], [phi_at_i,challenge])
+            challenge = self.field.hash(dumps([roothash, self.gs, self.h, self.u, S]))
+        ret = self.gs[0].pow(t_hat) == self.gs[0].pow(phi_at_i) * T.pow(challenge)
         ret &= D * self.h.pow(mu) == S.pow(challenge) * c
         if len(iproof[-1]) > 3:
             ret &= verify_batch_inner_product_one_known(
@@ -236,7 +248,7 @@ class PolyCommitBulletproofBlind:
     # Notice the witnesses need to be generated by the Merkle tree version (Which includes Merkle branches).
     '''def batch_verify_eval(self, cs, i, phis_at_i, witnesses):
         t = witnesses[0][-1][0] - 1
-        y_vec = [ZR(i) ** j for j in range(t + 1)]
+        y_vec = [self.field(i) ** j for j in range(t + 1)]
         Ds = []
         t_hats = []
         iproofs = []
@@ -244,9 +256,9 @@ class PolyCommitBulletproofBlind:
         for j in range(len(witnesses)):
             witness = witnesses[j]
             [roothash, branch, S, T, D, mu, t_hat, iproof] = witness
-            if not MerkleTree.verify_membership(pickle.dumps(T), branch, roothash):
+            if not MerkleTree.verify_membership(dumps(T), branch, roothash):
                 return False
-            challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
+            challenge = self.field.hash(dumps([roothash, self.gs, self.h, self.u, S]))
             ret &= self.gs[0] ** t_hat == self.gs[0] ** phis_at_i[j] * T ** challenge
             ret &= D * self.h ** mu == S ** challenge * cs[j]
             Ds.append(D)
@@ -265,11 +277,11 @@ class PolyCommitBulletproofBlind:
         if degree is not None:
             t = degree
         iproof, treeparts = proof
-        if not MerkleTree.verify_membership(pickle.dumps(T), branch, roothash):
+        if not MerkleTree.verify_membership(dumps(T), branch, roothash):
             return False
         # TODO: Should include cs
-        challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
-        y_vec = [ZR(i) ** j for j in range(t + 1)]
+        challenge = self.field.hash(dumps([roothash, self.gs, self.h, self.u, S]))
+        y_vec = [self.field(i) ** j for j in range(t + 1)]
         ret = True
         for j in range(len(Ds)):
             ret &= self.gs[0].pow(t_hats[j]) == self.gs[0].pow(phis_at_i[j]) * T.pow(challenge)
@@ -280,13 +292,17 @@ class PolyCommitBulletproofBlind:
         return ret
 
     def preprocess_prover(self, level=8):
-        self.u.preprocess(level)
-        self.h.preprocess(level)
-        # for g in self.gs:
-            # g.preprocess(level)
+        if self.group is G1:
+            self.u.preprocess(level)
+            self.h.preprocess(level)
+            for g in self.gs:
+                g.preprocess(level)
         # 0 to length-1
         for i in range(len(self.gs) - 1):
-            self.y_vecs.append([ZR(i + 1) ** j for j in range(len(self.gs))])
+            self.y_vecs.append([self.field(i + 1) ** j for j in range(len(self.gs))])
 
     def preprocess_verifier(self, level=8):
-        self.u.preprocess(level)
+        if self.group is G1:
+            self.u.preprocess(level)
+
+

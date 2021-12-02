@@ -1,17 +1,16 @@
-# from honeybadgermpc.betterpairing import ZR, G1
 #from pypairing import ZR, G1
 from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
 from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+#from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from honeybadgermpc.proofs import dleq_batch_prove, dleq_batch_verify
 
 
 class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
-    def __init__(self, crs=None, degree_max=33):
-        PolyCommitBulletproofBlind.__init__(self, crs, degree_max)
+    def __init__(self, crs=None, degree_max=33, group=None):
+        PolyCommitBulletproofBlind.__init__(self, crs, degree_max, group)
 
     def commit(self, phi, r):
-        bp, feldman, bp_c = [], [], G1.identity()
+        bp, feldman, bp_c = [], [], self.group.identity()
         for i in range(len(phi.coeffs)):
             # temp_prod = self.gs[i] ** phi.coeffs[i]
             temp_prod = self.gs[i].pow(phi.coeffs[i])
@@ -37,7 +36,7 @@ class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
         return PolyCommitFeldman.double_batch_create_witness(self, cs, phis, n, r)
 
     def verify_eval(self, c, i, phi_at_i, witness):
-        _, feldmanlist, _ = c
+        bplist, feldmanlist, _ = c
         return PolyCommitFeldman.verify_eval(self, feldmanlist, i, phi_at_i, witness)
 
 

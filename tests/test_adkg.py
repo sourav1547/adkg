@@ -26,19 +26,14 @@ def get_avss_params(n, t):
 
 
 @mark.asyncio
-@mark.parametrize("t",[3])
+@mark.parametrize("t",[1])
 async def test_adkg(test_router, t):
-    # from pypairing import ZR
-    # t = 1
     n = 3 * t + 1
 
     g, h, pks, sks, crs = get_avss_params(n, t)
     sends, recvs, _ = test_router(n, maxdelay=0.001)
-    pc = PolyCommitBulletproofBlind(crs, 2*t)
-    pc2 = PolyCommitHybrid(crs, 2*t)
-    # h.preprocess(8)
-    # pc.preprocess_prover()
-    # pc2.preprocess_prover()
+    pc = PolyCommitBulletproofBlind(crs, 2*t, group=G1)
+    pc2 = PolyCommitHybrid(crs, 2*t, group=G1)
 
     start_time = time.time()
     dkg_tasks = [None] * n # async task for adkg
