@@ -52,8 +52,8 @@ async def _run(peers, n, t, my_id, start_time):
         begin_time = time.time()
         logging.info(f"ADKG start time: {(begin_time)}")
             
-        pc = PolyCommitBulletproofBlind(crs, 2*t)
-        pc2 = PolyCommitHybrid(crs, 2*t)
+        pc = PolyCommitBulletproofBlind(crs, 2*t, group=G1)
+        pc2 = PolyCommitHybrid(crs, 2*t, group=G1)
         
         with ADKG(pks, sks[my_id], g, h, n, t, my_id, send, recv, pc, pc2) as adkg:
             while True:

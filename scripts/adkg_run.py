@@ -30,13 +30,10 @@ def get_avss_params(n, t):
 
 async def _run(peers, n, t, my_id, start_time):
     g, h, pks, sks, crs = get_avss_params(n, t)
-    # pc = PolyCommitFeldman(g)
-    # h.preprocess(8)
-    pc = PolyCommitBulletproofBlind(crs, 2*t)
-    pc2 = PolyCommitHybrid(crs, 2*t)
-    # pc.preprocess_prover()
-    # pc2.preprocess_prover()
-
+    # pc = PolyCommitFeldman(g, group=G1)
+    pc = PolyCommitBulletproofBlind(crs, 2*t, group=G1)
+    pc2 = PolyCommitHybrid(crs, 2*t, group=G1)
+    
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("A")
         logging.debug(f"Starting ADKG: {(my_id)}")

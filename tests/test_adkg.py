@@ -33,8 +33,8 @@ async def test_adkg(test_router, t):
 
     g, h, pks, sks, crs = get_avss_params(n, t)
     sends, recvs, _ = test_router(n, maxdelay=0.001)
-    pc = PolyCommitBulletproofBlind(crs, 2*t)
-    pc2 = PolyCommitHybrid(crs, 2*t)
+    pc = PolyCommitBulletproofBlind(crs, 2*t, group=G1)
+    pc2 = PolyCommitHybrid(crs, 2*t, group=G1)
 
     start_time = time.time()
     dkg_tasks = [None] * n # async task for adkg
