@@ -26,7 +26,7 @@ def get_avss_params(n, t):
 
 
 @mark.asyncio
-@mark.parametrize("t",[1])
+@mark.parametrize("t",[3])
 async def test_adkg(test_router, t):
     # from pypairing import ZR
     # t = 1

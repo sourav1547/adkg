@@ -1,6 +1,6 @@
 # from honeybadgermpc.betterpairing import ZR, G1
-#from pypairing import ZR, G1
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+#from pypairing import ZR, G1, blsmultiexp as multiexp
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1, curve25519multiexp as multiexp
 from honeybadgermpc.proofs import (
     prove_inner_product_one_known,
     verify_inner_product_one_known,
@@ -29,9 +29,7 @@ class PolyCommitBulletproofBlind:
         self.y_vecs = []
 
     def commit(self, phi, r):
-        c = G1.identity()
-        for i in range(len(phi.coeffs)):
-            c *= self.gs[i].pow(phi.coeffs[i])
+        c = multiexp(self.gs, phi.coeffs)
         c *= self.h.pow(r)
         return c
 
@@ -40,9 +38,8 @@ class PolyCommitBulletproofBlind:
         y_vec = [ZR(i) ** j for j in range(t + 1)]
         s_vec = [ZR.random() for _ in range(t + 1)]
         sy_prod = ZR(0)
-        S = G1.identity()
+        S = multiexp(self.gs, s_vec)
         for j in range(t + 1):
-            S *= self.gs[j].pow(s_vec[j])
             sy_prod += s_vec[j] * y_vec[j]
         T = self.gs[0].pow(sy_prod)
         rho = ZR.random()
@@ -50,9 +47,7 @@ class PolyCommitBulletproofBlind:
         # Fiat Shamir
         challenge = ZR.hash(pickle.dumps([self.gs, self.h, self.u, S, T]))
         d_vec = [phi.coeffs[j] + s_vec[j] * challenge for j in range(t + 1)]
-        D = G1.identity()
-        for j in range(t + 1):
-            D *= self.gs[j].pow(d_vec[j])
+        D = multiexp(self.gs, d_vec)
         mu = r + rho * challenge
         comm, t_hat, iproof = prove_inner_product_one_known(
             d_vec, y_vec, crs=[self.gs, self.u]
@@ -69,18 +64,16 @@ class PolyCommitBulletproofBlind:
                 i += 1
         s_vec = [ZR.random() for _ in range(t + 1)]
         sy_prods = [ZR(0) for _ in range(n)]
-        S = G1.identity()
+        S = multiexp(self.gs, s_vec)
         T_vec = [None] * n
         witnesses = [[] for _ in range(n)]
-        for i in range(t + 1):
-            S *= self.gs[i].pow(s_vec[i])
         for j in range(n):
             for i in range(t + 1):
                 sy_prods[j] += s_vec[i] * self.y_vecs[j][i]
             T_vec[j] = self.gs[0].pow(sy_prods[j])
         rho = ZR.random()
-        # S *= self.h ** rho
         S *= self.h.pow(rho)
+        
         # Fiat Shamir
         tree = MerkleTree()
         for j in range(n):
@@ -92,12 +85,9 @@ class PolyCommitBulletproofBlind:
             witnesses[j].append(branch)
         challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
         d_vec = [phi.coeffs[j] + s_vec[j] * challenge for j in range(t + 1)]
-        D = G1.identity()
-        for j in range(t + 1):
-            # D *= self.gs[j] ** d_vec[j]
-            D *= self.gs[j].pow(d_vec[j])
+        D = multiexp(self.gs, d_vec)
         mu = r + rho * challenge
-        comm, t_hats, iproofs = prove_batch_inner_product_one_known(
+        _, t_hats, iproofs = prove_batch_inner_product_one_known(
             d_vec, self.y_vecs, crs=[self.gs, self.u]
         )
         for j in range(len(witnesses)):
@@ -228,7 +218,7 @@ class PolyCommitBulletproofBlind:
             if not MerkleTree.verify_membership(pickle.dumps(T), branch, roothash):
                 return False
             challenge = ZR.hash(pickle.dumps([roothash, self.gs, self.h, self.u, S]))
-        ret = self.gs[0].pow(t_hat) == self.gs[0].pow(phi_at_i) * T.pow(challenge)
+        ret = self.gs[0].pow(t_hat) == multiexp([self.gs[0], T], [phi_at_i,challenge])
         ret &= D * self.h.pow(mu) == S.pow(challenge) * c
         if len(iproof[-1]) > 3:
             ret &= verify_batch_inner_product_one_known(

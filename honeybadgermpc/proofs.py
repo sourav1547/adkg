@@ -192,18 +192,17 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
         proofstep = []
         if n % 2 == 1:
             na = a_vec[-1] * -1
-            P *= g_vec[-1].pow(na) * u.pow(na * b_vec[-1])
+            P *= multiexp([g_vec[-1], u], [na, na * b_vec[-1]])
             proofstep.append(na)
         n_p = n // 2
         cl = ZR(0)
         cr = ZR(0)
-        L = G1.identity()
-        R = G1.identity()
         for i in range(n_p):
             cl += a_vec[:n_p][i] * b_vec[n_p:][i]
             cr += a_vec[n_p:][i] * b_vec[:n_p][i]
-            L *= g_vec[n_p:][i].pow(a_vec[:n_p][i])
-            R *= g_vec[:n_p][i].pow(a_vec[n_p:][i])
+        
+        L = multiexp(g_vec[n_p:], a_vec[:n_p])
+        R = multiexp(g_vec[:n_p], a_vec[n_p:])
         L *= u.pow(cl)
         R *= u.pow(cr)
         # Fiat Shamir L, R, state...
@@ -215,7 +214,7 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p, b_vec_p = [], [], []
         for i in range(n_p):
-            g_vec_p.append(g_vec[:n_p][i].pow(xi) * g_vec[n_p:][i].pow(x))
+            g_vec_p.append(multiexp([g_vec[:n_p][i], g_vec[n_p:][i]],[xi, x]))
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
         P_p = L.pow(x * x) * P * R.pow(xi * xi)
@@ -236,9 +235,10 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
     if comm is not None:
         P = comm * G1.identity()
     else:
-        comm = G1.identity()
-        for i in range(n):
-            comm *= g_vec[i].pow(a_vec[i])
+        # comm = G1.identity()
+        # for i in range(n):
+            # comm *= g_vec[i].pow(a_vec[i])
+        comm = multiexp(g_vec, a_vec)
     iprod = ZR(0)
     for i in range(n):
         iprod += a_vec[i] * b_vec[i]
