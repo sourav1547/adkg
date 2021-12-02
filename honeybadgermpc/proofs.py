@@ -217,7 +217,7 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
             g_vec_p.append(multiexp([g_vec[:n_p][i], g_vec[n_p:][i]],[xi, x]))
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
             b_vec_p.append(b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x)
-        P_p = L.pow(x * x) * P * R.pow(xi * xi)
+        P_p = multiexp([L,P,R],[x*x, ZR(1), xi*xi]) 
         proof = recursive_proof(g_vec_p, a_vec_p, b_vec_p, u, n_p, P_p, transcript)
         proofstep.append(L)
         proofstep.append(R)
@@ -235,9 +235,6 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
     if comm is not None:
         P = comm * G1.identity()
     else:
-        # comm = G1.identity()
-        # for i in range(n):
-            # comm *= g_vec[i].pow(a_vec[i])
         comm = multiexp(g_vec, a_vec)
     iprod = ZR(0)
     for i in range(n):
@@ -268,7 +265,8 @@ def verify_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
         n_p = n // 2
         g_vec_p = [multiexp([g_vec[:n_p][i], g_vec[n_p:][i]], [xi,x]) for i in range(n_p)]
         b_vec_p = [b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x for i in range(n_p)]
-        P_p = multiexp([L, R], [x*x, xi*xi]) * P
+        # P_p = multiexp([L, R], [x*x, xi*xi]) * P
+        P_p = multiexp([L,P,R],[x*x, ZR(1), xi*xi]) 
         return recursive_verify(g_vec_p, b_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]
@@ -338,7 +336,7 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
             a_vec_p.append(a_vec[:n_p][i] * x + a_vec[n_p:][i] * xi)
         b_vecs_p = [[b_vecs[j][:n_p][i] * xi + b_vecs[j][n_p:][i] * x for i in range(n_p)] for j in range(len(b_vecs))]
         x2, xi2 = x * x, xi * xi
-        Lax2Raxi2 = La.pow(x2) * Ra.pow(xi2)
+        Lax2Raxi2 = multiexp([La, Ra], [x2, xi2])
         for j in range(len(P_vec)):
             # Instead of doing L_vec[j]**(x2)*P_vec[j]*R_vec[j]**(xi2), save computation
             P_vec[j] *= Lax2Raxi2 * u.pow(x2 * cl_vec[j] + xi2 * cr_vec[j])
@@ -392,7 +390,7 @@ def verify_batch_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
         n_p = n // 2
         g_vec_p = [multiexp([g_vec[:n_p][i], g_vec[n_p:][i]], [xi,x]) for i in range(n_p)]
         b_vec_p = [b_vec[:n_p][i] * xi + b_vec[n_p:][i] * x for i in range(n_p)]
-        P_p = multiexp([L, R], [x*x, xi*xi]) * P
+        P_p = multiexp([L,P,R],[x*x, ZR(1), xi*xi]) 
         return recursive_verify(g_vec_p, b_vec_p, u, proof[:-1], n_p, P_p, transcript)
 
     n = proof[0]

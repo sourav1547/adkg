@@ -21,9 +21,7 @@ class CP:
         self.h = h
 
     def dleq_verify(self, x, y, chal, res):
-        # a1 = x.pow(chal)*(self.g.pow(res))
         a1 = multiexp([x,self.g], [chal, res])
-        # a2 = y.pow(chal)*(self.h.pow(res))
         a2 = multiexp([y,self.h], [chal, res])
         return chal == ZR.hash(hashlib.sha256(dumps((x,y,a1,a2))).digest())
 
@@ -163,7 +161,7 @@ class ADKG:
             aba_values[j] = await aba_out[j]()  # May block
             # print pid, j, 'ENTERING CRITICAL'
             # if sum(aba_values) >= self.n - self.t:
-            if sum(aba_values) >= 1:
+            if sum(aba_values) >= self.t+1:
                 # Provide 0 to all other aba
                 for k in range(self.n):
                     if not aba_inputted[k]:

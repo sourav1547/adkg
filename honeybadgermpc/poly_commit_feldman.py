@@ -13,10 +13,8 @@ class PolyCommitFeldman:
         exp = ZR(1)
         lhs = G1.identity()
         for j in range(len(c)):
-            # lhs *= c[j]**exp
             lhs *= c[j].pow(exp)
             exp *= i
-        # return lhs == self.g ** phi_at_i
         return lhs == self.g.pow(phi_at_i)
 
     def create_witness(*args):

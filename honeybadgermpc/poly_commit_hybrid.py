@@ -37,7 +37,7 @@ class PolyCommitHybrid(PolyCommitFeldman, PolyCommitBulletproofBlind):
         return PolyCommitFeldman.double_batch_create_witness(self, cs, phis, n, r)
 
     def verify_eval(self, c, i, phi_at_i, witness):
-        bplist, feldmanlist, _ = c
+        _, feldmanlist, _ = c
         return PolyCommitFeldman.verify_eval(self, feldmanlist, i, phi_at_i, witness)
 
 
