@@ -380,9 +380,6 @@ class Hbacss0SingleShare:
         # logger.debug("starting acss")
         await self._process_avss_msg(avss_id, dealer_id, rbc_msg)
         
-        #acss is done, cancel ongoing tasks
-        #self.subscribe_recv_task.cancel()
-        #self.tagvars[acsstag]['avid_recv_task'].cancel()
         for task in self.tagvars[acsstag]['tasks']:
             task.cancel()
         self.tagvars[acsstag] = {}

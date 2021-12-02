@@ -4,7 +4,7 @@ from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.share_recovery import interpolate_g1_at_x
 from honeybadgermpc.utils.serilization import deserialize_g, deserialize_gs, serialize_f, serialize_g
 # from pypairing import G1, ZR
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import Curve25519ZR as ZR, Curve25519G as G1, curve25519multiexp as multiexp
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
 import asyncio
 import hashlib
@@ -25,15 +25,15 @@ class CP:
         return  hs
 
     def dleq_verify(self, x, y, chal, res):
-        a1 = (x**chal)*(self.g**res)
-        a2 = (y**chal)*(self.h**res)
+        a1 = multiexp([x, self.g], [chal, res])
+        a2 = multiexp([y, self.h], [chal, res])
         valid = chal == self.dleq_derive_chal(x, a1, y, a2)
         return valid
         
     def dleq_prove(self, alpha, x, y):
         w = ZR.random()
-        a1 = self.g**w
-        a2 = self.h**w
+        a1 = self.g.pow(w)
+        a2 = self.h.pow(w)
         e = self.dleq_derive_chal(x, a1, y, a2)
         resp = w - e*alpha
         return  e, resp  # return (challenge, response)
@@ -288,8 +288,8 @@ class ADKG:
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
         
-        x = self.g**secret
-        y = self.h**secret
+        x = self.g.pow(secret)
+        y = self.h.pow(secret)
         cp = CP(self.g, self.h)
         chal, res = cp.dleq_prove(secret, x, y)
 
