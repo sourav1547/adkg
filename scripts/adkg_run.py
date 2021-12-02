@@ -4,8 +4,8 @@ from honeybadgermpc.adkg import ADKG
 # from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
 from honeybadgermpc.poly_commit_hybrid import PolyCommitHybrid
-# from pypairing import G1, ZR
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import G1, ZR
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 import asyncio
 import time
 import logging
@@ -29,7 +29,7 @@ def get_avss_params(n, t):
     return g, h, public_keys, private_keys, crs
 
 async def _run(peers, n, t, my_id, start_time):
-    g, h, pks, sks, crs = get_avss_params(n,t)
+    g, h, pks, sks, crs = get_avss_params(n, t)
     # pc = PolyCommitFeldman(g)
     # h.preprocess(8)
     pc = PolyCommitBulletproofBlind(crs, 2*t)
@@ -38,7 +38,7 @@ async def _run(peers, n, t, my_id, start_time):
     # pc2.preprocess_prover()
 
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
-        send, recv = runner.get_send_recv("")
+        send, recv = runner.get_send_recv("A")
         logging.debug(f"Starting ADKG: {(my_id)}")
         logging.debug(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
 

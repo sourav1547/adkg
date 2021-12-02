@@ -39,13 +39,7 @@ def get_avss_params(n, t):
 
 async def _run(peers, n, t, my_id, start_time):
     g, h, pks, sks, crs = get_avss_params(n, t)
-    # pc = PolyCommitFeldman(g)
-    pc = PolyCommitBulletproofBlind(crs, 2*t)
-    pc2 = PolyCommitHybrid(crs, 2*t)
-    # h.preprocess(8)
-    # pc.preprocess_prover()
-    # pc2.preprocess_prover()
-
+    
     from honeybadgermpc.ipc import ProcessProgramRunner
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("ADKG")
@@ -55,15 +49,18 @@ async def _run(peers, n, t, my_id, start_time):
         benchmark_logger = logging.LoggerAdapter(
            logging.getLogger("benchmark_logger"), {"node_id": my_id}
         )
-
+        begin_time = time.time()
+        logging.info(f"ADKG start time: {(begin_time)}")
+            
+        pc = PolyCommitBulletproofBlind(crs, 2*t)
+        pc2 = PolyCommitHybrid(crs, 2*t)
+        
         with ADKG(pks, sks[my_id], g, h, n, t, my_id, send, recv, pc, pc2) as adkg:
             while True:
                 if time.time() > start_time:
                     break
                 time.sleep(0.1)
             
-            begin_time = time.time()
-            logging.info(f"ADKG start time: {(begin_time)}")
             adkg_task = asyncio.create_task(adkg.run_adkg(begin_time))
             # await adkg.output_queue.get()
             logging.info(f"Created ADKG task, now waiting...")

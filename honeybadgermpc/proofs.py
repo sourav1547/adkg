@@ -100,7 +100,7 @@ def prove_inner_product(a_vec, b_vec, comm=None, crs=None):
         #transcript += dumps([g_vec, h_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + h_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, h_vec_p, a_vec_p, b_vec_p = [], [], [], []
@@ -159,7 +159,7 @@ def verify_inner_product(comm, iprod, proof, crs=None):
         #transcript += dumps([g_vec, h_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + h_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         n_p = n // 2
         g_vec_p = []
         h_vec_p = []
@@ -210,7 +210,7 @@ def prove_inner_product_one_known(a_vec, b_vec, comm=None, crs=None):
         #transcript += dumps([g_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p, b_vec_p = [], [], []
@@ -264,7 +264,7 @@ def verify_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
         #transcript += dumps([g_vec, u, P, L, R])
         transcript += dumps(hashg1list(g_vec + [u, P, L, R]))
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         n_p = n // 2
         g_vec_p = []
         b_vec_p = []
@@ -339,7 +339,7 @@ def prove_batch_inner_product_one_known(a_vec, b_vecs, comm=None, crs=None):
             proofsteps[j].append(branch)
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vec_p = [], []
@@ -406,7 +406,7 @@ def verify_batch_inner_product_one_known(comm, iprod, b_vec, proof, crs=None):
             return False
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         n_p = n // 2
         g_vec_p = []
         b_vec_p = []
@@ -497,7 +497,7 @@ def prove_double_batch_inner_product_one_known(a_vecs, b_vecs, comms=None, crs=N
             proofsteps[j].append(branch)
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -614,7 +614,7 @@ def verify_double_batch_inner_product_one_known(comms, iprods, b_vec, proofs, cr
                 return False
         transcript += dumps([hashg1list(g_vec), last_roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         x2 = x*x
         xi2 = xi*xi
         n_p = n // 2
@@ -730,7 +730,7 @@ def prove_double_batch_inner_product_one_known_but_different(a_vecs, b_vecs, com
                 proofsteps[j][i].append(branch)
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -879,7 +879,7 @@ def prove_double_batch_inner_product_one_known_but_differenter(a_vecs, b_vecs, c
         treesteps = [ [roothash, tree.get_branch(j)] for j in range(numverifiers)]
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         # this part must come after the challenge is generated, which must
         # come after L and R are calculated. Don't try to condense the loops
         g_vec_p, a_vecs_p = [], []
@@ -988,7 +988,7 @@ def verify_double_batch_inner_product_one_known_but_differenter(comms, iprods, b
             return False
         transcript += dumps([hashg1list(g_vec), roothash])
         x = ZR.hash(transcript)
-        xi = x**(-1)
+        xi = ZR(1)/x
         x2 = x*x
         xi2 = xi*xi
         n_p = n // 2

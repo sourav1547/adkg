@@ -168,7 +168,7 @@ class ADKG:
             aba_values[j] = await aba_out[j]()  # May block
             # print pid, j, 'ENTERING CRITICAL'
             # if sum(aba_values) >= self.n - self.t:
-            if sum(aba_values) >= 1:
+            if sum(aba_values) >= self.t+1:
                 # Provide 0 to all other aba
                 for k in range(self.n):
                     if not aba_inputted[k]:

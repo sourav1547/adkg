@@ -109,9 +109,11 @@ def parse_msg(msg):
     v = msg%10
     r = msg//10
     return (tag, v, r)
+    # return msg
 
 def encode_msg(tag, v, r):
     return r*100 + v*10 + tag
+    # return (tag, v, r)
 
 async def tylerba(sid, pid, n, f, coin_keys, input_msg, decide, broadcast, receive):
     """ Implementation of Tyler20 ABA. Tyler20 has two nice properties:
