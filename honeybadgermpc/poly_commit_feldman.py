@@ -1,5 +1,5 @@
-# from pypairing import ZR, G1
-from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+from pypairing import ZR, G1
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 
 class PolyCommitFeldman:
     def __init__(self, crs):
