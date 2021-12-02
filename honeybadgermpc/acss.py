@@ -1,16 +1,16 @@
 import asyncio
+from collections import defaultdict
 from pickle import dumps, loads
 from honeybadgermpc.broadcast.crypto.boldyreva import dealer, serialize
-# from pypairing import ZR, G1
+# from pypairing import ZR
 from pypairing import Curve25519ZR as ZR
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.symmetric_crypto import SymmetricCrypto
 from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
-# from honeybadgermpc.broadcast.avid import AVID
 from honeybadgermpc.utils.misc import wrap_send, subscribe_recv
-from honeybadgermpc.broadcast.qrbc import qrbc
+# from honeybadgermpc.broadcast.qrbc import qrbc
 from honeybadgermpc.broadcast.optqrbc import optqrbc
-from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs, deserialize_g
+from honeybadgermpc.utils.serilization import serialize_gs, deserialize_gs, deserialize_g, deserialize_f
 
 import logging
 logger = logging.getLogger(__name__)
@@ -23,7 +23,6 @@ logger.setLevel(logging.ERROR)
 class HbAVSSMessageType:
     OK = 1
     IMPLICATE = 2
-    READY = 3
     RECOVERY = 4
     RECOVERY1 = 5
     RECOVERY2 = 6
@@ -52,6 +51,7 @@ class Hbacss0SingleShare:
 
         self.get_send = _send
 
+        self.acss_status = defaultdict(lambda: True)
         self.field = field
         self.poly = polynomials_over(self.field)
         self.poly.clear_cache()
@@ -87,7 +87,6 @@ class Hbacss0SingleShare:
         if self.public_keys[j] != pow(self.g, j_sk):
             return False
         # decrypt and verify
-        # implicate_msg = await self.tagvars[tag]['avid'].retrieve(tag, j)
         implicate_msg = None #FIXME: IMPORTANT!!
         j_shared_key = pow(self.tagvars[tag]['ephemeral_public_key'], j_sk)
 
@@ -102,7 +101,7 @@ class Hbacss0SingleShare:
             logger.warn("Implicate confirmed, bad encryption:", e)
             return True
         return not self.poly_commit.batch_verify_eval(
-            commitments, j + 1, j_shares, j_witnesses
+            commitments, j + 1, j_shares, j_witnesses, self.t
         )
 
     def _init_recovery_vars(self, tag):
@@ -139,7 +138,7 @@ class Hbacss0SingleShare:
                 logger.debug("Implicate confirmed, bad encryption:", e)
             commitments = self.tagvars[tag]['commitments']
             if (self.poly_commit.batch_verify_eval(commitments,
-                                                   sender + 1, j_shares, j_witnesses)):
+                                                   sender + 1, j_shares, j_witnesses, self.t)):
                 if not self.saved_shares[sender]:
                     self.saved_shared_actual_length += 1
                     self.saved_shares[sender] = j_shares
@@ -160,6 +159,48 @@ class Hbacss0SingleShare:
             self.tagvars[tag]['in_share_recovery'] = False
             self.interpolated = True
             multicast((HbAVSSMessageType.OK, ""))
+    
+    def decode_proposal(self, proposal):
+        g_size = 32
+        c_size = 64
+
+        commit_data = proposal[0:g_size*(self.t+1)]
+        commits = deserialize_gs(commit_data) 
+
+        ephkey_data = proposal[g_size*(self.t+1):g_size*(self.t+2)]
+        ephkey = deserialize_g(ephkey_data)
+
+        dispersal_msg_raw = proposal[g_size*(self.t+2):]
+        dispersal_msg = dispersal_msg_raw[self.my_id*c_size : (self.my_id+1)*c_size]
+
+        return (dispersal_msg, commits, ephkey)
+
+    
+    def verify_proposal(self, dealer_id, dispersal_msg, commits, ephkey):
+        commitments = [commits]
+        shared_key = pow(ephkey, self.private_key)
+
+        try:
+            sharesb = SymmetricCrypto.decrypt(str(shared_key).encode(), dispersal_msg)
+        except ValueError as e:  # TODO: more specific exception
+            logger.warn(f"Implicate due to failure in decrypting: {e}")
+            self.acss_status[dealer_id] = False
+            return False
+        
+        witnesses = [None]
+
+        shares = [deserialize_f(sharesb)]
+
+        if self.poly_commit.batch_verify_eval(
+            commitments, self.my_id + 1, shares, witnesses, self.t
+        ): 
+            self.acss_status[dealer_id] = True
+            return True
+        
+        self.acss_status[dealer_id] = False
+        return False
+
+    
     #@profile    
     async def _process_avss_msg(self, avss_id, dealer_id, rbc_msg):
         tag = f"{dealer_id}-{avss_id}-B-AVSS"
@@ -171,37 +212,28 @@ class Hbacss0SingleShare:
                 send(i, msg)
 
         self.tagvars[tag]['io'] = [send, recv, multicast]
-        # self.tagvars[tag]['avid'] = avid
-        implicate_sent = False
         self.tagvars[tag]['in_share_recovery'] = False
+        dispersal_msg, commits, ephkey = self.decode_proposal(rbc_msg)
         
-        # get phi and public key from reliable broadcast msg       
-        commit_data = rbc_msg[0:32*(self.t+1)]
-        commits = deserialize_gs(commit_data) # commitments
+        ok_set = set()
+        implicate_set = set()
+        output = False
 
-        ephkey_data = rbc_msg[32*(self.t+1):32*(self.t+2)]
-        ephkey = deserialize_g(ephkey_data) # ephemeral public key
+        self.tagvars[tag]['all_shares_valid'] = self._handle_dealer_msgs(tag, dispersal_msg, ([commits], ephkey), dealer_id)
 
-        # AVID messages
-        # TODO: Put this into a function
-        dispersal_msg_raw = rbc_msg[32*(self.t+2):]
-        dlen = len(dispersal_msg_raw)//self.n
-        dispersal_msg = dispersal_msg_raw[self.my_id*dlen : (self.my_id+1)*dlen]
-        
-        self.tagvars[tag]['all_shares_valid'] = self._handle_dealer_msgs(tag, dispersal_msg, ([commits], ephkey))
         if self.tagvars[tag]['all_shares_valid']:
+            shares = self.tagvars[tag]['shares']
+            int_shares = [int(shares[i]) for i in range(len(shares))]
+            commitments = self.tagvars[tag]['commitments']
+            self.output_queue.put_nowait((dealer_id, avss_id, int_shares, commitments))
+            output = True
+            logger.debug("[%d] Output", self.my_id)
             multicast((HbAVSSMessageType.OK, ""))
         else:
             multicast((HbAVSSMessageType.IMPLICATE, self.private_key))
             implicate_sent = True
             logger.debug("Implicate Sent [%d]", dealer_id)
             self.tagvars[tag]['in_share_recovery'] = True
-
-        ok_set = set()
-        ready_set = set()
-        implicate_set = set()
-        output = False
-        ready_sent = False
 
         while True:
             # Bracha-style agreement
@@ -228,26 +260,6 @@ class Hbacss0SingleShare:
             if avss_msg[0] == HbAVSSMessageType.OK and sender not in ok_set:
                 # logger.debug("[%d] Received OK from [%d]", self.my_id, sender)
                 ok_set.add(sender)
-                if len(ok_set) >= (2 * self.t + 1) and not ready_sent:
-                    ready_sent = True
-                    multicast((HbAVSSMessageType.READY, ""))
-            # READY
-            if avss_msg[0] == HbAVSSMessageType.READY and (sender not in ready_set):
-                # logger.debug("[%d] Received READY from [%d]", self.my_id, sender)
-                ready_set.add(sender)
-                if len(ready_set) >= (self.t + 1) and not ready_sent:
-                    ready_sent = True
-                    multicast((HbAVSSMessageType.READY, ""))
-            # if 2t+1 ready -> output shares
-            if len(ready_set) >= (2 * self.t + 1):
-                # output result by setting the future value
-                if self.tagvars[tag]['all_shares_valid'] and not output:
-                    shares = self.tagvars[tag]['shares']
-                    int_shares = [int(shares[i]) for i in range(len(shares))]
-                    commitments = self.tagvars[tag]['commitments']
-                    self.output_queue.put_nowait((dealer_id, avss_id, int_shares, commitments))
-                    output = True
-                    logger.debug("[%d] Output", self.my_id)
 
             # The only condition where we can terminate
             if (len(ok_set) == 3 * self.t + 1) and output:
@@ -268,6 +280,7 @@ class Hbacss0SingleShare:
         # BatchPolyCommit
         #   Cs  <- BatchPolyCommit(SP,φ(·,k))
         # TODO: Whether we should keep track of that or not
+        # r = ZR.random()
         r = ZR.random()
         for k in range(secret_count):
             phi[k] = self.poly.random(self.t, values[k])
@@ -277,13 +290,13 @@ class Hbacss0SingleShare:
         ephemeral_secret_key = self.field.random()
         ephemeral_public_key = pow(self.g, ephemeral_secret_key)
         dispersal_msg_list = bytearray()
-        witnesses = self.poly_commit.double_batch_create_witness(phi, r, self.n)
+        witnesses = self.poly_commit.double_batch_create_witness(commitments, phi, self.n, r)
         for i in range(n):
             shared_key = pow(self.public_keys[i], ephemeral_secret_key)
             phis_i = [phi[k](i + 1).__getstate__() for k in range(secret_count)]
-            z = (phis_i, witnesses[i])
+            # z = (phis_i, witnesses[i])
             # zz = SymmetricCrypto.encrypt(str(shared_key).encode(), z)
-            zz = SymmetricCrypto.encrypt(str(shared_key).encode(), bytes(phis_i[0]))
+            zz = SymmetricCrypto.encrypt(str(shared_key).encode(), phis_i[0])
             dispersal_msg_list.extend(zz)
         commitments[0].append(ephemeral_public_key)
         datab = serialize_gs(commitments[0]) # Serializing commitments
@@ -293,8 +306,7 @@ class Hbacss0SingleShare:
         return bytes(datab)
     
     #@profile
-    def _handle_dealer_msgs(self, tag, dispersal_msg, rbc_msg):
-        all_shares_valid = True
+    def _handle_dealer_msgs(self, tag, dispersal_msg, rbc_msg, dealer_id):
         commitments, ephemeral_public_key = rbc_msg
         shared_key = pow(ephemeral_public_key, self.private_key)
         self.tagvars[tag]['shared_key'] = shared_key
@@ -305,24 +317,14 @@ class Hbacss0SingleShare:
             sharesb = SymmetricCrypto.decrypt(str(shared_key).encode(), dispersal_msg)
         except ValueError as e:  # TODO: more specific exception
             logger.warn(f"Implicate due to failure in decrypting: {e}")
-            all_shares_valid = False
+            return False
         
-        # Note that this only works for a share
-        # FIXME: Do this appropriately
-        witnesses = [None]
-        share = ZR()
-        share.__setstate__(list(sharesb))
-        shares = [share]
-        # call if decryption was successful
-        if all_shares_valid:
-            if self.poly_commit.batch_verify_eval(
-                    commitments, self.my_id + 1, shares, witnesses
-            ):
-                self.tagvars[tag]['shares'] = shares
-                self.tagvars[tag]['witnesses'] = witnesses
-            else:
-                all_shares_valid = False
-        return all_shares_valid
+        if self.acss_status[dealer_id]: 
+            self.tagvars[tag]['shares'] =  [deserialize_f(sharesb)]
+            self.tagvars[tag]['witnesses'] = [None]
+            return True
+        return False
+
     #@profile
     async def avss(self, avss_id, values=None, dealer_id=None):
         """
@@ -356,15 +358,16 @@ class Hbacss0SingleShare:
 
         broadcast_msg = None
         if self.my_id == dealer_id:
-            # broadcast_msg: phi & public key for reliable broadcast
             broadcast_msg = self._get_dealer_msg(values, n)
 
         send, recv = self.get_send(rbctag), self.subscribe_recv(rbctag)
         logger.debug("[%d] Starting reliable broadcast", self.my_id)
 
         async def predicate(_m):
-            return True
-        rbc_msg = await qrbc(
+            dispersal_msg, commits, ephkey = self.decode_proposal(_m)
+            return self.verify_proposal(dealer_id, dispersal_msg, commits, ephkey)
+
+        rbc_msg = await optqrbc(
             rbctag,
             self.my_id,
             self.n,

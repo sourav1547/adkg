@@ -22,13 +22,13 @@ class PolyCommitFeldman:
     def create_witness(*args):
         return None
 
-    def batch_create_witness(self, phi, r, n):
+    def batch_create_witness(self, c, phi, n, *args):
         return [None] * n
     
-    def double_batch_create_witness(self, phis, r, n):
+    def double_batch_create_witness(self, cs, phis, n, *args):
         return [[None] * len(phis)] * n
     
-    def batch_verify_eval(self, cs, i, phis_at_i, witness=None):
+    def batch_verify_eval(self, cs, i, phis_at_i, *args):
         for j in range(len(cs)):
             if not self.verify_eval(cs[j], i, phis_at_i[j]):
                 return False
