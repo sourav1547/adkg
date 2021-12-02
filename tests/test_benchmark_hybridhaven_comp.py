@@ -30,7 +30,10 @@ def get_avss_params(n, t):
 @mark.parametrize(
     "t, p, n",
     [
-        (5, 10, 7),
+        (5, 10, 16),
+        (10, 20, 32),
+        (21, 42, 64),
+        (42, 84, 128),
     ])
 def test_benchmark_hybrid_haven_dealer(benchmark, t, p, n):
     value = field.rand()
@@ -43,7 +46,10 @@ def test_benchmark_hybrid_haven_dealer(benchmark, t, p, n):
 @mark.parametrize(
     "t, p, n",
     [
-        (5, 10, 7),
+        (5, 10, 16),
+        (10, 20, 32),
+        (21, 42, 64),
+        (42, 84, 128),
     ])
 def test_benchmark_hybrid_haven_receiver(benchmark, t, p, n):
     value = field.rand()
