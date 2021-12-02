@@ -14,3 +14,13 @@ honeybadgermpc/.DS_Store
 pairing/.DS_Store
 tests/.DS_Store
 tests/.pytest.log
+.dockerignore
+conf/adkg/local.13.json
+conf/adkg/local.14.json
+conf/adkg/local.15.json
+data-paper/wan-datah
+drand_n64.log
+n128.log
+n128b.log
+n32.log
+n32b.log

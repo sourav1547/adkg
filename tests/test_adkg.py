@@ -4,6 +4,7 @@ from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
 from honeybadgermpc.adkg import ADKG
 import asyncio
 import uvloop
+import time
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
@@ -23,7 +24,7 @@ def get_avss_params(n, t):
 async def test_adkg(test_router):
     # from pypairing import ZR
     from pypairing import Curve25519ZR as ZR
-    t = 1
+    t = 3
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n, t)
@@ -33,10 +34,11 @@ async def test_adkg(test_router):
     dkg_tasks = [None] * n # async task for adkg
     dkg_list = [None] * n #
 
+    start_time = time.time()
     for i in range(n):
         dkg = ADKG(pks, sks[i], g, h, n, t, i, sends[i], recvs[i], pc)
         dkg_list[i] = dkg
-        dkg_tasks[i] = asyncio.create_task(dkg.run_adkg())
+        dkg_tasks[i] = asyncio.create_task(dkg.run_adkg(start_time))
     
     outputs = await asyncio.gather(
         *[dkg_list[i].output_queue.get() for i in range(n)]

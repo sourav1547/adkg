@@ -17,7 +17,13 @@ from .pypairing import (
     hashg1sbn,
     dotprod,
     condense_list,
-    pair
+    pair,
+    hashcurve25519zrs,
+    hashcurve25519gs,
+    hashcurve25519gsbn,
+    curve25519dotprod,
+    curve25519multiexp,
+    blsmultiexp
 )
 
 __all__ = [
@@ -37,5 +43,11 @@ __all__ = [
     "hashg1sbn",
     "dotprod",
     "condense_list",
-    "pair"
+    "pair",
+    "hashcurve25519zrs",
+    "hashcurve25519gs",
+    "hashcurve25519gsbn",
+    "curve25519dotprod",
+    "curve25519multiexp",
+    "blsmultiexp"
 ]

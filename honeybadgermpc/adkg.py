@@ -1,5 +1,4 @@
 from inspect import CO_NESTED
-from honeybadgermpc.broadcast.reliablebroadcast import reliablebroadcast
 from honeybadgermpc.acss import Hbacss0SingleShare
 from honeybadgermpc.polynomial import polynomials_over
 from honeybadgermpc.share_recovery import interpolate_g1_at_x
@@ -13,6 +12,7 @@ import time
 import logging
 from honeybadgermpc.utils.serilization import serialize_g, deserialize_g, serialize_f, deserialize_f
 from honeybadgermpc.utils.bitmap import Bitmap
+from pickle import dumps
 
 
 class CP:
@@ -21,29 +21,22 @@ class CP:
         self.h = h
 
     def dleq_derive_chal(self, x, y, a1, a2):
-        commit = str(x)+str(y)+str(a1)+str(a2)
-        try:
-            commit = commit.encode()
-        except AttributeError:
-            pass 
-        # TODO: Convert the hash output to a field element.
-        hs =  hashlib.sha256(commit).digest() 
-        return ZR.hash(hs)
+        hs = ZR.hash(hashlib.sha256(dumps((x,y,a1,a2))).digest())
+        return  hs
 
     def dleq_verify(self, x, y, chal, res):
         a1 = (x**chal)*(self.g**res)
         a2 = (y**chal)*(self.h**res)
-        eLocal = self.dleq_derive_chal(x, a1, y, a2)
-        if eLocal == chal:
-            return True
-        return False
-
+        valid = chal == self.dleq_derive_chal(x, a1, y, a2)
+        return valid
+        
     def dleq_prove(self, alpha, x, y):
         w = ZR.random()
         a1 = self.g**w
         a2 = self.h**w
         e = self.dleq_derive_chal(x, a1, y, a2)
-        return  e, w - e*alpha # return (challenge, response)
+        resp = w - e*alpha
+        return  e, resp  # return (challenge, response)
 
 class ADKG:
     def __init__(self, public_keys, private_key, g, h, n, t, my_id, send, recv, pc, field=ZR):
@@ -291,7 +284,7 @@ class ADKG:
                 await acss_signal.wait()
                 acss_signal.clear()
         
-        secret = 0
+        secret = ZR(0)
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
         

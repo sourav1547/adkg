@@ -52,9 +52,10 @@ extern crate rand_chacha;
 pub mod tests;
 
 pub mod bls12_381;
-use bls12_381::{G1, G1Affine, G2, Fr, Fq, Fq2, Fq6, Fq12, FqRepr, FrRepr};
+use bls12_381::{G1, G1Affine, G1Compressed, G2, Fr, Fq, Fq2, Fq6, Fq12, FqRepr, FrRepr};
 use group::CurveProjective;
 use group::CurveAffine;
+use group::EncodedPoint;
 
 use ff::{Field,  PrimeField, PrimeFieldDecodingError, PrimeFieldRepr, ScalarEngine, SqrtField};
 use std::error::Error;
@@ -64,10 +65,15 @@ use rand_chacha::ChaCha20Rng;
 use rand_core::SeedableRng;
 use sha2::{Sha256, Sha512, Digest};
 extern crate curve25519_dalek;
+//pub mod curve25519_dalek;
 use curve25519_dalek::scalar::Scalar;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::ristretto::CompressedRistretto;
-use curve25519_dalek::traits::Identity;
+use curve25519_dalek::traits::{Identity, VartimeMultiscalarMul};
+use curve25519_dalek::edwards::EdwardsPoint;
+use curve25519_dalek::backend::serial::curve_models::{
+    AffineNielsPoint, CompletedPoint, ProjectiveNielsPoint, ProjectivePoint,
+};
 use std::ops::MulAssign;
 use std::ops::AddAssign;
 use std::ops::SubAssign;
@@ -114,6 +120,7 @@ fn hex_to_bin (hexstr: &String) -> String
     }
     out
 }
+
 
 //We are currently using pairing v 0.16.0. The code is copied here rather than imported so that
 //some private struct fields can be manipulated.
@@ -392,9 +399,11 @@ impl PyG1 {
     }
     
     //Serialize into affine coordinates so that equal points serialize the same
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let aff = self.g1.into_affine();
-        let fqx = FqRepr::from(aff.x);
+        let compressed = aff.into_compressed();
+        Ok(PyBytes::new(py, compressed.as_ref()))
+        /*let fqx = FqRepr::from(aff.x);
         let fqy = FqRepr::from(aff.y);
         let arr1: &[u64] = fqx.as_ref();
         let arr2: &[u64] = fqy.as_ref();
@@ -403,12 +412,24 @@ impl PyG1 {
             end[0] = 1;
         }
         let arr = [arr1, arr2, &end].concat();
-        Ok(PyList::new(py, arr))
+        let u8arr = unsafe{arr.align_to::<u8>().1};
+        Ok(PyBytes::new(py, &u8arr))*/
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
     {
-        let arr: [u64; 13] = list.extract()?;
+        //let arr: [u64; 13] = list.extract()?;
+        let u8arr: &[u8] = list.extract()?;
+        let bytes: [u8;48] = u8arr.try_into().expect("invalid initialization");
+        let compressed = G1Compressed(bytes);
+        let aff = compressed.into_affine().unwrap();
+        self.g1 = aff.into_projective();
+        if self.pplevel != 0 {
+            self.pp = Vec::new();
+            self.pplevel = 0;
+        }
+        Ok(())
+        /*let arr = unsafe{u8arr.align_to::<u64>().1};
         let fqxr = FqRepr(arr[0..6].try_into().expect("invalid initialization"));
         let fqyr = FqRepr(arr[6..12].try_into().expect("invalid initialization"));
         let fqx = Fq::from_repr(fqxr).unwrap();
@@ -421,7 +442,7 @@ impl PyG1 {
             infinity: inf
         };
         self.g1 = ga.into_projective();
-        Ok(())
+        Ok(())*/
     }
     
     //Creates preprocessing elements to allow fast scalar multiplication.
@@ -490,13 +511,23 @@ impl PyG1 {
         Ok(self.pplevel)
     }
 
-    fn pow(&self, rhs: PyFr)  -> PyResult<PyG1> {
+    fn pow(&self, rhs: &PyAny)  -> PyResult<PyG1> {
         let mut out = PyG1{
             g1: G1::one(),
             pp: Vec::new(),
             pplevel : 0
         };
-        self.ppmul(&rhs, &mut out).unwrap();
+        let rhscel = &rhs.downcast::<PyCell<PyFr>>();
+        if rhscel.is_err(){
+            let exp: BigInt = rhs.extract()?;
+            let pyfrexp = bigint_to_pyfr(&exp);
+            self.ppmul(&pyfrexp, &mut out).unwrap();
+        }
+        else {
+            //let rhscel2 = rhscel.as_ref().unwrap();
+            let exp: &PyFr = &rhscel.as_ref().unwrap().borrow();
+            self.ppmul(&exp, &mut out).unwrap();
+        }
         Ok(out)
     }
 
@@ -808,6 +839,26 @@ impl PyG2 {
             self.pplevel = 0;
         }
         Ok(())
+    }
+    
+    fn pow(&self, rhs: &PyAny)  -> PyResult<PyG2> {
+        let mut out = PyG2{
+            g2: G2::one(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        let rhscel = &rhs.downcast::<PyCell<PyFr>>();
+        if rhscel.is_err(){
+            let exp: BigInt = rhs.extract()?;
+            let pyfrexp = bigint_to_pyfr(&exp);
+            self.ppmul(&pyfrexp, &mut out).unwrap();
+        }
+        else {
+            //let rhscel2 = rhscel.as_ref().unwrap();
+            let exp: &PyFr = &rhscel.as_ref().unwrap().borrow();
+            self.ppmul(&exp, &mut out).unwrap();
+        }
+        Ok(out)
     }
 
     /// a.equals(b)
@@ -1141,16 +1192,19 @@ impl PyFr {
         Ok(format!("{}",self.fr))
     }
     
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let frrep = FrRepr::from(self.fr);
         let arr: &[u64] = frrep.as_ref();
-        Ok(PyList::new(py, arr))
+        let u8arr = unsafe{arr.align_to::<u8>().1};
+        Ok(PyBytes::new(py, &u8arr))
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
     {
-        let arr: [u64; 4] = list.extract()?;
-        let myfr = Fr::from_repr(FrRepr(arr)).unwrap();
+        let u8arr: [u8; 32] = list.extract()?;
+        //let arr: [u64; 4] = list.extract()?;
+        let arr = unsafe{u8arr.align_to::<u64>().1};
+        let myfr = Fr::from_repr(FrRepr(arr[0..4].try_into().expect("invalid initialization"))).unwrap();
         self.fr = myfr;
         Ok(())
     }
@@ -1493,7 +1547,7 @@ impl PyFq12 {
         }
     }
 
-    fn rand(&mut self, a: Vec<u32>) -> PyResult<()>{
+    fn randomize(&mut self, a: Vec<u32>) -> PyResult<()>{
         let mut seed: [u32;8] = [0,0,0,0,0,0,0,0];
         let mut i = 0;
         for item in a.iter(){
@@ -1712,6 +1766,38 @@ impl PyFq12 {
         }
         Ok(())
     }
+    
+        #[staticmethod]
+    fn rand(a: Option<Vec<u32>>) -> PyResult<PyFq12> {
+        match a {
+            None => {
+                let mut rng = ChaCha20Rng::from_entropy();
+                let fq12 = Fq12::random(&mut rng);
+                Ok(PyFq12{
+                    fq12: fq12,
+                    pp: Vec::new(),
+                    pplevel : 0
+                })
+            },
+            Some(a) => {
+                let mut seed: [u32;8] = [0,0,0,0,0,0,0,0];
+                let mut i = 0;
+                for item in a.iter(){
+                    let myu32: &u32 = item;
+                    seed[i] = *myu32;
+                    i = i + 1;
+                }
+                let mut rng = ChaCha20Rng::from_seed(swap_seed_format(seed));
+                let fq12 = Fq12::random(&mut rng);
+                Ok(PyFq12{
+                    fq12: fq12,
+                    pp: Vec::new(),
+                    pplevel : 0
+                })
+            }
+        }
+        
+    }
 }
 
 #[pyproto]
@@ -1780,7 +1866,7 @@ impl PyObjectProtocol for PyFq12 {
 #[derive(Clone)]
 struct PyRistG {
    g : RistrettoPoint,
-   pp : Vec<RistrettoPoint>,
+   pp : Vec<AffineNielsPoint>, //was RistrettoPoint 
    pplevel : usize
 }
 
@@ -1862,20 +1948,9 @@ impl PyRistG {
     }
     
     //Serialize into affine coordinates so that equal points serialize the same
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
         let compressed = self.g.compress();
-        Ok(PyList::new(py, compressed.to_bytes()))
-        /*let aff = self.g1.into_affine();
-        let fqx = FqRepr::from(aff.x);
-        let fqy = FqRepr::from(aff.y);
-        let arr1: &[u64] = fqx.as_ref();
-        let arr2: &[u64] = fqy.as_ref();
-        let mut end: [u64;1] = [0;1];
-        if aff.infinity {
-            end[0] = 1;
-        }
-        let arr = [arr1, arr2, &end].concat();
-        Ok(PyList::new(py, arr))*/
+        Ok(PyBytes::new(py, &compressed.to_bytes()))
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
@@ -1889,7 +1964,7 @@ impl PyRistG {
     
     //Creates preprocessing elements to allow fast scalar multiplication.
     //Level determines extent of precomputation
-    fn preprocess(&mut self, level: usize) -> PyResult<()> {
+    /*fn preprocess(&mut self, level: usize) -> PyResult<()> {
         self.pplevel = level;
         //Everything requires a different kind of int (and only works with that kind)
         let mut base: u64 = 2;
@@ -1955,13 +2030,88 @@ impl PyRistG {
             }
         }
         Ok(())
+    }*/
+    
+    fn preprocess(&mut self, level: usize) -> PyResult<()> {
+        self.pplevel = level;
+        //Everything requires a different kind of int (and only works with that kind)
+        let mut base: u64 = 2;
+        //calling pow on a u64 only accepts a u32 parameter for reasons undocumented
+        base = base.pow(level as u32);
+        let ppsize = (base - 1) * ((252 + level as u64 - 1)/(level as u64));
+        self.pp = Vec::with_capacity(ppsize as usize);
+        let factor = Scalar::from(base);
+        self.pp.push(self.g.0.to_affine_niels());
+        for i in 1..base-1
+        {
+            //Yes, I really need to expicitly cast the indexing variable...
+            //let mut next = self.pp[i as usize -1].clone();
+            let next = &self.g.0 + &self.pp[i as usize -1];
+            //next.add_assign(&self.g);
+            self.pp.push(next.to_extended().to_affine_niels());
+        }
+        //(x + y - 1) / y is a way to round up the integer division x/y
+        for i in base-1..(base - 1) * ((252 + level as u64 - 1)/(level as u64)) {
+            //let mut next = self.pp[i as usize - (base-1) as usize].clone();
+            //Wait, so add_assign takes a borrowed object but mul_assign doesn't?!?!?!?
+            let temp = &EdwardsPoint::identity() + &self.pp[i as usize - (base-1) as usize];
+            let mut next = temp.to_extended();
+            next.mul_assign(factor);
+            self.pp.push(next.to_affine_niels());
+        }
+        //It's not really Ok. This is terrible.
+        Ok(())
+    }
+ 
+    fn ppmul(&self, prodend: &PyRistScalar, out: &mut PyRistG) -> PyResult<()>
+    {
+        if self.pp.len() == 0
+        {
+            out.g = self.g.clone();
+            out.g.mul_assign(prodend.scalar);
+        }
+        else
+        {
+            let zero = Scalar::zero();
+            out.g.mul_assign(zero);
+            let mut scalarbytes = prodend.scalar.to_bytes();
+            scalarbytes.reverse();
+            let hexstr = hex::encode(scalarbytes);
+            let binstr = hex_to_bin(&hexstr);
+            let mut buffer = 0usize;
+            for (i, c) in binstr.chars().rev().enumerate()
+            {
+                if i%self.pplevel == 0 && buffer != 0
+                {
+                    //(2**level - 1)*(i/level - 1) + (buffer - 1)
+                    let temp = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    out.g.0 = temp.to_extended();
+                    //out.g.0 = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    buffer = 0;
+                }
+                if c == '1'
+                {
+                    buffer = buffer + 2usize.pow((i%self.pplevel) as u32);
+                }
+                if i == 255 && buffer != 0{
+                    let temp = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    //out.g.0 = &out.g.0 + &self.pp[(2usize.pow(self.pplevel as u32) - 1)*(i/self.pplevel - 1) + (buffer-1)];
+                    out.g.0 = temp.to_extended();
+                    buffer = 0;
+                }
+            }
+            if buffer != 0{
+                 panic!("I KNEW IT");
+            }
+        }
+        Ok(())
     }
     
     fn get_pplevel(&self) -> PyResult<usize> {
         Ok(self.pplevel)
     }
 
-    fn pow(&self, rhs: PyRistScalar)  -> PyResult<PyRistG> {
+    /*fn pow(&self, rhs: PyRistScalar)  -> PyResult<PyRistG> {
         let mut out = PyRistG{
             g: RistrettoPoint::identity(),
             pp: Vec::new(),
@@ -1969,7 +2119,19 @@ impl PyRistG {
         };
         self.ppmul(&rhs, &mut out).unwrap();
         Ok(out)
+    }*/
+    
+    fn pow(&self, rhs: &PyAny)  -> PyResult<PyRistG> {
+        let mut out = PyRistG{
+            g: RistrettoPoint::identity(),
+            pp: Vec::new(),
+            pplevel : 0
+        };
+        let exp = pyscalar_from_pyany(&rhs)?;
+        self.ppmul(&exp, &mut out).unwrap();
+        Ok(out)
     }
+    
     //todo: they have their own from hash function
     #[staticmethod]
     fn hash(bytestr: &PyBytes) -> PyResult<PyRistG>{
@@ -2237,8 +2399,8 @@ impl PyRistScalar {
         Ok(())
     }
     
-    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyList> {
-        Ok(PyList::new(py, self.scalar.to_bytes()))
+    pub fn __getstate__<'p>(&self, py: Python<'p>) -> PyResult<&'p PyBytes> {
+        Ok(PyBytes::new(py, &self.scalar.to_bytes()))
     }
     
     pub fn __setstate__(&mut self, list: &PyAny) -> PyResult<()>
@@ -2417,6 +2579,24 @@ fn hashfrs(a: &PyList) -> PyResult<String>{
     Ok(format!("{}",text))
 }
 
+#[pyfunction]
+fn hashcurve25519zrs(a: &PyList) -> PyResult<String>{
+    let mut string =  String::from("");
+    for item in a.iter(){
+        let itemcel: &PyCell<PyRistScalar> = item.downcast()?;
+        let myfr: &PyRistScalar = &itemcel.borrow();
+        string.push_str(&myfr.__str__().unwrap())
+    }
+    let bytes = string.into_bytes();
+    let mut hasher = Sha256::new();
+    hasher.input(bytes);
+    let result = hasher.result();
+    let text = hex::encode(&result[..]);
+    Ok(format!("{}",text))
+}
+
+
+
 /*#[pyfunction]
 fn hashg1s(a: &PyList) -> PyResult<String>{
     //let mut string =  String::from("");
@@ -2466,6 +2646,35 @@ fn hashg1sbn(mut a: Vec<PyG1>) -> PyResult<String>{
         for num in arr {
             hasher.input(num.to_be_bytes());
         }
+    }
+    let result = hasher.result();
+    let text = hex::encode(&result[..]);
+    Ok(format!("{}",text))
+}
+
+#[pyfunction]
+fn hashcurve25519gs(mut a: Vec<PyRistG>) -> PyResult<String>{
+    let mut hasher = Sha256::new();
+    for point in a {
+        hasher.input(point.g.compress().to_bytes());
+    }
+    let result = hasher.result();
+    let text = hex::encode(&result[..]);
+    Ok(format!("{}",text))
+}
+
+#[pyfunction]
+fn hashcurve25519gsbn(mut a: Vec<PyRistG>) -> PyResult<String>{
+    let mut hasher = Sha256::new();
+    let mut uncompressed = Vec::with_capacity(a.len());
+    for g in a.iter(){
+        uncompressed.push(g.g);
+    }
+    //this doubles as a part of compressing for cost reasons, but that doesn't matter here 
+    //(as long as we're consistent about it)
+    let compressed = RistrettoPoint::double_and_compress_batch(&uncompressed);
+    for point in compressed {
+        hasher.input(point.to_bytes());
     }
     let result = hasher.result();
     let text = hex::encode(&result[..]);
@@ -2543,6 +2752,60 @@ fn dotprod(a: &PyList, b: &PyList) -> PyResult<PyFr>{
         output.fr.add_assign(&temp);
     }
     Ok(output)
+}
+
+#[pyfunction]
+fn curve25519dotprod(a: &PyList, b: &PyList) -> PyResult<PyRistScalar>{
+    let mut output = PyRistScalar{ scalar: Scalar::zero()};
+    let mut temp = Scalar::zero();
+    for (ai, bi) in a.iter().zip(b){
+        //let aif: &PyFr = ai.try_into().unwrap();
+        //let bif: &PyFr = bi.try_into().unwrap();
+        let aicel: &PyCell<PyRistScalar> = ai.downcast()?;
+        let aif: &PyRistScalar = &aicel.borrow();
+        let bicel: &PyCell<PyRistScalar> = bi.downcast()?;
+        let bif: &PyRistScalar = &bicel.borrow();
+        temp.clone_from(&aif.scalar);
+        temp.mul_assign(&bif.scalar);
+        output.scalar.add_assign(&temp);
+    }
+    Ok(output)
+}
+
+#[pyfunction]
+fn blsmultiexp(gs: &PyList, zrs: &PyList) -> PyResult<PyG1>{
+    let mut output = PyG1{ g1: G1::zero(), pp: Vec::new(), pplevel:0 };
+    let mut temp = Scalar::zero();
+    for (ai, bi) in gs.iter().zip(zrs){
+        //let aif: &PyFr = ai.try_into().unwrap();
+        //let bif: &PyFr = bi.try_into().unwrap();
+        let aicel: &PyCell<PyG1> = ai.downcast()?;
+        let aif: &PyG1 = &aicel.borrow();
+        let temp = aif.pow(bi)?;
+        output.add_assign(&temp);
+    }
+    Ok(output)
+}
+
+#[pyfunction]
+fn curve25519multiexp(gs: &PyList, zrs: &PyList) -> PyResult<PyRistG>{
+    let mut scalars: Vec<Scalar> = Vec::new();
+    let mut points: Vec<RistrettoPoint> = Vec::new();
+    for (ai, bi) in gs.iter().zip(zrs){
+        //let aif: &PyFr = ai.try_into().unwrap();
+        //let bif: &PyFr = bi.try_into().unwrap();
+        let aicel: &PyCell<PyRistG> = ai.downcast()?;
+        let aif: &PyRistG = &aicel.borrow();
+        points.push(aif.g);
+        let bicel: &PyCell<PyRistScalar> = bi.downcast()?;
+        let bif: &PyRistScalar = &bicel.borrow();
+        scalars.push(bif.scalar);
+    }
+    Ok(PyRistG{
+        g: RistrettoPoint::vartime_multiscalar_mul(scalars, points), 
+        pp: Vec::new(),
+        pplevel : 0
+    })
 }
 
 #[pyfunction]
@@ -2753,6 +3016,13 @@ fn pypairing(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(hashg1sbn))?;
     m.add_wrapped(wrap_pyfunction!(dotprod))?;
     m.add_wrapped(wrap_pyfunction!(condense_list))?;
+    m.add_wrapped(wrap_pyfunction!(blsmultiexp))?;
+
+    m.add_wrapped(wrap_pyfunction!(hashcurve25519zrs))?;
+    m.add_wrapped(wrap_pyfunction!(hashcurve25519gs))?;
+    m.add_wrapped(wrap_pyfunction!(hashcurve25519gsbn))?;
+    m.add_wrapped(wrap_pyfunction!(curve25519dotprod))?;
+    m.add_wrapped(wrap_pyfunction!(curve25519multiexp))?;
     Ok(())
 }
 

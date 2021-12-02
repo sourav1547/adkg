@@ -320,10 +320,10 @@ impl<'de> Deserialize<'de> for CompressedEdwardsY {
 #[derive(Copy, Clone)]
 #[allow(missing_docs)]
 pub struct EdwardsPoint {
-    pub(crate) X: FieldElement,
-    pub(crate) Y: FieldElement,
-    pub(crate) Z: FieldElement,
-    pub(crate) T: FieldElement,
+    pub X: FieldElement,
+    pub Y: FieldElement,
+    pub Z: FieldElement,
+    pub T: FieldElement,
 }
 
 // ------------------------------------------------------------------------
@@ -458,7 +458,7 @@ impl Eq for EdwardsPoint {}
 
 impl EdwardsPoint {
     /// Convert to a ProjectiveNielsPoint
-    pub(crate) fn to_projective_niels(&self) -> ProjectiveNielsPoint {
+    pub fn to_projective_niels(&self) -> ProjectiveNielsPoint {
         ProjectiveNielsPoint{
             Y_plus_X:  &self.Y + &self.X,
             Y_minus_X: &self.Y - &self.X,
@@ -471,7 +471,7 @@ impl EdwardsPoint {
     /// coordinates to projective coordinates.
     ///
     /// Free.
-    pub(crate) fn to_projective(&self) -> ProjectivePoint {
+    pub fn to_projective(&self) -> ProjectivePoint {
         ProjectivePoint{
             X: self.X,
             Y: self.Y,
@@ -481,7 +481,7 @@ impl EdwardsPoint {
 
     /// Dehomogenize to a AffineNielsPoint.
     /// Mainly for testing.
-    pub(crate) fn to_affine_niels(&self) -> AffineNielsPoint {
+    pub fn to_affine_niels(&self) -> AffineNielsPoint {
         let recip = self.Z.invert();
         let x = &self.X * &recip;
         let y = &self.Y * &recip;
@@ -558,7 +558,7 @@ impl EdwardsPoint {
 
 impl EdwardsPoint {
     /// Add this point to itself.
-    pub(crate) fn double(&self) -> EdwardsPoint {
+    pub fn double(&self) -> EdwardsPoint {
         self.to_projective().double().to_extended()
     }
 }
@@ -834,7 +834,7 @@ macro_rules! impl_basepoint_table {
 /// When \\(w = 8\\), we can't fit \\(carry \cdot 2^{w}\\) into an `i8`, so we
 /// add the carry bit onto an additional coefficient.
 #[derive(Clone)]
-pub struct $name(pub(crate) [$table<AffineNielsPoint>; 32]);
+pub struct $name(pub [$table<AffineNielsPoint>; 32]);
 
 impl BasepointTable for $name {
     type Point = $point;
@@ -992,7 +992,7 @@ impl_basepoint_table! {Name = EdwardsBasepointTableRadix256, LookupTable = Looku
 /// When \\(w = 8\\), we can't fit \\(carry \cdot 2^{w}\\) into an `i8`, so we
 /// add the carry bit onto an additional coefficient.
 #[derive(Clone)]
-pub struct EdwardsBasepointTable(pub(crate) [LookupTable<AffineNielsPoint>; 32]);
+pub struct EdwardsBasepointTable(pub [LookupTable<AffineNielsPoint>; 32]);
 
 impl EdwardsBasepointTable {
     /// Create a table of precomputed multiples of `basepoint`.
@@ -1117,7 +1117,7 @@ impl EdwardsPoint {
     }
 
     /// Compute \\([2\^k] P \\) by successive doublings. Requires \\( k > 0 \\).
-    pub(crate) fn mul_by_pow_2(&self, k: u32) -> EdwardsPoint {
+    pub fn mul_by_pow_2(&self, k: u32) -> EdwardsPoint {
         debug_assert!( k > 0 );
         let mut r: CompletedPoint;
         let mut s = self.to_projective();
