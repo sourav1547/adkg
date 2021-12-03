@@ -43,7 +43,7 @@ def test_benchmark_hybrid_haven_dealer(benchmark, t, p, n):
 @mark.parametrize(
     "t, p, n",
     [
-        (5, 10, 7),
+        (5, 10, 16),
     ])
 def test_benchmark_hybrid_haven_receiver(benchmark, t, p, n):
     value = field.rand()
@@ -52,7 +52,7 @@ def test_benchmark_hybrid_haven_receiver(benchmark, t, p, n):
     pc = PolyCommitBulletproofBlind(crs, 2*t, group=group)
     pc2 = PolyCommitHybrid(crs, 2*t, group=group)
     msgs = _get_dealer_msg(value, t, p, n, poly, pc, pc2, field, group)
-    benchmark( _handle_dealer_msg, msgs[0], t, p, n, 0, pc, pc2, field, group)
+    benchmark( _handle_dealer_msg, msgs[0][1], t, p, n, 0, pc, pc2, field, group)
     
 def _handle_dealer_msg(dealer_msg, t, p, n, my_id, poly_commit, poly_commit2, field, group):
     try:
