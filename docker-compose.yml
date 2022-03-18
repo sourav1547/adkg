@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  honeybadgermpc:
+  adkg:
     build:
       context: .
       dockerfile: Dockerfile

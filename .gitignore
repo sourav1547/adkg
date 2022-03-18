@@ -6,14 +6,8 @@ dump.log
 **/*.pyc
 data/
 conf/adkg-copy/
-.DS_Store
-DataWinterfell/.DS_Store
 *.out
-apps/.DS_Store
-conf/.DS_Store
-honeybadgermpc/.DS_Store
-pairing/.DS_Store
-tests/.DS_Store
+**/.DS_Store
 tests/.pytest.log
 .dockerignore
 conf/adkg/local.13.json

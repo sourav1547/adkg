@@ -47,19 +47,21 @@ docker-compose build adkg
 
 Then `debug` by running the following command. Make sure to run the debugging in `vscode` after executing the following command. 
 ```
-docker-compose run -p 5678:5678 honeybadgermpc pytest tests/test_adkg.py 
+docker-compose run -p 5678:5678 adkg pytest tests/test_adkg.py 
 ```
 
-For remote deployment build using
+## Running in AWS instances
+
+For remote deployment first build using
 ```
-docker build -t honeybadger . --build-arg BUILD=dev
+docker build -t adkg-remote . --build-arg BUILD=dev
 ```
 
 ## Miscelleneous instructions
 ```
-$ docker-compose build honeybadgermpc
-$ docker-compose run -p 5678:5678 honeybadgermpc pytest tests/test_adkg.py 
-$ docker-compose run honeybadgermpc -it
+$ docker-compose build adkg
+$ docker-compose run -p 5678:5678 adkg pytest tests/test_adkg.py 
+$ docker-compose run adkg -it
 ```
 
 ## Todo:
@@ -87,11 +89,8 @@ $ docker-compose run honeybadgermpc -it
 - This branch implements custom serialization for ACSS messages
 
 
-
-
 ## Historical Remarks.
 This library is built upon the open-source `hbACSS` library from https://github.com/tyurek/hbACSS, which itself is built upon the open source implementation of the `HoneyBadgerBFT` protocol https://github.com/amiller/HoneyBadgerBFT 
-
 
 
 
