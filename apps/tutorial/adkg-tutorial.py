@@ -36,7 +36,7 @@ async def _run(peers, n, t, my_id, start_time):
 
     from honeybadgermpc.ipc import ProcessProgramRunner
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
-        send, recv = runner.get_send_recv("")
+        send, recv = runner.get_send_recv("ADKG")
         logging.info(f"Starting ADKG: {(my_id)}")
         logging.info(f"Start time: {(start_time)}, diff {(start_time-int(time.time()))}")
 

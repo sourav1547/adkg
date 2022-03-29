@@ -366,7 +366,11 @@ class Hbacss0SingleShare:
             dispersal_msg, commits, ephkey = self.decode_proposal(_m)
             return self.verify_proposal(dealer_id, dispersal_msg, commits, ephkey)
 
-        rbc_msg = await optqrbc(
+        
+        
+        output = asyncio.Queue()
+        asyncio.create_task(
+        optqrbc(
             rbctag,
             self.my_id,
             self.n,
@@ -374,9 +378,23 @@ class Hbacss0SingleShare:
             dealer_id,
             predicate,
             broadcast_msg,
+            output.put_nowait,
             send,
             recv,
-        )
+        ))
+        rbc_msg = await output.get()
+
+        # rbc_msg = await reliablebroadcast(
+        #     rbctag,
+        #     self.my_id,
+        #     self.n,
+        #     self.t,
+        #     dealer_id,
+        #     predicate,
+        #     broadcast_msg,
+        #     send,
+        #     recv,
+        # )
 
         # avss processing
         # logger.debug("starting acss")

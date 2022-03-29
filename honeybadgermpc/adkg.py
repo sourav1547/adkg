@@ -119,7 +119,7 @@ class ADKG:
 
         async def _recv_rbc(j):
             # rbc_values[j] = await rbc_out[j]
-            rbcl = await rbc_out[j]
+            rbcl = await rbc_out[j].get()
             rbcb = Bitmap(self.n, rbcl)
             rbc_values[j] = []
             for i in range(self.n):
@@ -213,7 +213,8 @@ class ADKG:
                     riv.set_bit(k)
                 rbc_input = bytes(riv.array)
 
-            rbc_outputs[j] = asyncio.create_task(
+            # rbc_outputs[j] = 
+            asyncio.create_task(
                 optqrbc(
                     rbctag,
                     self.my_id,
@@ -222,6 +223,7 @@ class ADKG:
                     j,
                     predicate,
                     rbc_input,
+                    rbc_outputs[j].put_nowait,
                     rbcsend,
                     rbcrecv,
                 )
