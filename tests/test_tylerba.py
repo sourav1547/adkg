@@ -3,11 +3,11 @@ from asyncio import Queue, Event
 from asyncio import get_event_loop, create_task, gather
 from pytest import mark
 
-from honeybadgermpc.broadcast.commoncoin import shared_coin
-from honeybadgermpc.broadcast.tylerba import tylerba
-from honeybadgermpc.broadcast.crypto.boldyreva import dealer
+from adkg.broadcast.commoncoin import shared_coin
+from adkg.broadcast.tylerba import tylerba
+from adkg.broadcast.crypto.boldyreva import dealer
 from collections import defaultdict
-from honeybadgermpc.utils.misc import print_exception_callback
+from adkg.utils.misc import print_exception_callback
 
 
 def byzantine_broadcast_router(n, maxdelay=0.005, seed=None, **byzargs):

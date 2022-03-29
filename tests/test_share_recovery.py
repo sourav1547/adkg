@@ -1,12 +1,12 @@
 import asyncio
 from pytest import mark
 
-from honeybadgermpc.poly_commit_const_dl import PolyCommitConstDL, gen_pc_const_dl_crs
-#from honeybadgermpc.betterpairing import ZR
+from adkg.poly_commit_const_dl import PolyCommitConstDL, gen_pc_const_dl_crs
+#from adkg.betterpairing import ZR
 from pypairing import ZR
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.utils.misc import print_exception_callback
-from honeybadgermpc.share_recovery import HbACSS1Recoverer
+from adkg.polynomial import polynomials_over
+from adkg.utils.misc import print_exception_callback
+from adkg.share_recovery import HbACSS1Recoverer
 
 @mark.asyncio
 async def test_HbACSS1Recoverer(test_router):

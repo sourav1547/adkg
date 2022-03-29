@@ -1,8 +1,8 @@
 from pytest import mark
 import asyncio
-from honeybadgermpc.field import GF
-from honeybadgermpc.mpc import Subgroup
-from honeybadgermpc.progs.mixins.share_arithmetic import (
+from adkg.field import GF
+from adkg.mpc import Subgroup
+from adkg.progs.mixins.share_arithmetic import (
     BeaverMultiply,
     BeaverMultiplyArrays,
     InvertShare,
@@ -10,8 +10,8 @@ from honeybadgermpc.progs.mixins.share_arithmetic import (
     DivideShares,
     DivideShareArrays,
 )
-from honeybadgermpc.progs.mixins.share_comparison import Equality
-from honeybadgermpc.progs.mimc_jubjub_pkc import (
+from adkg.progs.mixins.share_comparison import Equality
+from adkg.progs.mimc_jubjub_pkc import (
     mimc_encrypt,
     mimc_decrypt,
     key_generation,

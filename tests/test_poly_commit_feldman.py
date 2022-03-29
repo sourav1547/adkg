@@ -1,6 +1,6 @@
 from pypairing import ZR, G1
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_feldman import PolyCommitFeldman
 
 def test_pc_const():
     t = 6

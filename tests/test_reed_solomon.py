@@ -1,5 +1,5 @@
 import pytest
-from honeybadgermpc.reed_solomon import (
+from adkg.reed_solomon import (
     VandermondeEncoder,
     FFTEncoder,
     VandermondeDecoder,
@@ -7,10 +7,10 @@ from honeybadgermpc.reed_solomon import (
     GaoRobustDecoder,
     WelchBerlekampRobustDecoder,
 )
-from honeybadgermpc.polynomial import EvalPoint
-from honeybadgermpc.reed_solomon import EncoderFactory, DecoderFactory
-from honeybadgermpc.reed_solomon import EncoderSelector, DecoderSelector
-from honeybadgermpc.ntl import AvailableNTLThreads
+from adkg.polynomial import EvalPoint
+from adkg.reed_solomon import EncoderFactory, DecoderFactory
+from adkg.reed_solomon import EncoderSelector, DecoderSelector
+from adkg.ntl import AvailableNTLThreads
 from unittest.mock import patch
 
 

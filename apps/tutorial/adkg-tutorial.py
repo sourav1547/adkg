@@ -7,9 +7,9 @@ Instructions:
 sh scripts/launch-tmuxlocal.sh apps/tutorial/adkg-tutorial.py conf/adkg/local
 ```
 """
-from honeybadgermpc.config import HbmpcConfig
-from honeybadgermpc.adkg import ADKG
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
+from adkg.config import HbmpcConfig
+from adkg.adkg import ADKG
+from adkg.poly_commit_feldman import PolyCommitFeldman
 from pypairing import G1, ZR
 import asyncio
 import time
@@ -34,7 +34,7 @@ async def _run(peers, n, t, my_id, start_time):
     g, h, pks, sks = get_avss_params(n)
     pc = PolyCommitFeldman(g)
 
-    from honeybadgermpc.ipc import ProcessProgramRunner
+    from adkg.ipc import ProcessProgramRunner
     async with ProcessProgramRunner(peers, n, t, my_id) as runner:
         send, recv = runner.get_send_recv("ADKG")
         logging.info(f"Starting ADKG: {(my_id)}")
@@ -69,7 +69,7 @@ async def _run(peers, n, t, my_id, start_time):
 
 
 if __name__ == "__main__":
-    from honeybadgermpc.config import HbmpcConfig
+    from adkg.config import HbmpcConfig
     logging.info("Running ADKG ...")
     HbmpcConfig.load_config()
     

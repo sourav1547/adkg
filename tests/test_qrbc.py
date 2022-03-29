@@ -1,5 +1,5 @@
 from benchmark.test_benchmark_rbc import rbc
-from honeybadgermpc.broadcast.qrbc import qrbc
+from adkg.broadcast.qrbc import qrbc
 from random import randint
 from pytest import mark
 from asyncio import create_task, gather

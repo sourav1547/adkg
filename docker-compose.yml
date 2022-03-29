@@ -8,26 +8,26 @@ services:
     cap_add:
       - NET_ADMIN
     volumes:
-      - ./apps:/usr/src/HoneyBadgerMPC/apps
-      - ./progs:/usr/src/HoneyBadgerMPC/progs
-      - ./benchmark:/usr/src/HoneyBadgerMPC/benchmark
-      - ./.benchmarks:/usr/src/HoneyBadgerMPC/.benchmarks
-      - ./aws:/usr/src/HoneyBadgerMPC/aws
-      - ./conf:/usr/src/HoneyBadgerMPC/conf
-      - ./docs:/usr/src/HoneyBadgerMPC/docs
-      - ./honeybadgermpc:/usr/src/HoneyBadgerMPC/honeybadgermpc
-      - ./scripts:/usr/src/HoneyBadgerMPC/scripts
-      - ./tests:/usr/src/HoneyBadgerMPC/tests
-      - ./.coveragerc:/usr/src/HoneyBadgerMPC/.coveragerc
-      - ./.flake8:/usr/src/HoneyBadgerMPC/.flake8
-      - ./Makefile:/usr/src/HoneyBadgerMPC/Makefile
-      - ./pytest.ini:/usr/src/HoneyBadgerMPC/pytest.ini
-      - ./setup.py:/usr/src/HoneyBadgerMPC/setup.py
-      - ./pairing/pypairing/__init__.py:/usr/src/HoneyBadgerMPC/pairing/pypairing/__init__.py
-      - ./pairing/src:/usr/src/HoneyBadgerMPC/pairing/src
-      - ./pairing/benches:/usr/src/HoneyBadgerMPC/pairing/benches
-      - ./pairing/Cargo.toml:/usr/src/HoneyBadgerMPC/pairing/Cargo.toml
-      - ./pairing/setup.py:/usr/src/HoneyBadgerMPC/pairing/setup.py
-      - ./:/usr/src/HoneyBadgerMPC/
-      - /usr/src/HoneyBadgerMPC/honeybadgermpc/ntl  # Directory _not_ mounted from host
-    command: pytest -v --cov=honeybadgermpc
+      - ./apps:/usr/src/adkg/apps
+      - ./progs:/usr/src/adkg/progs
+      - ./benchmark:/usr/src/adkg/benchmark
+      - ./.benchmarks:/usr/src/adkg/.benchmarks
+      - ./aws:/usr/src/adkg/aws
+      - ./conf:/usr/src/adkg/conf
+      - ./docs:/usr/src/adkg/docs
+      - ./adkg:/usr/src/adkg/adkg
+      - ./scripts:/usr/src/adkg/scripts
+      - ./tests:/usr/src/adkg/tests
+      - ./.coveragerc:/usr/src/adkg/.coveragerc
+      - ./.flake8:/usr/src/adkg/.flake8
+      - ./Makefile:/usr/src/adkg/Makefile
+      - ./pytest.ini:/usr/src/adkg/pytest.ini
+      - ./setup.py:/usr/src/adkg/setup.py
+      - ./pairing/pypairing/__init__.py:/usr/src/adkg/pairing/pypairing/__init__.py
+      - ./pairing/src:/usr/src/adkg/pairing/src
+      - ./pairing/benches:/usr/src/adkg/pairing/benches
+      - ./pairing/Cargo.toml:/usr/src/adkg/pairing/Cargo.toml
+      - ./pairing/setup.py:/usr/src/adkg/pairing/setup.py
+      - ./:/usr/src/adkg/
+      - /usr/src/adkg/adkg/ntl  # Directory _not_ mounted from host
+    command: pytest -v --cov=adkg

@@ -6,7 +6,7 @@ set -e  # fail if any command fails
 
 if [ $# -lt 2 ] ; then
     echo "usage: $0 <module.py> <conf>"
-    echo "example: $0 honeybadgermpc/ipc.py conf/mpc/local"
+    echo "example: $0 adkg/ipc.py conf/mpc/local"
     exit 1
 fi
 
@@ -32,14 +32,14 @@ port=8000
 
 # CMD="docker run\
 #     -p $port:$port \
-#     -v /Users/sourav/hbACSS/conf/adkg:/usr/src/HoneyBadgerMPC/config/ \
-#     -v /Users/sourav/hbACSS/benchmark-logs:/usr/src/HoneyBadgerMPC/benchmark-logs/ \
-#     sourav1547/honeybadgermpc:latest
+#     -v /Users/sourav/hbACSS/conf/adkg:/usr/src/adkg/config/ \
+#     -v /Users/sourav/hbACSS/benchmark-logs:/usr/src/adkg/benchmark-logs/ \
+#     sourav1547/adkg:latest
 #     python3 -m scripts.adkg_run"
 
-CMD="-v /Users/sourav/hbACSS/conf/adkg:/usr/src/HoneyBadgerMPC/config/ \
-    -v /Users/sourav/hbACSS/benchmark-logs:/usr/src/HoneyBadgerMPC/benchmark-logs/ \
-    sourav1547/honeybadgermpc:latest
+CMD="-v /Users/sourav/hbACSS/conf/adkg:/usr/src/adkg/config/ \
+    -v /Users/sourav/hbACSS/benchmark-logs:/usr/src/adkg/benchmark-logs/ \
+    sourav1547/adkg:latest
     python3 -m scripts.adkg_run"
 
 # CMD="python3 -m ${MODULE_PATH}"
@@ -57,7 +57,7 @@ echo ">>> Command to be executed: '${CMD}'"
 #    ${CMD} -d -f ${CONFIG_PATH}.${ID}.json > logs/logs-${ID}.log 2>&1 &
 # done
 
-CONFIG_PATH="/usr/src/HoneyBadgerMPC/config/local"
+CONFIG_PATH="/usr/src/adkg/config/local"
 
 # sleep 3s
 if [ -z "$3" ]

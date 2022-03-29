@@ -244,7 +244,7 @@ class ComposeStager(Stager):
         self.compose_filename = compose_filename
         self.compose_content = self._parse_compose_file(compose_filename)
 
-        docker_filename = self.compose_content["services"]["honeybadgermpc"]["build"][
+        docker_filename = self.compose_content["services"]["adkg"]["build"][
             "dockerfile"
         ]
         super().__init__(docker_filename, dockerhub_base)
@@ -261,10 +261,10 @@ class ComposeStager(Stager):
 
         build_content = {**self.compose_content}  # shallow copy
 
-        build_content["services"]["honeybadgermpc"][
+        build_content["services"]["adkg"][
             "image"
         ] = f"{self._build_repo_name(target, build_tag)}"
-        build_content["services"]["honeybadgermpc"]["build"]["target"] = target
+        build_content["services"]["adkg"]["build"]["target"] = target
 
         cached_images = []
         for cache_tag in cache_tags:
@@ -273,11 +273,11 @@ class ComposeStager(Stager):
                 for t in self._get_prior_targets(target)
             ]
 
-        build_content["services"]["honeybadgermpc"]["build"][
+        build_content["services"]["adkg"]["build"][
             "cache_from"
         ] = cached_images
 
-        build_command = f'echo "{yaml.dump(build_content)}" | docker-compose -f - build honeybadgermpc'
+        build_command = f'echo "{yaml.dump(build_content)}" | docker-compose -f - build adkg'
         if not cache:
             build_command = f"{build_command} --no-cache"
 

@@ -135,8 +135,8 @@ def trigger_run(run_id, skip_setup, max_k, only_setup, cleanup):
                 [
                     f"sudo docker run\
                 -p {port}:{port} \
-                -v /home/ubuntu/config:/usr/src/HoneyBadgerMPC/config/ \
-                -v /home/ubuntu/benchmark-logs:/usr/src/HoneyBadgerMPC/benchmark-logs/ \
+                -v /home/ubuntu/config:/usr/src/adkg/config/ \
+                -v /home/ubuntu/benchmark-logs:/usr/src/adkg/benchmark-logs/ \
                 {AwsConfig.DOCKER_IMAGE_PATH} \
                 {AwsConfig.MPC_CONFIG.COMMAND} -d -f config/config-{i}.json -time {start_time}"
                 ],

@@ -149,7 +149,7 @@ RUN pip install pairing/
 # target for dev targets later with good cache performance by delaying copying 
 # changed files until the end of the dev targets.
 FROM base AS pre-prod
-WORKDIR /usr/src/HoneyBadgerMPC/
+WORKDIR /usr/src/adkg/
 
 COPY --from=build ${PYTHON_LIBRARY_PATH} ${PYTHON_LIBRARY_PATH}
 COPY --from=build /usr/local/include/ /usr/local/include/
@@ -160,9 +160,9 @@ COPY --from=build ${LIBRARY_PATH} ${LIBRARY_PATH}
 
 COPY setup.py .
 COPY README.md .
-COPY honeybadgermpc/__version__.py honeybadgermpc/
-COPY honeybadgermpc/__init__.py honeybadgermpc/
-COPY honeybadgermpc/ntl/ honeybadgermpc/ntl/
+COPY adkg/__version__.py adkg/
+COPY adkg/__init__.py adkg/
+COPY adkg/ntl/ adkg/ntl/
 # COPY apps/asynchromix/solver/ apps/asynchromix/solver/
 RUN pip install -e .['tests,docs']
 
@@ -207,7 +207,7 @@ RUN apt-get install -y --no-install-recommends \
 # RUN npm install -g ganache-cli
 
 # Install remaining pip dependencies here
-WORKDIR /usr/src/HoneyBadgerMPC/
+WORKDIR /usr/src/adkg/
 RUN pip install -e .['dev']
 
 FROM pre-dev AS dev

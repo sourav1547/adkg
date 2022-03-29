@@ -1,5 +1,5 @@
 from pytest import mark
-from honeybadgermpc.progs.random_refinement import refine_randoms
+from adkg.progs.random_refinement import refine_randoms
 
 
 @mark.parametrize("n", [4, 10, 16, 50, 100])

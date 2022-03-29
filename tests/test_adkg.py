@@ -1,7 +1,7 @@
 from pytest import mark
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
-from honeybadgermpc.adkg import ADKG
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_feldman import PolyCommitFeldman
+from adkg.adkg import ADKG
 import asyncio
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

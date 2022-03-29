@@ -1,4 +1,4 @@
-from honeybadgermpc.ntl import (
+from adkg.ntl import (
     lagrange_interpolate,
     vandermonde_batch_interpolate,
     vandermonde_batch_evaluate,

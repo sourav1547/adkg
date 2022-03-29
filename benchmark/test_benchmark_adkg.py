@@ -1,7 +1,7 @@
 from pytest import mark
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
-from honeybadgermpc.adkg import adkg
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_feldman import PolyCommitFeldman
+from adkg.adkg import adkg
 import asyncio
 
 

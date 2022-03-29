@@ -1,4 +1,4 @@
-from honeybadgermpc.proofs import (
+from adkg.proofs import (
     prove_inner_product,
     verify_inner_product,
     prove_inner_product_one_known,
@@ -7,7 +7,7 @@ from honeybadgermpc.proofs import (
     verify_batch_inner_product_one_known,
     MerkleTree,
 )
-from honeybadgermpc.proofs_interactive import (
+from adkg.proofs_interactive import (
     inner_product_prover,
     inner_product_verifier,
 )

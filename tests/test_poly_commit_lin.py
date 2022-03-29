@@ -1,6 +1,6 @@
-from honeybadgermpc.poly_commit_lin import PolyCommitLin
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.betterpairing import G1, ZR
+from adkg.poly_commit_lin import PolyCommitLin
+from adkg.polynomial import polynomials_over
+from adkg.betterpairing import G1, ZR
 from random import randint
 
 

@@ -1,8 +1,8 @@
 from pytest import mark, raises
 from asyncio import gather
 from random import randint
-from honeybadgermpc.preprocessing import PreProcessedElements
-from honeybadgermpc.progs.mixins.share_arithmetic import (
+from adkg.preprocessing import PreProcessedElements
+from adkg.progs.mixins.share_arithmetic import (
     BeaverMultiply,
     BeaverMultiplyArrays,
     InvertShare,
@@ -12,7 +12,7 @@ from honeybadgermpc.progs.mixins.share_arithmetic import (
     DoubleSharingMultiply,
     DoubleSharingMultiplyArrays,
 )
-from honeybadgermpc.progs.mixins.share_comparison import Equality
+from adkg.progs.mixins.share_comparison import Equality
 
 STANDARD_ARITHMETIC_MIXINS = [
     BeaverMultiply(),
@@ -111,7 +111,7 @@ async def test_batch_double_sharing_multiply(galois_field, test_runner):
 
 @mark.asyncio
 async def test_cant_multiply_shares_from_different_contexts():
-    from honeybadgermpc.mpc import TaskProgramRunner
+    from adkg.mpc import TaskProgramRunner
     import asyncio
 
     n, t, k = 9, 2, 2000

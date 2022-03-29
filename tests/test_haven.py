@@ -1,14 +1,14 @@
 from pytest import mark
 from random import randint
 from pickle import dumps
-from honeybadgermpc.polynomial import polynomials_over
-# from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
-from honeybadgermpc.poly_commit_bulletproof import PolyCommitBulletproof
-from honeybadgermpc.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
-from honeybadgermpc.poly_commit_hybrid import PolyCommitHybrid
-from honeybadgermpc.haven import HavenAVSS, HybridHavenAVSS
-# from honeybadgermpc.symmetric_crypto import SymmetricCrypto
-from honeybadgermpc.utils.misc import print_exception_callback
+from adkg.polynomial import polynomials_over
+# from adkg.poly_commit_feldman import PolyCommitFeldman
+from adkg.poly_commit_bulletproof import PolyCommitBulletproof
+from adkg.poly_commit_bulletproof_blind import PolyCommitBulletproofBlind
+from adkg.poly_commit_hybrid import PolyCommitHybrid
+from adkg.haven import HavenAVSS, HybridHavenAVSS
+# from adkg.symmetric_crypto import SymmetricCrypto
+from adkg.utils.misc import print_exception_callback
 import asyncio
 
 

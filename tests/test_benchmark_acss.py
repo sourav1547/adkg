@@ -1,8 +1,8 @@
 from pytest import mark
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
-from honeybadgermpc.symmetric_crypto import SymmetricCrypto
-from honeybadgermpc.utils.serilization import serialize_g, deserialize_g, serialize_gs, deserialize_gs, deserialize_f
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_feldman import PolyCommitFeldman
+from adkg.symmetric_crypto import SymmetricCrypto
+from adkg.utils.serilization import serialize_g, deserialize_g, serialize_gs, deserialize_gs, deserialize_f
 import hashlib
 # from pypairing import Curve25519G as group, Curve25519ZR as field
 from pypairing import G1 as group, ZR as field

@@ -1,4 +1,4 @@
-from honeybadgermpc.utils.typecheck import TypeCheck
+from adkg.utils.typecheck import TypeCheck
 from pytest import raises
 from typing import Callable
 

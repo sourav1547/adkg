@@ -1,8 +1,8 @@
 from pytest import mark
-# from honeybadgermpc.betterpairing import ZR
+# from adkg.betterpairing import ZR
 from pypairing import ZR
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_log import PolyCommitLog
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_log import PolyCommitLog
 import cProfile
 
 short_param_list_t = [1,

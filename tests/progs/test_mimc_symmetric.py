@@ -1,9 +1,9 @@
 from pytest import mark
 from random import randint
-from honeybadgermpc.field import GF
-from honeybadgermpc.elliptic_curve import Subgroup
-from honeybadgermpc.progs.mixins.share_arithmetic import BeaverMultiply
-from honeybadgermpc.progs.mimc_symmetric import mimc_encrypt, mimc_decrypt
+from adkg.field import GF
+from adkg.elliptic_curve import Subgroup
+from adkg.progs.mixins.share_arithmetic import BeaverMultiply
+from adkg.progs.mimc_symmetric import mimc_encrypt, mimc_decrypt
 
 MIXINS = [BeaverMultiply()]
 PREPROCESSING = ["rands", "triples", "zeros", "cubes", "bits"]

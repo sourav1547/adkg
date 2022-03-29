@@ -1,5 +1,5 @@
 def test_zr_math():
-    from honeybadgermpc.betterpairing import ZR
+    from adkg.betterpairing import ZR
 
     assert ZR("2") ** 3 == 8
     assert ZR(200) / 10 == ZR(20)
@@ -12,7 +12,7 @@ def test_zr_math():
 
 
 def test_bilinear_math():
-    from honeybadgermpc.betterpairing import ZR, G1, G2, GT, pair
+    from adkg.betterpairing import ZR, G1, G2, GT, pair
 
     a = G1.rand()
     b = G2.rand()
@@ -43,7 +43,7 @@ def test_bilinear_math():
 
 
 def test_serialization():
-    from honeybadgermpc.betterpairing import ZR, G1, G2, GT
+    from adkg.betterpairing import ZR, G1, G2, GT
 
     a = ZR.random()
     b = G1.rand()
@@ -60,7 +60,7 @@ def test_serialization():
 
 
 def test_hashing():
-    from honeybadgermpc.betterpairing import ZR, G1, G2
+    from adkg.betterpairing import ZR, G1, G2
     import pickle
 
     crs = G1.hash_many(b"honeybadger", 10) + G2.hash_many(b"honeybadger", 2)

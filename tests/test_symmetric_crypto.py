@@ -1,5 +1,5 @@
 import uuid
-from honeybadgermpc.symmetric_crypto import SymmetricCrypto
+from adkg.symmetric_crypto import SymmetricCrypto
 
 
 def test_encrypt_decrypt():

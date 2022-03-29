@@ -1,12 +1,12 @@
 from pytest import mark
 from contextlib import ExitStack
 from random import randint
-from honeybadgermpc.poly_commit_const import gen_pc_const_crs, PolyCommitConst
-from honeybadgermpc.poly_commit_lin import PolyCommitLin
-from honeybadgermpc.betterpairing import G1, ZR
-from honeybadgermpc.hbavss import HbAvssLight, HbAvssBatch
-from honeybadgermpc.field import GF
-from honeybadgermpc.elliptic_curve import Subgroup
+from adkg.poly_commit_const import gen_pc_const_crs, PolyCommitConst
+from adkg.poly_commit_lin import PolyCommitLin
+from adkg.betterpairing import G1, ZR
+from adkg.hbavss import HbAvssLight, HbAvssBatch
+from adkg.field import GF
+from adkg.elliptic_curve import Subgroup
 import asyncio
 
 

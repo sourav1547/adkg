@@ -1,6 +1,6 @@
 from pytest import mark
-from honeybadgermpc.mpc import TaskProgramRunner
-from honeybadgermpc.preprocessing import PreProcessedElements
+from adkg.mpc import TaskProgramRunner
+from adkg.preprocessing import PreProcessedElements
 import asyncio
 
 

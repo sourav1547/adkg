@@ -1,11 +1,11 @@
 import pytest
 import operator
 from pytest import raises
-from honeybadgermpc.field import GF, FieldsNotIdentical
+from adkg.field import GF, FieldsNotIdentical
 
 
 def test_bool():
-    from honeybadgermpc.field import GF
+    from adkg.field import GF
 
     field1 = GF(17)
     assert bool(field1(23))

@@ -1,5 +1,5 @@
 import random
-from honeybadgermpc.reed_solomon_wb import make_wb_encoder_decoder
+from adkg.reed_solomon_wb import make_wb_encoder_decoder
 
 
 def test_decoding():
@@ -47,7 +47,7 @@ def test_decoding_all_zeros():
     encoded = enc(int_msg)
 
     # Check decoding with no errors
-    # https://github.com/initc3/HoneyBadgerMPC/issues/143
+    # https://github.com/initc3/adkg/issues/143
     # If an error is raised then the bug has not been fixed D:
     _ = dec(encoded, debug=False)
 

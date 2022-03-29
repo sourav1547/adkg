@@ -78,6 +78,6 @@
     },
 
     "docker": {
-        "image_path": "sourav1547/honeybadgermpc:latest"
+        "image_path": "sourav1547/adkg:latest"
     }
 }

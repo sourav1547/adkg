@@ -2,12 +2,12 @@ import pickle
 import random
 from base64 import encodebytes
 from pytest import mark
-from honeybadgermpc.broadcast.crypto.boldyreva import dealer
+from adkg.broadcast.crypto.boldyreva import dealer
 
 
 class TestTBLSPublicKey:
     def test_init(self, vk, vks):
-        from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey
+        from adkg.broadcast.crypto.boldyreva import TBLSPublicKey
 
         players = 10  # TODO bind to fixtures
         count = 5  # TODO bind to fixtures
@@ -28,7 +28,7 @@ class TestTBLSPublicKey:
         assert tbls_public_key.__dict__ == original_dict
 
     def test_setstate(self, tbls_public_key, serialized_tbls_public_key_dict):
-        from honeybadgermpc.broadcast.crypto.boldyreva import TBLSPublicKey
+        from adkg.broadcast.crypto.boldyreva import TBLSPublicKey
 
         unset_public_key = TBLSPublicKey(None, None, None, None)
         unset_public_key.__setstate__(serialized_tbls_public_key_dict)
@@ -66,7 +66,7 @@ def test_boldyreva():
 
 @mark.parametrize("n", (0, 1, 2))
 def test_deserialize_arg(n, g, mocker):
-    from honeybadgermpc.broadcast.crypto import boldyreva
+    from adkg.broadcast.crypto import boldyreva
 
     mocked_deserialize = mocker.patch.object(
         boldyreva.group, "deserialize", autospec=True

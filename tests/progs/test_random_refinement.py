@@ -1,5 +1,5 @@
 from pytest import mark
-from honeybadgermpc.progs.random_refinement import refine_randoms
+from adkg.progs.random_refinement import refine_randoms
 
 
 @mark.parametrize("n, t, k", [(4, 1, 3), (4, 1, 4), (7, 2, 5)])

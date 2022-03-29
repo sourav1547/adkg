@@ -1,7 +1,7 @@
-from honeybadgermpc.config import HbmpcConfig
-from honeybadgermpc.ipc import ProcessProgramRunner
-from honeybadgermpc.adkg import ADKG
-from honeybadgermpc.poly_commit_feldman import PolyCommitFeldman
+from adkg.config import HbmpcConfig
+from adkg.ipc import ProcessProgramRunner
+from adkg.adkg import ADKG
+from adkg.poly_commit_feldman import PolyCommitFeldman
 from pypairing import G1, ZR
 import asyncio
 import time
@@ -55,7 +55,7 @@ async def _run(peers, n, t, my_id, start_time):
         logging.info(f"[{my_id}] Total bytes sent out aa: {bytes_sent}")
 
 if __name__ == "__main__":
-    from honeybadgermpc.config import HbmpcConfig
+    from adkg.config import HbmpcConfig
     logging.info("Running ADKG ...")
     HbmpcConfig.load_config()
 

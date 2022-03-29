@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -f tests/.pytest.log
 
 lint: ## check style with flake8
-	flake8 honeybadgermpc tests
+	flake8 adkg tests
 
 test: ## run tests quickly with the default Python
 	pytest -v
@@ -58,7 +58,7 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	pytest -v -n auto --cov=honeybadgermpc --cov-report term --cov-report html
+	pytest -v -n auto --cov=adkg --cov-report term --cov-report html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs

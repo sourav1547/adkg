@@ -2,16 +2,16 @@ import pypairing
 from pytest import mark
 from contextlib import ExitStack
 from random import randint
-from honeybadgermpc.betterpairing import ZR, G1
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_log import PolyCommitLog
-from honeybadgermpc.poly_commit_dummy import PolyCommitAMTDummy, PolyCommitLoglinDummy
-from honeybadgermpc.hbavss import Hbacss0, Hbacss1, Hbacss2, HbAVSSMessageType
-from honeybadgermpc.field import GF
-from honeybadgermpc.utils.misc import print_exception_callback, wrap_send, subscribe_recv
-from honeybadgermpc.router import SimpleRouter
+from adkg.betterpairing import ZR, G1
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_log import PolyCommitLog
+from adkg.poly_commit_dummy import PolyCommitAMTDummy, PolyCommitLoglinDummy
+from adkg.hbavss import Hbacss0, Hbacss1, Hbacss2, HbAVSSMessageType
+from adkg.field import GF
+from adkg.utils.misc import print_exception_callback, wrap_send, subscribe_recv
+from adkg.router import SimpleRouter
 import asyncio
-from honeybadgermpc.symmetric_crypto import SymmetricCrypto
+from adkg.symmetric_crypto import SymmetricCrypto
 import logging
 import time
 import cProfile

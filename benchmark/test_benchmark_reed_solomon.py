@@ -1,7 +1,7 @@
-from honeybadgermpc.field import GF
-from honeybadgermpc.elliptic_curve import Subgroup
-from honeybadgermpc.reed_solomon import GaoRobustDecoder
-from honeybadgermpc.polynomial import EvalPoint, polynomials_over
+from adkg.field import GF
+from adkg.elliptic_curve import Subgroup
+from adkg.reed_solomon import GaoRobustDecoder
+from adkg.polynomial import EvalPoint, polynomials_over
 from random import randint
 from pytest import mark
 

@@ -1,8 +1,8 @@
 from pytest import mark
-#from honeybadgermpc.betterpairing import ZR, G1
+#from adkg.betterpairing import ZR, G1
 from pypairing import ZR, G1
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_log import PolyCommitLog
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_log import PolyCommitLog
 
 
 @mark.parametrize("t", [3, 6, 10])

@@ -1,9 +1,9 @@
 from pytest import mark
 from random import randint
-from honeybadgermpc.field import GF
-from honeybadgermpc.mpc import Subgroup
-from honeybadgermpc.progs.mimc import mimc_mpc, mimc_plain, mimc_mpc_batch
-from honeybadgermpc.progs.mixins.share_arithmetic import BeaverMultiply
+from adkg.field import GF
+from adkg.mpc import Subgroup
+from adkg.progs.mimc import mimc_mpc, mimc_plain, mimc_mpc_batch
+from adkg.progs.mixins.share_arithmetic import BeaverMultiply
 
 MIXINS = [BeaverMultiply()]
 PREPROCESSING = ["rands", "triples", "zeros", "cubes"]

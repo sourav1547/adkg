@@ -2,20 +2,20 @@ from pytest import mark
 from random import randint
 from contextlib import ExitStack
 from pickle import dumps
-from honeybadgermpc.polynomial import polynomials_over
-from honeybadgermpc.poly_commit_const_dl import PolyCommitConstDL, gen_pc_const_dl_crs
-# from honeybadgermpc.betterpairing import G1, ZR
-from honeybadgermpc.hbavss import Hbacss0, Hbacss1, Hbacss2
-from honeybadgermpc.mpc import TaskProgramRunner
-from honeybadgermpc.symmetric_crypto import SymmetricCrypto
-from honeybadgermpc.utils.misc import print_exception_callback
-from honeybadgermpc.field import GF
-from honeybadgermpc.elliptic_curve import Subgroup
+from adkg.polynomial import polynomials_over
+from adkg.poly_commit_const_dl import PolyCommitConstDL, gen_pc_const_dl_crs
+# from adkg.betterpairing import G1, ZR
+from adkg.hbavss import Hbacss0, Hbacss1, Hbacss2
+from adkg.mpc import TaskProgramRunner
+from adkg.symmetric_crypto import SymmetricCrypto
+from adkg.utils.misc import print_exception_callback
+from adkg.field import GF
+from adkg.elliptic_curve import Subgroup
 import asyncio
 
 
 def get_avss_params(n, t):
-    from honeybadgermpc.betterpairing import G1, ZR
+    from adkg.betterpairing import G1, ZR
     g, h = G1.rand(), G1.rand()
     public_keys, private_keys = [None] * n, [None] * n
     for i in range(n):
@@ -159,7 +159,7 @@ async def test_hbacss0_share_fault(test_router):
 @mark.asyncio
 async def test_hbacss1(test_router):
     from pypairing import G1, ZR
-    #from honeybadgermpc.betterpairing import G1, ZR
+    #from adkg.betterpairing import G1, ZR
     t = 2
     n = 3 * t + 1
 
@@ -204,7 +204,7 @@ async def test_hbacss1(test_router):
 @mark.asyncio
 async def test_hbacss1_share_fault(test_router):
     from pypairing import G1, ZR
-    #from honeybadgermpc.betterpairing import G1, ZR
+    #from adkg.betterpairing import G1, ZR
     # Injects one invalid share
     class BadDealer(Hbacss1):
         def _get_dealer_msg(self, values, n):
@@ -327,7 +327,7 @@ async def test_hbacss2(test_router):
 @mark.asyncio
 async def test_hbacss2_share_fault(test_router):
     from pypairing import G1, ZR
-    from honeybadgermpc.share_recovery import poly_lagrange_at_x, poly_interpolate_at_x
+    from adkg.share_recovery import poly_lagrange_at_x, poly_interpolate_at_x
     # Injects one invalid share
     class BadDealer(Hbacss2):
         def _get_dealer_msg(self, values, n):

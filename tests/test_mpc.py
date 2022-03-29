@@ -1,8 +1,8 @@
 from pytest import mark
-from honeybadgermpc.mpc import TaskProgramRunner
-from honeybadgermpc.progs.mixins.share_arithmetic import BeaverMultiply
-from honeybadgermpc.progs.mixins.constants import MixinConstants
-from honeybadgermpc.preprocessing import PreProcessedElements
+from adkg.mpc import TaskProgramRunner
+from adkg.progs.mixins.share_arithmetic import BeaverMultiply
+from adkg.progs.mixins.constants import MixinConstants
+from adkg.preprocessing import PreProcessedElements
 import asyncio
 
 

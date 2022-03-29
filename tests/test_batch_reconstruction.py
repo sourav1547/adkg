@@ -1,9 +1,9 @@
 from pytest import mark
 import pytest
 import asyncio
-from honeybadgermpc.batch_reconstruction import batch_reconstruct
-from honeybadgermpc.field import GFElement
-from honeybadgermpc.polynomial import EvalPoint
+from adkg.batch_reconstruction import batch_reconstruct
+from adkg.field import GFElement
+from adkg.polynomial import EvalPoint
 
 
 @pytest.fixture

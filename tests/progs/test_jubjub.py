@@ -1,9 +1,9 @@
 import asyncio
 from copy import copy
 from pytest import mark
-from honeybadgermpc.elliptic_curve import Ideal, Point, Jubjub
-from honeybadgermpc.progs.jubjub import SharedPoint, SharedIdeal, share_mul
-from honeybadgermpc.progs.mixins.share_arithmetic import (
+from adkg.elliptic_curve import Ideal, Point, Jubjub
+from adkg.progs.jubjub import SharedPoint, SharedIdeal, share_mul
+from adkg.progs.mixins.share_arithmetic import (
     BeaverMultiply,
     BeaverMultiplyArrays,
     InvertShare,
@@ -11,7 +11,7 @@ from honeybadgermpc.progs.mixins.share_arithmetic import (
     DivideShares,
     DivideShareArrays,
 )
-from honeybadgermpc.progs.mixins.share_comparison import Equality
+from adkg.progs.mixins.share_comparison import Equality
 
 TEST_CURVE = Jubjub()
 
