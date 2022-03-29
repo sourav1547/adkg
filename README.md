@@ -55,20 +55,11 @@ docker-compose run -p 5678:5678 adkg pytest tests/test_adkg.py
 2. Start the ADKG instances
 ```$sh scripts/launch-tmuxlocal.sh apps/tutorial/adkg-tutorial.py conf/adkg/local```
 
-NOTE: You might have to update the `conf/akdg` files with the correct ipaddress of the docker image
-
 ## Running in AWS instances
 
 For remote deployment first build using
 ```
 docker build -t adkg-remote . --build-arg BUILD=dev
-```
-
-## Miscelleneous instructions
-```
-$ docker-compose build adkg
-$ docker-compose run -p 5678:5678 adkg pytest tests/test_adkg.py 
-$ docker-compose run adkg -it
 ```
 
 ## Todo:
