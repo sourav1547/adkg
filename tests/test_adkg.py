@@ -21,7 +21,7 @@ def get_avss_params(n):
 
 @mark.asyncio
 async def test_adkg(test_router):
-    t = 3
+    t = 1
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n)

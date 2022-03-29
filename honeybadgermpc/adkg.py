@@ -12,6 +12,12 @@ import logging
 from honeybadgermpc.utils.serilization import serialize_g, deserialize_g, serialize_f, deserialize_f
 from honeybadgermpc.utils.bitmap import Bitmap
 
+class ADKGMsgType:
+    ACSS = "A"
+    RBC = "R"
+    ABA = "B"
+    KEY = "K"
+    
 class CP:
     def __init__(self, g, h, field=ZR):
         self.g  = g
@@ -87,7 +93,7 @@ class ADKG:
     async def acss_step(self, outputs, value, acss_signal):
         #todo, need to modify send and recv
         # Need different send and recv instances for different component of the code.
-        acsstag = "A"
+        acsstag = ADKGMsgType.ACSS
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
         self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
         self.acss_tasks = [None] * self.n
@@ -203,7 +209,7 @@ class ADKG:
         async def _setup(j):
             
             # starting RBC
-            rbctag ="R" + str(j) # (R, msg)
+            rbctag =ADKGMsgType.RBC + str(j) # (R, msg)
             rbcsend, rbcrecv = self.get_send(rbctag), self.subscribe_recv(rbctag)
 
             rbc_input = None
@@ -229,7 +235,7 @@ class ADKG:
                 )
             )
 
-            abatag = "B" + str(j) # (B, msg)
+            abatag = ADKGMsgType.ABA + str(j) # (B, msg)
             # abatag = j # (B, msg)
             abasend, abarecv =  self.get_send(abatag), self.subscribe_recv(abatag)
 
@@ -292,29 +298,39 @@ class ADKG:
                 acss_signal.clear()
         
         secret = 0
+        coeffs = [G1.identity() for _ in range(self.t+1)]
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
+            # Computing aggregated coeffients
+            for i in range(self.t+1):
+                coeffs[i] = coeffs[i]*acss_outputs[k][1][0][i]
         
         x = self.g**secret
         y = self.h**secret
         cp = CP(self.g, self.h)
         chal, res = cp.dleq_prove(secret, x, y)
 
-        key_tag = "K" # (K, msg)
-        send, recv = self.get_send(key_tag), self.subscribe_recv(key_tag)
+        keytag = ADKGMsgType.KEY
+        send, recv = self.get_send(keytag), self.subscribe_recv(keytag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
-        xb, yb = serialize_g(x), serialize_g(y)
-        chalb, resb = serialize_f(chal), serialize_f(res)
+        yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
         for i in range(self.n):
-            send(i, (xb, yb, chalb, resb))
+            send(i, (yb, chalb, resb))
 
         pk_shares = []
         while True:
             (sender, msg) = await recv()
-            xb, yb, chalb, resb = msg
-            x, y = deserialize_g(xb), deserialize_g(yb)
-            chal, res = deserialize_f(chalb), deserialize_f(resb)
+            yb, chalb, resb = msg
+            y, chal, res = deserialize_g(yb), deserialize_f(chalb), deserialize_f(resb)
+
+            # polynomial evaluation, not optimized
+            x = G1.identity()
+            exp = ZR(1)
+            for j in range(self.t+1):
+                x *= coeffs[j]**exp
+                exp *= (sender+1)
+        
             
             if cp.dleq_verify(x, y, chal, res):
                 pk_shares.append([sender+1, y])

@@ -73,6 +73,7 @@ $ docker-compose run adkg -it
 
 ## Todo:
 - [x] Complete the fallback path of the optimized RBC code.
+- [ ] Use FFT for faster polynomial evaluation (including in exponents).
 - [ ] Terminate the optrbc threads.
 - [ ] Take reconstruction threshold and group as a public parameter.
 - [ ] Merge all configurations into a single `branch`
