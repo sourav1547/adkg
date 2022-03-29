@@ -95,5 +95,8 @@ docker build -t adkg-remote . --build-arg BUILD=dev
 - This branch implements custom serialization for ACSS messages
 
 
+### Contributors (Alphabetical)
+Sourav Das, Zhuolun Xiang, and Tom Yurek
+
 ## Historical Remarks.
 This library is built upon the open-source `hbACSS` library from https://github.com/tyurek/hbACSS, which itself is built upon the open source implementation of the `HoneyBadgerBFT` protocol https://github.com/amiller/HoneyBadgerBFT 
