@@ -75,7 +75,8 @@ RUN pip install \
     zfec \
     uvloop \
     reedsolo \
-    line_profiler
+    line_profiler \
+    phe 
 
 # This is needed otherwise the build for the power sum solver will fail.
 # This is a known issue in the version of libflint-dev in apt.
@@ -199,8 +200,6 @@ RUN echo "alias cls=\"clear && printf '\e[3J'\"" >> ~/.bashrc
 
 # If you're testing out apt dependencies, put them here
 RUN apt-get install -y --no-install-recommends \
-    # nodejs \
-    # npm \
     tmux \
     vim
 
@@ -213,5 +212,5 @@ RUN pip install -e .['dev']
 FROM pre-dev AS dev
 COPY . .
 
-# RUN pip install debugpy
-# ENTRYPOINT [ "python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m"]
+RUN pip install debugpy
+ENTRYPOINT [ "python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m"]

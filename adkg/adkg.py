@@ -12,6 +12,9 @@ import logging
 from adkg.utils.serilization import serialize_g, deserialize_g, serialize_f, deserialize_f
 from adkg.utils.bitmap import Bitmap
 
+from adkg.acss_dcr import ACSS_DCR
+# import phe
+
 class ADKGMsgType:
     ACSS = "A"
     RBC = "R"
@@ -95,7 +98,10 @@ class ADKG:
         # Need different send and recv instances for different component of the code.
         acsstag = ADKGMsgType.ACSS
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
-        self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
+        # self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
+
+        self.acss = ACSS_DCR(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv)
+
         self.acss_tasks = [None] * self.n
         # value =[ZR.rand()]
         for i in range(self.n):
@@ -298,12 +304,12 @@ class ADKG:
                 acss_signal.clear()
         
         secret = 0
-        coeffs = [G1.identity() for _ in range(self.t+1)]
+        # coeffs = [G1.identity() for _ in range(self.t+1)]
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
             # Computing aggregated coeffients
-            for i in range(self.t+1):
-                coeffs[i] = coeffs[i]*acss_outputs[k][1][0][i]
+            # for i in range(self.t+1):
+                # coeffs[i] = coeffs[i]*acss_outputs[k][1][0][i]
         
         x = self.g**secret
         y = self.h**secret
@@ -314,22 +320,23 @@ class ADKG:
         send, recv = self.get_send(keytag), self.subscribe_recv(keytag)
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
-        yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
+        # yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
+        xb, yb, chalb, resb = serialize_g(x), serialize_g(y), serialize_f(chal), serialize_f(res)
         for i in range(self.n):
-            send(i, (yb, chalb, resb))
+            send(i, (xb, yb, chalb, resb))
 
         pk_shares = []
         while True:
             (sender, msg) = await recv()
-            yb, chalb, resb = msg
-            y, chal, res = deserialize_g(yb), deserialize_f(chalb), deserialize_f(resb)
+            xb, yb, chalb, resb = msg
+            x, y, chal, res =  deserialize_g(xb), deserialize_g(yb), deserialize_f(chalb), deserialize_f(resb)
 
             # polynomial evaluation, not optimized
-            x = G1.identity()
-            exp = ZR(1)
-            for j in range(self.t+1):
-                x *= coeffs[j]**exp
-                exp *= (sender+1)
+            # x = G1.identity()
+            # exp = ZR(1)
+            # for j in range(self.t+1):
+            #     x *= coeffs[j]**exp
+            #     exp *= (sender+1)
         
             
             if cp.dleq_verify(x, y, chal, res):
