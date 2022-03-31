@@ -1,6 +1,5 @@
 import random
 import math
-from pypairing import ZR, G1
 
 class PolyCommitAMTDummy:
     def __init__(self, crs=None, degree_max=33):

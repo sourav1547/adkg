@@ -6,8 +6,6 @@ from itertools import zip_longest
 from adkg.ntl import fft as fft_cpp
 from adkg.ntl import fft_interpolate as fft_interpolate_cpp
 
-# from .betterpairing import ZR as bpZR
-from pypairing import ZR
 from .elliptic_curve import Subgroup
 from .field import GF
 

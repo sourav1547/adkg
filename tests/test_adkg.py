@@ -5,25 +5,14 @@ from adkg.adkg import ADKG
 import asyncio
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-from pypairing import ZR
+from pypairing import ZR, G1
+# from pypairing import Curve25519ZR as ZR, Curve25519G as G1
+    
 import time
 
-# def get_avss_params(n):
-#     from pypairing import G1, ZR
-#     g = G1.rand()
-#     h = G1.rand()
-#     public_keys, private_keys = [None] * n, [None] * n
-#     for i in range(n):
-#         private_keys[i] = ZR.random()
-#         public_keys[i] = pow(g, private_keys[i])
-#     return g, h, public_keys, private_keys
-
-def get_avss_params(n):
-    from pypairing import G1
+def get_avss_params(n, G1):
     from phe import PaillierPublicKey, PaillierPrivateKey
-    # from pypairing import Curve25519ZR as ZR, Curve25519G as G1
     g, h = G1.hash(b'g'), G1.hash(b'h') 
-
     public_keys = [None for _ in range(n)]
     private_keys = [None for _ in range(n)]
     with open("apps/tutorial/keys", 'r') as kfile:
@@ -36,11 +25,11 @@ def get_avss_params(n):
 
 @mark.asyncio
 async def test_adkg(test_router):
-    t = 3
+    t = 1
     deg = 2*t
     n = 3 * t + 1
 
-    g, h, pks, sks = get_avss_params(n)
+    g, h, pks, sks = get_avss_params(n, G1)
     sends, recvs, _ = test_router(n, maxdelay=0.001)
     pc = PolyCommitFeldman(g)
 
@@ -50,7 +39,7 @@ async def test_adkg(test_router):
     start_time = time.time()
 
     for i in range(n):
-        dkg = ADKG(pks, sks[i], g, h, n, t, deg, i, sends[i], recvs[i], pc)
+        dkg = ADKG(pks, sks[i], g, h, n, t, deg, i, sends[i], recvs[i], pc, ZR, G1)
         dkg_list[i] = dkg
         dkg_tasks[i] = asyncio.create_task(dkg.run_adkg(start_time))
     

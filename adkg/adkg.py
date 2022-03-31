@@ -1,19 +1,13 @@
-from inspect import CO_NESTED
-from adkg.broadcast.reliablebroadcast import reliablebroadcast
-from adkg.acss import Hbacss0SingleShare
 from adkg.polynomial import polynomials_over
-from adkg.share_recovery import interpolate_g1_at_x
-from pypairing import G1, ZR
+from adkg.utils.poly_misc import interpolate_g1_at_x
 from adkg.utils.misc import wrap_send, subscribe_recv
 import asyncio
 import hashlib
 import time
 import logging
-from adkg.utils.serilization import serialize_g, deserialize_g, serialize_f, deserialize_f
+from adkg.utils.serilization import Serial
 from adkg.utils.bitmap import Bitmap
-
 from adkg.acss_dcr import ACSS_DCR
-# import phe
 
 class ADKGMsgType:
     ACSS = "A"
@@ -22,9 +16,10 @@ class ADKGMsgType:
     KEY = "K"
     
 class CP:
-    def __init__(self, g, h, field=ZR):
+    def __init__(self, g, h, ZR):
         self.g  = g
         self.h = h
+        self.ZR = ZR
 
     def dleq_derive_chal(self, x, y, a1, a2):
         commit = str(x)+str(y)+str(a1)+str(a2)
@@ -34,7 +29,7 @@ class CP:
             pass 
         # TODO: Convert the hash output to a field element.
         hs =  hashlib.sha256(commit).digest() 
-        return ZR.hash(hs)
+        return self.ZR.hash(hs)
 
     def dleq_verify(self, x, y, chal, res):
         a1 = (x**chal)*(self.g**res)
@@ -45,18 +40,18 @@ class CP:
         return False
 
     def dleq_prove(self, alpha, x, y):
-        w = ZR.random()
+        w = self.ZR.random()
         a1 = self.g**w
         a2 = self.h**w
         e = self.dleq_derive_chal(x, a1, y, a2)
         return  e, w - e*alpha # return (challenge, response)
 
 class ADKG:
-    def __init__(self, public_keys, private_key, g, h, n, t, deg, my_id, send, recv, pc, field=ZR):
+    def __init__(self, public_keys, private_key, g, h, n, t, deg, my_id, send, recv, pc, ZR, G1):
         self.public_keys, self.private_key, self.g, self.h = (public_keys, private_key, g, h)
         self.n, self.t, self.deg, self.my_id = (n, t, deg, my_id)
-        self.send, self.recv, self.pc, self.field = (send, recv, pc, field)
-        self.poly = polynomials_over(self.field)
+        self.send, self.recv, self.pc, self.ZR, self.G1 = (send, recv, pc, ZR, G1)
+        self.poly = polynomials_over(self.ZR)
         self.poly.clear_cache() #FIXME: Not sure why we need this.
         # Create a mechanism to split the `recv` channels based on `tag`
         self.subscribe_recv_task, self.subscribe_recv = subscribe_recv(recv)
@@ -100,7 +95,7 @@ class ADKG:
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
         # self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
 
-        self.acss = ACSS_DCR(self.public_keys, self.private_key, self.g, self.n, self.t, self.deg, self.my_id, acsssend, acssrecv)
+        self.acss = ACSS_DCR(self.public_keys, self.private_key, self.g, self.n, self.t, self.deg, self.my_id, self.G1, self.ZR, acsssend, acssrecv)
 
         self.acss_tasks = [None] * self.n
         # value =[ZR.rand()]
@@ -304,7 +299,7 @@ class ADKG:
                 acss_signal.clear()
         
         secret = 0
-        agg_x = [G1.identity() for _ in range(self.n)]
+        agg_x = [self.G1.identity() for _ in range(self.n)]
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
             # Computing aggregated commitments
@@ -313,15 +308,17 @@ class ADKG:
         
         x = self.g**secret
         y = self.h**secret
-        cp = CP(self.g, self.h)
+        cp = CP(self.g, self.h, self.ZR)
         chal, res = cp.dleq_prove(secret, x, y)
 
         keytag = ADKGMsgType.KEY
         send, recv = self.get_send(keytag), self.subscribe_recv(keytag)
 
+        sr = Serial(self.G1)
+
         # print("Node " + str(self.my_id) + " starting key-derivation")
         # yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
-        yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
+        yb, chalb, resb = sr.serialize_g(y), sr.serialize_f(chal), sr.serialize_f(res)
         for i in range(self.n):
             send(i, (yb, chalb, resb))
 
@@ -329,13 +326,13 @@ class ADKG:
         while True:
             (sender, msg) = await recv()
             yb, chalb, resb = msg
-            y, chal, res =  deserialize_g(yb), deserialize_f(chalb), deserialize_f(resb)
+            y, chal, res =  sr.deserialize_g(yb), sr.deserialize_f(chalb), sr.deserialize_f(resb)
             
             if cp.dleq_verify(agg_x[sender], y, chal, res):
                 pk_shares.append([sender+1, y])
             if len(pk_shares) > self.deg:
                 break
-        pk =  interpolate_g1_at_x(pk_shares, 0)
+        pk =  interpolate_g1_at_x(pk_shares, 0, self.G1, self.ZR)
         return (mks, secret, pk)
 
     async def run_adkg(self, start_time):
@@ -343,7 +340,7 @@ class ADKG:
         acss_signal = asyncio.Event()
 
         acss_start_time = time.time()
-        value =[ZR.rand()]
+        value =[self.ZR.rand()]
         self.acss_task = asyncio.create_task(self.acss_step(acss_outputs, value, acss_signal))
         await acss_signal.wait()
         acss_signal.clear()
