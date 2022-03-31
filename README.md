@@ -68,7 +68,7 @@ docker build -t adkg-remote . --build-arg BUILD=dev
 - [ ] Terminate the optrbc threads.
 - [ ] Take reconstruction threshold and group as a public parameter.
 - [ ] Merge all configurations into a single `branch`
-- [ ] Include DCR-ACSS to the codebase.
+- [x] Include DCR-ACSS to the codebase.
 
 ## Branches and description
 `adkg`
@@ -92,6 +92,10 @@ docker build -t adkg-remote . --build-arg BUILD=dev
 
 `serial-high-ed`
 - `ed25519` curve, high threshold, implements Haven
+- This branch implements custom serialization for ACSS messages
+
+`dcr-acss`
+- Uses the DCR-ACSS, takes the curve as a parameter, any threshold in `[t, n-t-1]` is supported
 - This branch implements custom serialization for ACSS messages
 
 
