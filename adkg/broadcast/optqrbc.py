@@ -142,108 +142,108 @@ async def optqrbc(sid, pid, n, f, leader, predicate, input, output, send, receiv
     committed = False
 
     while True:  # main receive loop
-            sender, msg = await receive()
-            if msg[0] == RBCMsgType.PROPOSE and leader_hash is None:
-                (_, leader_msg) = msg
-                if sender != leader:
-                    logger.info(f"[{pid}] PROPOSE message from other than leader: {sender}")
-                    continue
-            
-                valid = await predicate(leader_msg)
-                if valid:
-                    leader_hash = hash(leader_msg)
-                    broadcast((RBCMsgType.ECHO, leader_hash))
+        sender, msg = await receive()
+        if msg[0] == RBCMsgType.PROPOSE and leader_hash is None:
+            (_, leader_msg) = msg
+            if sender != leader:
+                logger.info(f"[{pid}] PROPOSE message from other than leader: {sender}")
+                continue
+        
+            valid = await predicate(leader_msg)
+            if valid:
+                leader_hash = hash(leader_msg)
+                broadcast((RBCMsgType.ECHO, leader_hash))
 
-                    # TODO: double check this
-                    if leader_hash == committed_hash:
-                        broadcast((RBCMsgType.TERMINATE, 0))
+                # TODO: double check this
+                if leader_hash == committed_hash:
+                    broadcast((RBCMsgType.TERMINATE, 0))
+                
+        if msg[0] == RBCMsgType.ECHO:
+            (_, _digest) = msg
+            if sender in echo_senders:
+                # Received redundant ECHO message from the same sender
+                continue
+            echo_senders.add(sender)
+            echo_counter[_digest] = echo_counter[_digest]+1
+            
+            if echo_counter[_digest] >= echo_threshold and not ready_sent:
+                ready_sent = True
+                broadcast((RBCMsgType.READY, _digest))
+        
+        elif msg[0] == RBCMsgType.READY:
+            (_, _digest) = msg
+            if sender in ready_senders:
+                logger.info("[{pid}] Redundant R")
+                continue
+            ready_senders.add(sender)
+            ready_counter[_digest] = ready_counter[_digest]+1
+            if ready_counter[_digest] >= ready_threshold and not ready_sent:
+                ready_sent = True
+                broadcast((RBCMsgType.READY, _digest))
+            
+            if ready_counter[_digest] >= output_threshold:
+                committed_hash = _digest
+                if _digest == leader_hash:
+                    committed = True
+                    output(leader_msg)
+                    broadcast((RBCMsgType.TERMINATE, 0))
+                elif _digest == reconstructed_hash:
+                    committed = True
+                    output(reconstructed_msg)  
+                    broadcast((RBCMsgType.TERMINATE, 0))
+                else:
+                    broadcast((RBCMsgType.ADD_TRIGGER, 0))
                     
-            if msg[0] == RBCMsgType.ECHO:
-                (_, _digest) = msg
-                if sender in echo_senders:
-                    # Received redundant ECHO message from the same sender
-                    continue
-                echo_senders.add(sender)
-                echo_counter[_digest] = echo_counter[_digest]+1
-                
-                if echo_counter[_digest] >= echo_threshold and not ready_sent:
-                    ready_sent = True
-                    broadcast((RBCMsgType.READY, _digest))
+
+        elif msg[0] == RBCMsgType.TERMINATE:
+            if sender in terminate_senders:
+                logger.info("[{pid}] Redundant TERMINATE")
+                continue
+            terminate_senders.add(sender)
+            if len(terminate_senders) == n:
+                return
+
+
+        elif msg[0] == RBCMsgType.ADD_TRIGGER:
+            if sender in add_trigger_senders:
+                logger.info("[{pid}] Redundant ADD_TRIGGER")
+                continue
+            add_trigger_senders.add(sender)
+            if committed:
+                if stripes is None:
+                    stripes = encode(k,n,m)
+                send(sender, (RBCMsgType.ADD_DISPERSE, stripes[sender], stripes[pid]))
+
+        elif msg[0] == RBCMsgType.ADD_DISPERSE:
+            if committed:
+                continue
+            (_, my_stripe, sender_stripe) = msg
+            if sender in add_disperse_senders:
+                logger.info("[{pid}] Redundant ADD_DISPERSE")
+                continue
+            add_disperse_senders.add(sender)
+            add_reconstruct_senders.add(sender)
+            add_disperse_counter[my_stripe] = add_disperse_counter[my_stripe]+1
+            stripes[sender] = sender_stripe
+
+            if add_disperse_senders[my_stripe] >= f + 1 and not add_ready_sent:
+                add_ready_sent = True
+                broadcast((RBCMsgType.ADD_RECONSTRUCT, my_stripe))
+
+        elif msg[0] == RBCMsgType.ADD_RECONSTRUCT:
+            if committed:
+                continue
+            (_, stripe) = msg
+            if sender in add_reconstruct_senders:
+                logger.info("[{pid}] Redundant ADD_RECONSTRUCT")
+                continue
+            add_reconstruct_senders.add(sender)
+            stripes[sender] = stripe
             
-            elif msg[0] == RBCMsgType.READY:
-                (_, _digest) = msg
-                if sender in ready_senders:
-                    logger.info("[{pid}] Redundant R")
-                    continue
-                ready_senders.add(sender)
-                ready_counter[_digest] = ready_counter[_digest]+1
-                if ready_counter[_digest] >= ready_threshold and not ready_sent:
-                    ready_sent = True
-                    broadcast((RBCMsgType.READY, _digest))
-                
-                if ready_counter[_digest] >= output_threshold:
-                    committed_hash = _digest
-                    if _digest == leader_hash:
-                        committed = True
-                        output(leader_msg)
-                        broadcast((RBCMsgType.TERMINATE, 0))
-                    elif _digest == reconstructed_hash:
-                        committed = True
-                        output(reconstructed_msg)  
-                        broadcast((RBCMsgType.TERMINATE, 0))
-                    else:
-                        broadcast((RBCMsgType.ADD_TRIGGER, 0))
-                        
-
-            elif msg[0] == RBCMsgType.TERMINATE:
-                if sender in terminate_senders:
-                    logger.info("[{pid}] Redundant TERMINATE")
-                    continue
-                terminate_senders.add(sender)
-                if len(terminate_senders) == n:
-                    return
-
- 
-            elif msg[0] == RBCMsgType.ADD_TRIGGER:
-                if sender in add_trigger_senders:
-                    logger.info("[{pid}] Redundant ADD_TRIGGER")
-                    continue
-                add_trigger_senders.add(sender)
-                if committed:
-                    if stripes is None:
-                        stripes = encode(k,n,m)
-                    send(sender, (RBCMsgType.ADD_DISPERSE, stripes[sender], stripes[pid]))
-
-            elif msg[0] == RBCMsgType.ADD_DISPERSE:
-                if committed:
-                    continue
-                (_, my_stripe, sender_stripe) = msg
-                if sender in add_disperse_senders:
-                    logger.info("[{pid}] Redundant ADD_DISPERSE")
-                    continue
-                add_disperse_senders.add(sender)
-                add_reconstruct_senders.add(sender)
-                add_disperse_counter[my_stripe] = add_disperse_counter[my_stripe]+1
-                stripes[sender] = sender_stripe
-
-                if add_disperse_senders[my_stripe] >= f + 1 and not add_ready_sent:
-                    add_ready_sent = True
-                    broadcast((RBCMsgType.ADD_RECONSTRUCT, my_stripe))
-
-            elif msg[0] == RBCMsgType.ADD_RECONSTRUCT:
-                if committed:
-                    continue
-                (_, stripe) = msg
-                if sender in add_reconstruct_senders:
-                    logger.info("[{pid}] Redundant ADD_RECONSTRUCT")
-                    continue
-                add_reconstruct_senders.add(sender)
-                stripes[sender] = stripe
-                
-                if len(add_reconstruct_senders) >= output_threshold:
-                    reconstructed_msg = decode(k, n, stripes)
-                    reconstructed_hash = hash(reconstructed_msg)
-                    if reconstructed_hash == committed_hash:
-                        committed = True
-                        output(reconstructed_msg)  
-                        broadcast((RBCMsgType.TERMINATE, 0))
+            if len(add_reconstruct_senders) >= output_threshold:
+                reconstructed_msg = decode(k, n, stripes)
+                reconstructed_hash = hash(reconstructed_msg)
+                if reconstructed_hash == committed_hash:
+                    committed = True
+                    output(reconstructed_msg)  
+                    broadcast((RBCMsgType.TERMINATE, 0))

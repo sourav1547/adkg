@@ -52,9 +52,9 @@ class CP:
         return  e, w - e*alpha # return (challenge, response)
 
 class ADKG:
-    def __init__(self, public_keys, private_key, g, h, n, t, my_id, send, recv, pc, field=ZR):
+    def __init__(self, public_keys, private_key, g, h, n, t, deg, my_id, send, recv, pc, field=ZR):
         self.public_keys, self.private_key, self.g, self.h = (public_keys, private_key, g, h)
-        self.n, self.t, self.my_id = (n, t, my_id)
+        self.n, self.t, self.deg, self.my_id = (n, t, deg, my_id)
         self.send, self.recv, self.pc, self.field = (send, recv, pc, field)
         self.poly = polynomials_over(self.field)
         self.poly.clear_cache() #FIXME: Not sure why we need this.
@@ -100,7 +100,7 @@ class ADKG:
         acsssend, acssrecv = self.get_send(acsstag), self.subscribe_recv(acsstag)
         # self.acss = Hbacss0SingleShare(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv, self.pc)
 
-        self.acss = ACSS_DCR(self.public_keys, self.private_key, self.g, self.n, self.t, self.my_id, acsssend, acssrecv)
+        self.acss = ACSS_DCR(self.public_keys, self.private_key, self.g, self.n, self.t, self.deg, self.my_id, acsssend, acssrecv)
 
         self.acss_tasks = [None] * self.n
         # value =[ZR.rand()]
@@ -304,12 +304,12 @@ class ADKG:
                 acss_signal.clear()
         
         secret = 0
-        # coeffs = [G1.identity() for _ in range(self.t+1)]
+        agg_x = [G1.identity() for _ in range(self.n)]
         for k in mks:
             secret = secret + acss_outputs[k][0][0]
-            # Computing aggregated coeffients
-            # for i in range(self.t+1):
-                # coeffs[i] = coeffs[i]*acss_outputs[k][1][0][i]
+            # Computing aggregated commitments
+            for i in range(self.n):
+                agg_x[i] = agg_x[i]*acss_outputs[k][1][i]
         
         x = self.g**secret
         y = self.h**secret
@@ -321,42 +321,22 @@ class ADKG:
 
         # print("Node " + str(self.my_id) + " starting key-derivation")
         # yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
-        xb, yb, chalb, resb = serialize_g(x), serialize_g(y), serialize_f(chal), serialize_f(res)
+        yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
         for i in range(self.n):
-            send(i, (xb, yb, chalb, resb))
+            send(i, (yb, chalb, resb))
 
         pk_shares = []
         while True:
             (sender, msg) = await recv()
-            xb, yb, chalb, resb = msg
-            x, y, chal, res =  deserialize_g(xb), deserialize_g(yb), deserialize_f(chalb), deserialize_f(resb)
-
-            # polynomial evaluation, not optimized
-            # x = G1.identity()
-            # exp = ZR(1)
-            # for j in range(self.t+1):
-            #     x *= coeffs[j]**exp
-            #     exp *= (sender+1)
-        
+            yb, chalb, resb = msg
+            y, chal, res =  deserialize_g(yb), deserialize_f(chalb), deserialize_f(resb)
             
-            if cp.dleq_verify(x, y, chal, res):
+            if cp.dleq_verify(agg_x[sender], y, chal, res):
                 pk_shares.append([sender+1, y])
-                # print("Node " + str(self.my_id) + " received key shares from "+ str(sender))
-            if len(pk_shares) > self.t:
+            if len(pk_shares) > self.deg:
                 break
         pk =  interpolate_g1_at_x(pk_shares, 0)
         return (mks, secret, pk)
-
-    # TODO: This function given an index computes g^x
-    def derive_x(self, acss_outputs, mks):
-        xlist = []
-        for i in range(self.n):
-            xi = G1.identity()
-            for ii in mks:
-                # TODO: This is not the correct implementation.
-                xi = xi*acss_outputs[ii][i]
-            xlist.append(xi)
-        return xlist
 
     async def run_adkg(self, start_time):
         acss_outputs = {}

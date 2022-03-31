@@ -1,10 +1,9 @@
 import asyncio
 from pickle import dumps, loads
 import secrets
-from pypairing import ZR, G1
+from pypairing import ZR, blsmultiexp
 # from pypairing import Curve25519ZR as ZR, Curve25519G as G1
 from adkg.polynomial import polynomials_over
-from adkg.broadcast.reliablebroadcast import reliablebroadcast
 from adkg.broadcast.optqrbc import optqrbc
 from adkg.utils.misc import wrap_send, subscribe_recv
 
@@ -18,10 +17,10 @@ logger.setLevel(logging.ERROR)
 class ACSS_DCR:
     #@profile
     def __init__(
-            self, public_keys, private_key, g, n, t, my_id, send, recv, field=ZR
+            self, public_keys, private_key, g, n, t, deg, my_id, send, recv, field=ZR
     ):  # (# noqa: E501)
         self.public_keys, self.private_key = public_keys, private_key
-        self.n, self.t, self.my_id = n, t, my_id
+        self.n, self.t, self.deg, self.my_id = n, t, deg, my_id
         self.g = g
 
         # Create a mechanism to split the `recv` channels based on `tag`
@@ -39,43 +38,33 @@ class ACSS_DCR:
         self.output_queue = asyncio.Queue()
         self.dual_codes = {}
         # assume the same dual code can be used multiple times safely
-        self.dual_codes[(t,n)] = gen_dual_code(n,t,self.poly)
+        self.dual_codes[(deg,n)] = gen_dual_code(n,deg,self.poly)
         self.tasks = []
     
     def kill(self):
         # self.benchmark_logger.info("ACSS kill called")
         self.subscribe_recv_task.cancel()
-        # self.benchmark_logger.info("ACSS recv task cancelled")
         for task in self.tasks:
             task.cancel()
         # self.benchmark_logger.info("ACSS self.tasks cancelled")
 
     #@profile
-    async def _process_avss_msg(self, avss_id, dealer_id, rbc_msg):
+    def _process_avss_msg(self, avss_id, dealer_id, rbc_msg):
         comms, encryptions, _ = loads(rbc_msg)
-        #Check 1: check each encryption proof is valid
-        # for i in range(self.n):
-        #     if not verify_knowledge_of_discrete_log(self.public_keys[i], self.g, comms[i], encryptions[i], proofs[i]):
-        #         return False
-                
-        # #Check 2: verify that polynomial is degree d
-        # if not self.check_degree(self.t, comms):
-        #     return False
         share = ZR(self.private_key.raw_decrypt(encryptions[self.my_id]))
         self.output_queue.put_nowait((dealer_id, avss_id, [int(share)], comms))
     
     def check_degree(self, claimed_degree, commitments):
         if (claimed_degree, len(commitments)) not in self.dual_codes.keys():
             self.dual_codes[(claimed_degree, len(commitments))] = gen_dual_code(len(commitments), claimed_degree, self.poly)
-        dual_code = self.dual_codes[(claimed_degree, len(commitments))]
 
-        check = self.g ** 0
-        for i in range(len(commitments)):
-            check *= commitments[i] ** dual_code[i]
+        dual_code = self.dual_codes[(claimed_degree, len(commitments))]
+        check = blsmultiexp(commitments, dual_code)
+
         return check == self.g ** 0
 
     def _get_dealer_msg(self, secret, n):
-        phi = self.poly.random(self.t, secret)
+        phi = self.poly.random(self.deg, secret)
         outputs = [prove_knowledge_of_encrypted_dlog(self.g, phi(i+1), self.public_keys[i]) for i in range(n)]
         return dumps([[outputs[i][j] for i in range(n)] for j in range(3)])
 
@@ -92,7 +81,6 @@ class ACSS_DCR:
         elif dealer_id is not None:
             assert dealer_id != self.my_id
         assert type(avss_id) is int
-        logger.info("pant")
 
         logger.debug(
             "[%d] Starting AVSS. Id: %s, Dealer Id: %d",
@@ -102,8 +90,7 @@ class ACSS_DCR:
         )
 
         n = self.n
-        rbctag = f"{dealer_id}-{avss_id}-RBC"
-        acsstag = f"{dealer_id}-{avss_id}-AVSS"
+        rbctag = f"{dealer_id}-{avss_id}-R"
 
         broadcast_msg = None
         if self.my_id == dealer_id:
@@ -118,7 +105,7 @@ class ACSS_DCR:
         async def predicate(_m):
             comms, encryptions, proofs = loads(_m)
             #Check 1: verify that polynomial is degree d
-            if not self.check_degree(self.t, comms):
+            if not self.check_degree(self.deg, comms):
                 return False
             
             #Check 2: check each encryption proof is valid
@@ -143,10 +130,9 @@ class ACSS_DCR:
         ))  # (# noqa: E501)
 
         rbc_msg = await output.get()
-
         # avss processing
         logger.debug("checking dealer msg")
-        await self._process_avss_msg(avss_id, dealer_id, rbc_msg)
+        self._process_avss_msg(avss_id, dealer_id, rbc_msg)
         #self.subscribe_recv_task.cancel()
 
 def prove_knowledge_of_encrypted_dlog(g, x, pk, g_to_the_x=None):

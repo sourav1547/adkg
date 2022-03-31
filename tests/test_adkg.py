@@ -20,19 +20,24 @@ import time
 
 def get_avss_params(n):
     from pypairing import G1
-    import phe
+    from phe import PaillierPublicKey, PaillierPrivateKey
     # from pypairing import Curve25519ZR as ZR, Curve25519G as G1
-    g = G1.rand()
-    h = G1.rand()
-    keypairs = [phe.paillier.generate_paillier_keypair() for _ in range(n)]
-    public_keys, private_keys = [[keypairs[i][j] for i in range(n)] for j in range(2)]
+    g, h = G1.hash(b'g'), G1.hash(b'h') 
+
+    public_keys = [None for _ in range(n)]
+    private_keys = [None for _ in range(n)]
+    with open("apps/tutorial/keys", 'r') as kfile:
+        keys = kfile.readlines()
+        for i in range(n):
+            data = keys[i].split(' ')
+            public_keys[i] = PaillierPublicKey(int(data[0]))
+            private_keys[i] = PaillierPrivateKey(public_keys[i], int(data[1]), int(data[2]))
     return g, h, public_keys, private_keys
-
-
 
 @mark.asyncio
 async def test_adkg(test_router):
-    t = 1
+    t = 3
+    deg = 2*t
     n = 3 * t + 1
 
     g, h, pks, sks = get_avss_params(n)
@@ -45,7 +50,7 @@ async def test_adkg(test_router):
     start_time = time.time()
 
     for i in range(n):
-        dkg = ADKG(pks, sks[i], g, h, n, t, i, sends[i], recvs[i], pc)
+        dkg = ADKG(pks, sks[i], g, h, n, t, deg, i, sends[i], recvs[i], pc)
         dkg_list[i] = dkg
         dkg_tasks[i] = asyncio.create_task(dkg.run_adkg(start_time))
     

@@ -438,7 +438,7 @@ impl<'de> Deserialize<'de> for CompressedRistretto {
 /// `EdwardsPoint`s.
 ///
 #[derive(Copy, Clone)]
-pub struct RistrettoPoint(pub(crate) EdwardsPoint);
+pub struct RistrettoPoint(pub EdwardsPoint);
 
 impl RistrettoPoint {
     /// Compress this point using the Ristretto encoding.

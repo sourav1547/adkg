@@ -14,9 +14,6 @@
 #![cfg_attr(feature = "nightly", feature(doc_cfg))]
 #![cfg_attr(feature = "simd_backend", feature(stdsimd))]
 
-// Refuse to compile if documentation is missing.
-#![deny(missing_docs)]
-
 #![doc(html_logo_url = "https://doc.dalek.rs/assets/dalek-logo-clear.png")]
 #![doc(html_root_url = "https://docs.rs/curve25519-dalek/3.2.0")]
 
@@ -308,13 +305,13 @@ pub mod traits;
 //------------------------------------------------------------------------
 
 // Finite field arithmetic mod p = 2^255 - 19
-pub(crate) mod field;
+pub mod field;
 
 // Arithmetic backends (using u32, u64, etc) live here
-pub(crate) mod backend;
+pub mod backend;
 
 // Crate-local prelude (for alloc-dependent features like `Vec`)
-pub(crate) mod prelude;
+pub mod prelude;
 
 // Generic code for window lookups
-pub(crate) mod window;
+pub mod window;

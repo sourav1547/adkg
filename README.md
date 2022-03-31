@@ -75,6 +75,7 @@ docker build -t adkg-remote . --build-arg BUILD=dev
 - Merged `abaopt` branch
 - `bls12381` curve, low threshold, implements hbACSS0
 - This branch implements custom serialization for ACSS messages
+- This branch does not support multi-exponentiation as of now.
 
 
 `abaopt`
