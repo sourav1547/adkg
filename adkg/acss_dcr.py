@@ -37,7 +37,6 @@ class ACSS_DCR:
         self.dual_codes = {}
         # assume the same dual code can be used multiple times safely
         self.dual_codes[(deg,n)] = self.gen_dual_code(n,deg,self.poly)
-        self.tasks = []
 
         if G1 is blsG1:
             self.multiexp = blsmultiexp
@@ -46,11 +45,8 @@ class ACSS_DCR:
         
     
     def kill(self):
-        # self.benchmark_logger.info("ACSS kill called")
         self.subscribe_recv_task.cancel()
-        for task in self.tasks:
-            task.cancel()
-        # self.benchmark_logger.info("ACSS self.tasks cancelled")
+        self.rbc_task.cancel()
 
     #@profile
     def _process_avss_msg(self, avss_id, dealer_id, rbc_msg):
@@ -119,7 +115,7 @@ class ACSS_DCR:
             return True
 
         output = asyncio.Queue()
-        asyncio.create_task(
+        self.rbc_task = asyncio.create_task(
         optqrbc(
             rbctag,
             self.my_id,

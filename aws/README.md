@@ -1,11 +1,11 @@
 # How to run?
 1. `cd /path/to/adkg`
-2. Update the config with appropriate parameters. Run `python -m aws.run-on-ec2` to start the AWS instances and run the honeybadgermc command specified in the config. This command creates a `current.vms` file which consists of instance ids of the VMs created during this run. Subsequent runs of this command will reuse the same VMs.
+2. Update the config with appropriate parameters. Run `python -m aws.run-on-ec2` to start the AWS instances and run the adkg command specified in the config. This command creates a `current.vms` file which consists of instance ids of the VMs created during this run. Subsequent runs of this command will reuse the same VMs.
 3. After you are done testing you can delete the VMs using `python -m aws.delete_vms`.
-4. The value of `N` for the MPC applications is equal to the total number of VMs created in all the regions.
+4. The value of `N` for the total number of VMs created in all the regions.
 
 # Configuration
-1. This code pulls the docker image with tag:`latest` from [here](https://hub.docker.com/r/smkuls/adkg/tags/). In order to replace the docker image, update `image_path` in `aws-config.json` with the appropriate image.
+1. This code pulls the docker image with tag:`latest` from [here](https://hub.docker.com/r/sourav1547/adkg/tags/). In order to replace the docker image, update `image_path` in `aws-config.json` with the appropriate image.
 2. Make sure you have the following two environment variables set to appropriate values. Please use the export command if you are setting them within the container. Eg: `export <key>=<value>`.
     1. `ACCESS_KEY_ID` - Set this to your AWS access key id.
     2. `SECRET_ACCESS_KEY` - Set this to your AWS secret acces key.
@@ -38,8 +38,8 @@ There is a `BenchmarkLogger` which must be used when logging any benchmak data. 
 Use the following commands to push the image to dockerhub. Avoid building the image using `docker-compose` since it doesn't the ignore files specified in `.dockerignore`.
 ```
 cd /path/to/adkg
-docker build -t honeybadger . --build-arg BUILD=dev
-docker tag honeybadger:latest smkuls/adkg:latest # Replace with appropriate DockerHub location
-docker push smkuls/adkg:latest # Replace with appropriate DockerHub location
+docker build -t adkg . --build-arg BUILD=dev
+docker tag adkg:latest sourav1547/adkg:latest # Replace with appropriate DockerHub location
+docker push sourav1547/adkg:latest # Replace with appropriate DockerHub location
 
 ```

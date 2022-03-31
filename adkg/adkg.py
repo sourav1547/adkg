@@ -74,8 +74,6 @@ class ADKG:
         for task in self.acss_tasks:
             task.cancel()
         self.benchmark_logger.info("ADKG ACSS tasks canceled")
-        # TODO: To determine the order of kills, I think that might giving that error.
-        # 1. 
         self.acss.kill()
         self.benchmark_logger.info("ADKG ACSS killed")
         self.acss_task.cancel()
@@ -315,9 +313,6 @@ class ADKG:
         send, recv = self.get_send(keytag), self.subscribe_recv(keytag)
 
         sr = Serial(self.G1)
-
-        # print("Node " + str(self.my_id) + " starting key-derivation")
-        # yb, chalb, resb = serialize_g(y), serialize_f(chal), serialize_f(res)
         yb, chalb, resb = sr.serialize_g(y), sr.serialize_f(chal), sr.serialize_f(res)
         for i in range(self.n):
             send(i, (yb, chalb, resb))
