@@ -5,7 +5,7 @@ from pickle import dumps
 from adkg.polynomial import polynomials_over
 from adkg.acss_dcr import ACSS_DCR
 #from honeybadgermpc.mpc import TaskProgramRunner
-from adkg.misc import print_exception_callback
+from adkg.utils.misc import print_exception_callback
 import asyncio
 import phe
 #from pypairing import G1, ZR
